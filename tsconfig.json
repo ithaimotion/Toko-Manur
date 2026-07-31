@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "dom", "dom.iterable"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "baseUrl": ".",
+    "paths": {
+      "@toko-manur/types": ["packages/types/index.ts"],
+      "@toko-manur/mock-data": ["packages/mock-data/index.ts"],
+      "@toko-manur/utils": ["packages/utils/index.ts"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

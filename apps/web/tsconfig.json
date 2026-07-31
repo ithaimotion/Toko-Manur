@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@toko-manur/types": ["../../packages/types/index.ts"],
+      "@toko-manur/mock-data": ["../../packages/mock-data/index.ts"],
+      "@toko-manur/utils": ["../../packages/utils/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
