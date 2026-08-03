@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
-import { MapPin, Mail, MessageCircle, Clock, Phone } from "lucide-react";
+import { MapPin, Mail, MessageCircle, Clock } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ContactForm } from "@/components/contact/ContactForm";
-import { mockContactInfo } from "@toko-manur/mock-data";
 import { buildWhatsAppUrl } from "@toko-manur/utils";
+import { getContactInfo } from "@/../admin/app/actions/contact";
 
 export const metadata: Metadata = {
   title: "Kontak Kami",
   description: "Hubungi Toko Manur via WhatsApp, email, atau kunjungi kantor kami. Tim kami siap membantu kebutuhan perlengkapan bayi Anda.",
 };
 
-export default function ContactPage() {
-  const contact = mockContactInfo;
-  const waUrl = buildWhatsAppUrl(contact.whatsapp, contact.whatsappMessage);
+export default async function ContactPage() {
+  const contactResponse = await getContactInfo();
+  const contact = contactResponse.success ? contactResponse.data : undefined;
+  const waUrl = buildWhatsAppUrl(contact?.whatsapp ?? "", contact?.whatsappMessage);
 
   return (
     <div className="pt-20">
@@ -55,12 +56,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900 mb-1">Alamat</p>
-                    <p className="text-slate-500 text-sm leading-relaxed">{contact.address}</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">{contact?.address ?? "-"}</p>
                   </div>
                 </div>
 
                 <a
-                  href={`mailto:${contact.email}`}
+                  href={`mailto:${contact?.email ?? ""}`}
                   className="card-base p-5 flex items-start gap-4 hover:shadow-card-hover hover:border-primary-200 transition-all group block"
                 >
                   <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center shrink-0">
@@ -68,7 +69,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900 mb-1">Email</p>
-                    <p className="text-primary-600 text-sm group-hover:underline">{contact.email}</p>
+                    <p className="text-primary-600 text-sm group-hover:underline">{contact?.email ?? "-"}</p>
                   </div>
                 </a>
 
@@ -83,12 +84,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-slate-900 mb-1">WhatsApp</p>
-                    <p className="text-emerald-600 text-sm group-hover:underline">+{contact.whatsapp}</p>
+                    <p className="text-emerald-600 text-sm group-hover:underline">+{contact?.whatsapp ?? "-"}</p>
                     <p className="text-xs text-slate-400 mt-0.5">Chat langsung dengan tim kami</p>
                   </div>
                 </a>
 
-                {contact.businessHours && (
+                {contact?.businessHours && (
                   <div className="card-base p-5 flex items-start gap-4">
                     <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
                       <Clock className="w-5 h-5 text-amber-600" />
@@ -128,7 +129,7 @@ export default function ContactPage() {
       </section>
 
       {/* Google Maps */}
-      {contact.googleMapsEmbed && (
+      {contact?.googleMapsEmbed && (
         <section className="section-sm bg-section-alt">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Lokasi Kami</h2>
@@ -144,7 +145,7 @@ export default function ContactPage() {
                 title="Peta Lokasi Toko Manur"
               />
             </div>
-            {contact.googleMapsUrl && (
+            {contact?.googleMapsUrl && (
               <div className="text-center mt-4">
                 <a
                   href={contact.googleMapsUrl}

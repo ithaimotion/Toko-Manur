@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Plus, Pencil, Trash2, Eye, Search } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { mockBlogs } from "@toko-manur/mock-data";
 import { formatDate } from "@toko-manur/utils";
 import type { BlogStatus } from "@toko-manur/types";
@@ -11,6 +12,7 @@ import type { BlogStatus } from "@toko-manur/types";
 export default function AdminBlogsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | BlogStatus>("all");
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
 
   const filtered = mockBlogs.filter((b) => {
     const q = search.toLowerCase();
@@ -86,7 +88,10 @@ export default function AdminBlogsPage() {
                     <Link href={`/blogs/${blog.id}/edit`} className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors text-muted-foreground">
                       <Pencil className="w-4 h-4" />
                     </Link>
-                    <button className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground">
+                    <button 
+                      onClick={() => setDeleteTarget({ id: blog.id, title: blog.title })}
+                      className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -99,6 +104,12 @@ export default function AdminBlogsPage() {
           <p className="text-xs text-muted-foreground">Menampilkan {filtered.length} dari {mockBlogs.length} artikel</p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        itemName={deleteTarget?.title}
+        onConfirm={() => setDeleteTarget(null)}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

@@ -102,9 +102,9 @@ export default function AdminCompanyProfilePage() {
             {mockCompanyProfile.values.map((val) => (
               <div key={val.id} className="border border-border rounded-lg p-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <select className="admin-input w-24 text-xs py-1.5">
+                  <select defaultValue={val.icon} className="admin-input w-24 text-xs py-1.5">
                     {iconOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value} selected={opt.value === val.icon}>{opt.icon} {opt.label}</option>
+                      <option key={opt.value} value={opt.value}>{opt.icon} {opt.label}</option>
                     ))}
                   </select>
                   <input defaultValue={val.title} className="admin-input flex-1 text-sm" placeholder="Judul nilai" />

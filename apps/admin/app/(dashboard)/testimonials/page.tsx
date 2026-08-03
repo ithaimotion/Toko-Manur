@@ -4,12 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { Plus, Pencil, Trash2, Star } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { mockTestimonials } from "@toko-manur/mock-data";
 
 export default function AdminTestimonialsPage() {
   const [testimonials, setTestimonials] = useState(mockTestimonials);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ customerName: "", customerTitle: "", rating: 5, content: "", isActive: true });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const handleSave = () => {
     const newT = {
@@ -25,6 +27,12 @@ export default function AdminTestimonialsPage() {
 
   const toggleActive = (id: string) =>
     setTestimonials((p) => p.map((t) => t.id === id ? { ...t, isActive: !t.isActive } : t));
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    setTestimonials((p) => p.filter((t) => t.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
 
   return (
     <div>
@@ -95,7 +103,10 @@ export default function AdminTestimonialsPage() {
                 <button onClick={() => toggleActive(t.id)} className={`p-1.5 rounded-md transition-colors text-xs ${t.isActive ? "text-emerald-600 hover:bg-emerald-50" : "text-muted-foreground hover:bg-muted"}`}>
                   {t.isActive ? "Aktif" : "Nonaktif"}
                 </button>
-                <button className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground">
+                <button 
+                  onClick={() => setDeleteTarget({ id: t.id, name: t.customerName })}
+                  className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -109,6 +120,12 @@ export default function AdminTestimonialsPage() {
           </div>
         ))}
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        itemName={deleteTarget?.name}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

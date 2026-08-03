@@ -4,7 +4,8 @@ import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users } from "lucide
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";
-import { mockCompanyProfile, mockContactInfo } from "@toko-manur/mock-data";
+import { mockCompanyProfile } from "@toko-manur/mock-data";
+import { getContactInfo } from "@/../admin/app/actions/contact";
 
 export const metadata: Metadata = {
   title: "Tentang Kami",
@@ -19,8 +20,10 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   star: Star,
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
   const profile = mockCompanyProfile;
+  const contactResponse = await getContactInfo();
+  const contact = contactResponse.success ? contactResponse.data : undefined;
 
   return (
     <div className="pt-20">
@@ -198,7 +201,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <CTAWhatsApp phone={mockContactInfo.whatsapp} message="Halo, saya ingin tahu lebih lanjut tentang Toko Manur." />
+      <CTAWhatsApp phone={contact?.whatsapp ?? ""} message={contact?.whatsappMessage ?? "Halo, saya ingin tahu lebih lanjut tentang Toko Manur."} />
     </div>
   );
 }

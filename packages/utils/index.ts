@@ -53,27 +53,36 @@ export function formatCompactNumber(num: number): string {
 // ================================
 
 /** Format a date string to a human-readable Indonesian format */
-export function formatDate(dateString: string): string {
+export function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
   return new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
     month: "long",
     year: "numeric",
-  }).format(new Date(dateString));
+  }).format(date);
 }
 
 /** Format a date string to short format */
-export function formatDateShort(dateString: string): string {
+export function formatDateShort(dateString: string | undefined | null): string {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }).format(new Date(dateString));
+  }).format(date);
 }
 
 /** Get relative time (e.g. "3 hari lalu") */
-export function timeAgo(dateString: string): string {
-  const now = new Date();
+export function timeAgo(dateString: string | undefined | null): string {
+  if (!dateString) return "-";
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
+  
+  const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 

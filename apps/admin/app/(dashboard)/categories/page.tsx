@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2, Package } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { mockCategories } from "@toko-manur/mock-data";
 
 export default function AdminCategoriesPage() {
@@ -10,6 +11,7 @@ export default function AdminCategoriesPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", slug: "", description: "" });
   const [categories, setCategories] = useState(mockCategories);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -34,7 +36,11 @@ export default function AdminCategoriesPage() {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => setCategories((p) => p.filter((c) => c.id !== id));
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    setCategories((p) => p.filter((c) => c.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
 
   return (
     <div>
@@ -103,7 +109,7 @@ export default function AdminCategoriesPage() {
                         <button onClick={() => handleEdit(cat)} className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors text-muted-foreground">
                           <Pencil className="w-4 h-4" />
                         </button>
-                        <button onClick={() => handleDelete(cat.id)} className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground">
+                        <button onClick={() => setDeleteTarget({ id: cat.id, name: cat.name })} className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -115,6 +121,12 @@ export default function AdminCategoriesPage() {
           </div>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        itemName={deleteTarget?.name}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

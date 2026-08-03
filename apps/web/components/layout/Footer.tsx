@@ -1,11 +1,6 @@
 import Link from "next/link";
 import {
-  Baby,
-  MapPin,
-  Mail,
-  Phone,
   Instagram,
-  Facebook,
   Youtube,
   ExternalLink,
 } from "lucide-react";
@@ -18,33 +13,24 @@ interface FooterProps {
 }
 
 const footerLinks = {
-  company: [
-    { label: "Tentang Kami", href: "/about" },
+  menu: [
+    { label: "About", href: "/about" },
+    { label: "Industries", href: "/industries" },
+    { label: "Product", href: "/products" },
+    { label: "Categories", href: "/categories" },
+  ],
+  shop: [
+    { label: "Jacket", href: "/products?category=jacket" },
+    { label: "Torebag", href: "/products?category=torebag" },
+    { label: "Hat", href: "/products?category=hat" },
+    { label: "Blouse", href: "/products?category=blouse" },
+  ],
+  cart: [
     { label: "Blog", href: "/blog" },
-    { label: "Kontak", href: "/contact" },
+    { label: "Contact", href: "/contact" },
+    { label: "Terms", href: "/terms" },
+    { label: "Tutorials", href: "/tutorials" },
   ],
-  products: [
-    { label: "Popok Celana", href: "/products?category=popok-celana" },
-    { label: "Popok Perekat", href: "/products?category=popok-perekat" },
-    { label: "Tisu Basah", href: "/products?category=tisu-basah" },
-    { label: "Perawatan Kulit Bayi", href: "/products?category=perawatan-kulit-bayi" },
-    { label: "Perlengkapan Menyusui", href: "/products?category=perlengkapan-menyusui" },
-  ],
-  marketplace: [
-    { label: "Shopee", href: "https://shopee.co.id/tokomanur", external: true },
-    { label: "Tokopedia", href: "https://tokopedia.com/tokomanur", external: true },
-    { label: "TikTok Shop", href: "https://tiktok.com/@tokomanur", external: true },
-    { label: "Lazada", href: "https://lazada.co.id/tokomanur", external: true },
-  ],
-};
-
-const SocialIcon = ({ platform }: { platform: string }) => {
-  switch (platform.toLowerCase()) {
-    case "instagram": return <Instagram className="w-4 h-4" />;
-    case "facebook": return <Facebook className="w-4 h-4" />;
-    case "youtube": return <Youtube className="w-4 h-4" />;
-    default: return <ExternalLink className="w-4 h-4" />;
-  }
 };
 
 export function Footer({ contactInfo, settings }: FooterProps) {
@@ -54,141 +40,149 @@ export function Footer({ contactInfo, settings }: FooterProps) {
   );
 
   return (
-    <footer className="bg-slate-900 text-slate-300">
+    <footer className="bg-gradient-to-br from-[#f7fbfd] via-[#fdf7fc] to-[#f9eaf6] text-[#4b3f49] relative overflow-hidden font-sans border-t border-[#e8dce7]">
       {/* Main Footer */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
-          {/* Brand Column */}
-          <div className="lg:col-span-2">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 font-bold text-xl text-white hover:text-primary-400 transition-colors group mb-4"
-            >
-              <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center">
-                <Baby className="w-5 h-5 text-white" />
-              </div>
-              <span>Toko Manur Baby</span>
-            </Link>
-            <p className="text-slate-400 leading-relaxed mb-6 text-sm max-w-sm">
-              {settings.siteTagline}. Sahabat belanja Bunda terpercaya yang menghadirkan produk original sejak 2018.
-            </p>
+      <div className="container mx-auto px-6 lg:px-12 pt-20 pb-48 lg:pb-72 relative z-10">
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-16 lg:gap-8 mb-24">
+          
+          {/* Brand & Contact Column */}
+          <div className="max-w-sm space-y-10">
+            {/* Social Icons */}
+            <div className="flex items-center gap-4">
+              <a
+                href="#"
+                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white transition-all duration-300"
+              >
+                <Instagram className="w-5 h-5" strokeWidth={1.5} />
+              </a>
+              <a
+                href="#"
+                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white active:bg-[#78a4cb] active:text-white focus-visible:bg-[#78a4cb] focus-visible:text-white transition-all duration-300"
+              >
+                {/* Custom X Icon */}
+                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4l16 16m0-16L4 20" />
+                </svg>
+              </a>
+              <a
+                href="#"
+                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white active:bg-[#78a4cb] active:text-white focus-visible:bg-[#78a4cb] focus-visible:text-white transition-all duration-300"
+              >
+                <Youtube className="w-5 h-5" strokeWidth={1.5} />
+              </a>
+            </div>
 
             {/* Contact Info */}
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3 text-slate-400">
-                <MapPin className="w-4 h-4 mt-0.5 text-primary-400 shrink-0" />
-                <span>{contactInfo.address}</span>
-              </div>
-              <a
-                href={`mailto:${contactInfo.email}`}
-                className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors"
-              >
-                <Mail className="w-4 h-4 text-primary-400 shrink-0" />
-                {contactInfo.email}
-              </a>
-              <a
-                href={waUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors"
-              >
-                <Phone className="w-4 h-4 text-primary-400 shrink-0" />
-                +{contactInfo.whatsapp}
-              </a>
-            </div>
-
-            {/* Social Media */}
-            <div className="flex items-center gap-3 mt-6">
-              {settings.socialMedia.map((social) => (
-                <a
-                  key={social.platform}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.platform}
-                  className="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white transition-all duration-200"
-                >
-                  <SocialIcon platform={social.platform} />
+            <div className="space-y-4 text-[15px] leading-relaxed text-[#5f5560]">
+              <p className="whitespace-pre-line">
+                {contactInfo.address || "Alamat belum diisi"}
+              </p>
+              <p>
+                <a href={`mailto:${contactInfo.email}`} className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors">
+                  {contactInfo.email || "Email belum diisi"}
                 </a>
-              ))}
+              </p>
+              <p>
+                <a href={waUrl} target="_blank" rel="noopener noreferrer" className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors">
+                  {contactInfo.whatsapp ? `+${contactInfo.whatsapp}` : "Nomor WhatsApp belum diisi"}
+                </a>
+              </p>
             </div>
           </div>
 
-          {/* Company Links */}
-          <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">
-              Perusahaan
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.company.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Links Columns */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-16 lg:gap-28 w-full lg:w-auto">
+            <div>
+              <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
+                MENU
+              </h4>
+              <ul className="space-y-4">
+                {footerLinks.menu.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-[15px] text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
+                SHOP
+              </h4>
+              <ul className="space-y-4">
+                {footerLinks.shop.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-[15px] text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
+                CART
+              </h4>
+              <ul className="space-y-4">
+                {footerLinks.cart.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-[15px] text-gray-400 hover:text-white transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="relative border-t border-[#e8dce7] pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+          {/* Get Started Button placed over the line */}
+          <div className="absolute right-0 -top-5">
+            <Link 
+              href="/contact" 
+              className="bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-700 transition-colors"
+            >
+              Get Started
+            </Link>
           </div>
 
-          {/* Product Links */}
-          <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">
-              Produk
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.products.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-slate-400 hover:text-white transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p className="text-sm text-[#6f6972] max-w-md leading-relaxed">
+            From branding to digital marketing. Our expert<br />
+            team is here to elevate your brand and connect you<br />
+            with your audience
+          </p>
 
-          {/* Marketplace Links */}
-          <div>
-            <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">
-              Marketplace
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.marketplace.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
-                  >
-                    {link.label}
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className="flex gap-8 text-sm text-[#6f6972] font-medium tracking-wide">
+            <Link href="/terms" className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors uppercase">
+              TERMS & CONDITIONS
+            </Link>
+            <Link href="/privacy" className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors uppercase">
+              PRIVACY POLICY
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-slate-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <p>{settings.footerText}</p>
-          <div className="flex items-center gap-4">
-            <Link href="/sitemap.xml" className="hover:text-slate-300 transition-colors">
-              Sitemap
-            </Link>
-            <span>·</span>
-            <span>Jakarta Selatan 👶</span>
-          </div>
-        </div>
+      <div className="absolute -bottom-4 left-0 w-full overflow-hidden pointer-events-none select-none text-center flex justify-center">
+        <h1 className="text-[15vw] sm:text-[13vw] md:text-[11vw] lg:text-[10vw] xl:text-[9.5vw] leading-[0.75] font-bold text-[#e8dce7] whitespace-nowrap tracking-tighter">
+          Toko-Manur
+        </h1>
       </div>
     </footer>
   );
 }
+

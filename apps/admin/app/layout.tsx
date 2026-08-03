@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,18 +18,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   return (
     <html lang="id" className={inter.variable}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <div className="flex h-screen overflow-hidden">
-          {/* Sidebar */}
-          <Sidebar />
-
-          {/* Main */}
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <Header />
-            <main className="flex-1 overflow-y-auto p-6 bg-background">
-              {children}
-            </main>
-          </div>
-        </div>
+        {children}
       </body>
     </html>
   );

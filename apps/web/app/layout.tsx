@@ -3,7 +3,8 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { mockSettings, mockContactInfo } from "@toko-manur/mock-data";
+import { mockSettings } from "@toko-manur/mock-data";
+import { getContactInfo } from "@/../admin/app/actions/contact";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -46,17 +47,20 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const contactResponse = await getContactInfo();
+  const contactInfo = contactResponse.success ? contactResponse.data : undefined;
+
   return (
     <html lang="id" className={`${inter.variable} ${plusJakarta.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>
-        <Footer contactInfo={mockContactInfo} settings={mockSettings} />
+        <Footer contactInfo={contactInfo ?? { id: "", address: "", email: "", whatsapp: "", updatedAt: new Date().toISOString() }} settings={mockSettings} />
       </body>
     </html>
   );

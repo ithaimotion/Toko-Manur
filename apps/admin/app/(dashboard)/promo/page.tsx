@@ -4,20 +4,37 @@ import { useState } from "react";
 import { Plus, Pencil, Trash2, Megaphone } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { mockPromos } from "@toko-manur/mock-data";
+import type { Promo } from "@toko-manur/types";
 import { formatDate } from "@toko-manur/utils";
+
+interface PromoFormState {
+  title: string;
+  description: string;
+  code: string;
+  discount: string;
+  validUntil: string;
+  isActive: boolean;
+}
 
 export default function AdminPromoPage() {
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<PromoFormState>({
     title: "", description: "", code: "", discount: "",
     validUntil: "", isActive: true,
   });
-  const [promos, setPromos] = useState(mockPromos);
+  const [promos, setPromos] = useState<Promo[]>(mockPromos);
 
   const handleSave = () => {
-    const newPromo = {
+    const newPromo: Promo = {
       id: `promo-${Date.now()}`,
-      ...form,
+      title: form.title,
+      description: form.description,
+      subtitle: form.code || undefined,
+      badgeText: form.discount || undefined,
+      isActive: form.isActive,
+      order: promos.length + 1,
+      validUntil: form.validUntil || undefined,
+      createdAt: new Date().toISOString(),
     };
     setPromos((p) => [...p, newPromo]);
     setShowForm(false);
@@ -83,11 +100,11 @@ export default function AdminPromoPage() {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-border">
-              {promo.discount && (
-                <span className="badge-admin bg-rose-100 text-rose-700">{promo.discount}</span>
+              {promo.badgeText && (
+                <span className="badge-admin bg-rose-100 text-rose-700">{promo.badgeText}</span>
               )}
-              {promo.code && (
-                <span className="px-2 py-1 bg-muted font-mono text-xs font-semibold rounded">{promo.code}</span>
+              {promo.subtitle && (
+                <span className="px-2 py-1 bg-muted font-mono text-xs font-semibold rounded">{promo.subtitle}</span>
               )}
               <span className="text-xs text-muted-foreground ml-auto">
                 Valid s/d {formatDate(promo.validUntil)}

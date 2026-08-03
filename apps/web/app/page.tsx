@@ -17,8 +17,8 @@ import {
   mockBlogs,
   mockTestimonials,
   mockMarketplaceLinks,
-  mockContactInfo,
 } from "@toko-manur/mock-data";
+import { getContactInfo } from "@/../admin/app/actions/contact";
 
 export const metadata: Metadata = {
   title: "Toko Manur Baby Care — Pusat Popok & Perlengkapan Bayi Termurah",
@@ -43,10 +43,12 @@ const jsonLd = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
   const hero = mockHeroBanners.find((b) => b.isActive && b.order === 1) ?? mockHeroBanners[0];
   const featuredProducts = mockProducts.filter((p) => p.isFeatured && p.status === "published").slice(0, 4);
   const recentBlogs = mockBlogs.filter((b) => b.status === "published").slice(0, 3);
+  const contactResponse = await getContactInfo();
+  const contact = contactResponse.success ? contactResponse.data : undefined;
 
   return (
     <>
@@ -137,8 +139,8 @@ export default function HomePage() {
 
       {/* CTA WhatsApp */}
       <CTAWhatsApp
-        phone={mockContactInfo.whatsapp}
-        message={mockContactInfo.whatsappMessage}
+        phone={contact?.whatsapp ?? ""}
+        message={contact?.whatsappMessage}
       />
     </>
   );

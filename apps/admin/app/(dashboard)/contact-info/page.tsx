@@ -1,13 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Save, Loader2, MapPin, Mail, Phone, Clock, Map } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { mockContactInfo } from "@toko-manur/mock-data";
+import { getContactInfo, updateContactInfo } from "@/app/actions/contact";
+import type { ContactInfo } from "@toko-manur/types";
 
 export default function AdminContactInfoPage() {
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ ...mockContactInfo });
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string | null>(null);
+  const [form, setForm] = useState<ContactInfo>({
+    id: "",
+    address: "",
+    email: "",
+    whatsapp: "",
+    whatsappMessage: "",
+    googleMapsEmbed: "",
+    googleMapsUrl: "",
+    businessHours: "",
+    updatedAt: new Date().toISOString(),
+  });
+
+  useEffect(() => {
+    async function loadContact() {
+      const response = await getContactInfo();
+      if (response.success) {
+        setForm({
+          ...response.data,
+          whatsappMessage: response.data.whatsappMessage ?? "",
+          googleMapsEmbed: response.data.googleMapsEmbed ?? "",
+          googleMapsUrl: response.data.googleMapsUrl ?? "",
+          businessHours: response.data.businessHours ?? "",
+        });
+      }
+      setLoading(false);
+    }
+
+    loadContact();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -16,7 +47,9 @@ export default function AdminContactInfoPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 1000));
+    setStatus(null);
+    const response = await updateContactInfo(form);
+    setStatus(response.success ? "Informasi kontak berhasil disimpan." : "Gagal menyimpan informasi kontak.");
     setSaving(false);
   };
 
@@ -34,7 +67,16 @@ export default function AdminContactInfoPage() {
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {loading ? (
+        <div className="admin-card p-6 text-sm text-muted-foreground">Memuat data kontak...</div>
+      ) : (
+      <div className="space-y-4">
+        {status && (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {status}
+          </div>
+        )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Address & Contact */}
         <div className="admin-card p-6 space-y-5">
           <h2 className="font-bold text-base flex items-center gap-2">
@@ -55,7 +97,7 @@ export default function AdminContactInfoPage() {
                 <span className="px-3 py-2.5 bg-muted border border-r-0 border-input rounded-l-lg text-sm text-muted-foreground">+</span>
                 <input name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="6281234567890" className="admin-input rounded-l-none" />
               </div>
-              <p className="text-xs text-muted-foreground mt-1">Format: kode negara + nomor (tanpa +). Cth: 6281234567890</p>
+              <p className="text-xs text-muted-foreground mt-1">Format: kode negara + nomor (tanpa +). Cth: 62087718676718</p>
             </div>
             <div>
               <label className="admin-label">Pesan Awal WhatsApp (opsional)</label>
@@ -90,7 +132,9 @@ export default function AdminContactInfoPage() {
             </div>
           )}
         </div>
+        </div>
       </div>
+      )}
     </div>
   );
 }

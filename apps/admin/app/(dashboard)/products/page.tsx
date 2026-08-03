@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Plus, Pencil, Trash2, Search, Eye, Package } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { mockProducts } from "@toko-manur/mock-data";
 import { formatRupiah, formatDate } from "@toko-manur/utils";
 import type { ProductStatus } from "@toko-manur/types";
@@ -12,7 +13,7 @@ import type { ProductStatus } from "@toko-manur/types";
 export default function AdminProductsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ProductStatus>("all");
-  const [toDelete, setToDelete] = useState<string | null>(null);
+  const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const filtered = mockProducts.filter((p) => {
     const q = search.toLowerCase();
@@ -129,7 +130,7 @@ export default function AdminProductsPage() {
                           <Pencil className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => setToDelete(product.id)}
+                          onClick={() => setToDelete({ id: product.id, name: product.name })}
                           className="p-1.5 rounded-md hover:bg-red-50 hover:text-destructive transition-colors text-muted-foreground"
                           title="Hapus"
                         >
@@ -158,6 +159,12 @@ export default function AdminProductsPage() {
           </p>
         </div>
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!toDelete}
+        itemName={toDelete?.name}
+        onConfirm={() => { setToDelete(null); }}
+        onCancel={() => setToDelete(null)}
+      />
     </div>
   );
 }

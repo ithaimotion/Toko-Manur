@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { mockMarketplaceLinks } from "@toko-manur/mock-data";
+import type { MarketplaceLink, MarketplacePlatform } from "@toko-manur/types";
 
 export default function AdminMarketplacePage() {
-  const [links, setLinks] = useState(mockMarketplaceLinks);
+  const [links, setLinks] = useState<MarketplaceLink[]>(mockMarketplaceLinks);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: "", platform: "custom", url: "", description: "", order: 0, isActive: true });
+  const [form, setForm] = useState<Omit<MarketplaceLink, "id">>({ name: "", platform: "custom", url: "", description: "", order: 0, isActive: true });
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
   const platforms = [
     { value: "shopee", label: "Shopee" },
@@ -19,13 +22,19 @@ export default function AdminMarketplacePage() {
   ];
 
   const handleSave = () => {
-    const newLink = { id: `link-${Date.now()}`, ...form };
+    const newLink: MarketplaceLink = { id: `link-${Date.now()}`, ...form };
     setLinks(p => [...p, newLink].sort((a, b) => a.order - b.order));
     setShowForm(false);
     setForm({ name: "", platform: "custom", url: "", description: "", order: 0, isActive: true });
   };
 
   const toggleActive = (id: string) => setLinks(p => p.map(l => l.id === id ? { ...l, isActive: !l.isActive } : l));
+
+  const handleDelete = () => {
+    if (!deleteTarget) return;
+    setLinks(p => p.filter(l => l.id !== deleteTarget.id));
+    setDeleteTarget(null);
+  };
 
   return (
     <div>
@@ -46,7 +55,7 @@ export default function AdminMarketplacePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
             <div>
               <label className="admin-label">Platform</label>
-              <select value={form.platform} onChange={(e) => setForm(p => ({ ...p, platform: e.target.value }))} className="admin-input">
+              <select value={form.platform} onChange={(e) => setForm(p => ({ ...p, platform: e.target.value as MarketplacePlatform }))} className="admin-input">
                 {platforms.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
               </select>
             </div>
@@ -113,7 +122,7 @@ export default function AdminMarketplacePage() {
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-2 justify-end">
                     <button className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors text-muted-foreground"><Pencil className="w-4 h-4" /></button>
-                    <button className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => setDeleteTarget({ id: link.id, name: link.name })} className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </td>
               </tr>
@@ -121,6 +130,12 @@ export default function AdminMarketplacePage() {
           </tbody>
         </table>
       </div>
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        itemName={deleteTarget?.name}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

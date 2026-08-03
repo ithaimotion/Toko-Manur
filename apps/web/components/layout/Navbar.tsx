@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, Sprout, Phone, ChevronDown } from "lucide-react";
 import type { NavItem } from "@toko-manur/types";
@@ -44,10 +45,10 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2.5 font-bold text-xl text-foreground hover:text-primary transition-colors group"
           >
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-sm group-hover:bg-primary-700 transition-colors">
-              <Sprout className="w-5 h-5 text-white" />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 relative transition-all group-hover:scale-105">
+              <Image src="/logo-manur.jpeg" alt="Toko Manur" fill className="object-contain mix-blend-multiply" />
             </div>
-            <span className="gradient-text">Toko Manur</span>
+
           </Link>
 
           {/* Desktop Navigation */}

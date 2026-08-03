@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Package, Tag, FileText, Star, Image, Megaphone,
+  LayoutDashboard, Package, Tag, FileText, Star, Image as ImageIcon, Megaphone,
   ShoppingBag, Building2, Phone, Users, Settings, Baby, ChevronLeft,
-  ChevronRight, ExternalLink,
+  ChevronRight, ExternalLink, Key
 } from "lucide-react";
 
 interface NavItem {
@@ -35,7 +36,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: "Tampilan",
     items: [
-      { label: "Hero Banner", href: "/hero-banner", icon: Image },
+      { label: "Hero Banner", href: "/hero-banner", icon: ImageIcon },
       { label: "Promo", href: "/promo", icon: Megaphone },
       { label: "Marketplace", href: "/marketplace", icon: ShoppingBag },
     ],
@@ -51,6 +52,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     title: "Sistem",
     items: [
       { label: "Pengguna", href: "/users", icon: Users },
+      { label: "Permintaan Reset", href: "/users/reset-requests", icon: Key },
       { label: "Pengaturan", href: "/settings", icon: Settings },
     ],
   },
@@ -60,8 +62,21 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    
+    // Temukan semua href (selain "/") yang cocok dengan pathname
+    const allHrefs = navSections.flatMap(s => s.items.map(i => i.href)).filter(h => h !== "/");
+    const matchedHrefs = allHrefs.filter(h => pathname === h || pathname.startsWith(`${h}/`));
+    
+    if (matchedHrefs.length > 0) {
+      // Cari href yang paling spesifik (paling panjang)
+      const longestMatch = matchedHrefs.reduce((a, b) => a.length > b.length ? a : b);
+      return href === longestMatch;
+    }
+    
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   return (
     <aside
@@ -71,13 +86,13 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className={`flex items-center h-16 border-b border-sidebar-border px-4 ${collapsed ? "justify-center" : "gap-3"}`}>
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shrink-0">
-          <Baby className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 relative rounded-lg overflow-hidden shrink-0">
+          <Image src="/logo-manur.jpeg" alt="Toko Manur Logo" fill className="object-cover" />
         </div>
         {!collapsed && (
           <div>
-            <p className="text-white font-bold text-sm">Toko Manur Baby</p>
-            <p className="text-slate-400 text-xs">Admin Panel</p>
+            <p className="text-[#2f2a33] font-bold text-sm">Toko Manur Baby</p>
+            <p className="text-[#7c6d7e] text-xs">Admin Panel</p>
           </div>
         )}
       </div>
@@ -87,7 +102,7 @@ export function Sidebar() {
         {navSections.map((section) => (
           <div key={section.title} className="mb-6">
             {!collapsed && (
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-3 mb-2">
+              <p className="text-xs font-semibold text-[#8a7d8d] uppercase tracking-wider px-3 mb-2">
                 {section.title}
               </p>
             )}
@@ -106,7 +121,7 @@ export function Sidebar() {
                     <>
                       <span className="flex-1">{label}</span>
                       {badge !== undefined && (
-                        <span className="ml-auto bg-primary-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="ml-auto bg-[#78a4cb] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                           {badge}
                         </span>
                       )}
@@ -137,7 +152,7 @@ export function Sidebar() {
       {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="flex items-center justify-center h-10 border-t border-sidebar-border text-slate-400 hover:text-white transition-colors"
+        className="flex items-center justify-center h-10 border-t border-sidebar-border text-[#8a7d8d] hover:text-[#78a4cb] transition-colors"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
