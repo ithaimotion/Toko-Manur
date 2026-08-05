@@ -1,0 +1,76 @@
+{
+  "id": "company-1",
+  "about": "Toko Manur Baby Care hadir sejak 2018 sebagai sahabat terpercaya para Ibu di Indonesia. Kami menyediakan berbagai kebutuhan popok bayi, perawatan kulit si kecil, dan perlengkapan menyusui dari brand-brand terkemuka dengan jaminan orisinalitas 100%.",
+  "vision": "Menjadi destinasi belanja kebutuhan ibu dan bayi nomor satu yang memberikan kemudahan, kenyamanan, dan edukasi parenting yang bermanfaat.",
+  "mission": [
+    "Menyediakan ragam pilihan popok dan kebutuhan bayi terlengkap dengan harga kompetitif",
+    "Menjamin keaslian setiap produk untuk keamanan dan kesehatan si kecil",
+    "Memberikan pelayanan pengiriman cepat (instan delivery) untuk solusi darurat Bunda",
+    "Menyajikan konten edukasi parenting yang terpercaya dari para ahli"
+  ],
+  "values": [
+    {
+      "id": "val-1",
+      "title": "100% Original (Aman)",
+      "description": "Kami hanya menjual produk resmi dari distributor principal, menjamin keaslian dan masa expired yang panjang.",
+      "icon": "shield"
+    },
+    {
+      "id": "val-2",
+      "title": "Penuh Kasih Ibu",
+      "description": "Layanan kami mengedepankan empati dan kelembutan, siap membantu Bunda memilihkan produk terbaik.",
+      "icon": "heart"
+    },
+    {
+      "id": "val-3",
+      "title": "Pengiriman Cepat",
+      "description": "Popok habis di malam hari? Layanan pengiriman cepat kami menjadi andalan di saat darurat.",
+      "icon": "zap"
+    },
+    {
+      "id": "val-4",
+      "title": "Kualitas Premium",
+      "description": "Semua barang disimpan dalam suhu ruangan terkontrol untuk menjaga higienitas dan kualitas popok.",
+      "icon": "star"
+    },
+    {
+      "id": "cd4e818d-24aa-47e9-a668-411511d38575",
+      "icon": "star",
+      "title": "testing",
+      "description": "dasds"
+    }
+  ],
+  "brandStory": "Berawal dari kesulitan seorang ibu pekerja mencari stok popok langganan saat malam hari, Toko Manur lahir sebagai solusi kepraktisan. Kami memahami bahwa kehabisan popok atau anak tiba-tiba ruam adalah momen menegangkan bagi orang tua baru. Oleh karena itu, Toko Manur tidak hanya sekedar berjualan, tapi menjadi 'support system' para Bunda.",
+  "founded": "2018",
+  "legalDocuments": [
+    {
+      "id": "leg-1",
+      "name": "NIB",
+      "number": "9120301456789",
+      "issuedBy": "OSS RI",
+      "issuedDate": "2018-03-15"
+    },
+    {
+      "id": "leg-2",
+      "name": "SIUP",
+      "number": "503/1234/SIUP-B/2018",
+      "issuedBy": "Dinas Perdagangan",
+      "issuedDate": "2018-04-01"
+    },
+    {
+      "id": "leg-3",
+      "name": "NPWP",
+      "number": "12.345.678.9-123.000",
+      "issuedBy": "DJP Kementerian Keuangan RI",
+      "issuedDate": "2018-04-15"
+    },
+    {
+      "id": "68170834-ee58-4608-bc20-ef810fa70f1d",
+      "name": "yoi",
+      "number": "45678",
+      "issuedBy": "kok",
+      "issuedDate": "2026-08-05"
+    }
+  ],
+  "updatedAt": "2026-08-05T04:31:18.346Z"
+}

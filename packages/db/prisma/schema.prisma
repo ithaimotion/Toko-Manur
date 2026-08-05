@@ -48,6 +48,34 @@ model ResetRequest {
   @@map("reset_requests")
 }
 
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("contact_messages")
+}
+
+model CompanyProfile {
+  id             String   @id @default(cuid())
+  about          String   @db.Text
+  vision         String
+  mission        Json
+  values         Json
+  brandStory     String   @db.Text
+  founded        String
+  legalDocuments Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("company_profile")
+}
+
 model ContactInfo {
   id              String   @id @default(cuid())
   address         String   @db.Text
@@ -55,7 +83,8 @@ model ContactInfo {
   whatsapp        String
   whatsappMessage String?  @db.Text
   googleMapsEmbed String?  @db.Text
-  googleMapsUrl   String?  @db.Text
+  latitude        String?
+  longitude       String?
   businessHours   String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

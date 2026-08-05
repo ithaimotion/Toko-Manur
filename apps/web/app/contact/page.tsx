@@ -5,6 +5,12 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { buildWhatsAppUrl } from "@toko-manur/utils";
 import { getContactInfo } from "@/../admin/app/actions/contact";
 
+function getMapUrl(input: string | undefined | null): string {
+  if (!input) return "";
+  const srcMatch = input.match(/src=["']([^"']+)["']/);
+  return srcMatch ? srcMatch[1] : input;
+}
+
 export const metadata: Metadata = {
   title: "Kontak Kami",
   description: "Hubungi Toko Manur via WhatsApp, email, atau kunjungi kantor kami. Tim kami siap membantu kebutuhan perlengkapan bayi Anda.",
@@ -14,6 +20,12 @@ export default async function ContactPage() {
   const contactResponse = await getContactInfo();
   const contact = contactResponse.success ? contactResponse.data : undefined;
   const waUrl = buildWhatsAppUrl(contact?.whatsapp ?? "", contact?.whatsappMessage);
+  const embedUrl = getMapUrl(contact?.googleMapsEmbed);
+  
+  let mapsUrl = "";
+  if (contact?.latitude && contact?.longitude) {
+    mapsUrl = `https://www.google.com/maps/place/${contact.latitude},${contact.longitude}`;
+  }
 
   return (
     <div className="pt-20">
@@ -129,13 +141,13 @@ export default async function ContactPage() {
       </section>
 
       {/* Google Maps */}
-      {contact?.googleMapsEmbed && (
+      {embedUrl && (
         <section className="section-sm bg-section-alt">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-6 text-center">Lokasi Kami</h2>
             <div className="rounded-2xl overflow-hidden border border-border shadow-card h-80 md:h-96">
               <iframe
-                src={contact.googleMapsEmbed}
+                src={embedUrl}
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
@@ -145,10 +157,10 @@ export default async function ContactPage() {
                 title="Peta Lokasi Toko Manur"
               />
             </div>
-            {contact?.googleMapsUrl && (
+            {mapsUrl && (
               <div className="text-center mt-4">
                 <a
-                  href={contact.googleMapsUrl}
+                  href={mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-secondary text-sm inline-flex"

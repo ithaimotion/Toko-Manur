@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Check, X, Key, Search, RefreshCw } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { toast } from "sonner";
 import { getResetRequests, updateResetRequestStatus } from "@/app/actions/users";
 import type { RequestStatus } from "@toko-manur/db";
 
@@ -35,8 +36,9 @@ export default function ResetRequestsPage() {
     const res = await updateResetRequestStatus(id, status);
     if (res.success) {
       fetchRequests();
+      toast.success("Status permintaan berhasil diperbarui.");
     } else {
-      alert("Gagal memperbarui status.");
+      toast.error("Gagal memperbarui status.");
     }
   };
 

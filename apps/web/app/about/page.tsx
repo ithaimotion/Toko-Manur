@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users } from "lucide-react";
+import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users, Fire, Activity } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";
-import { mockCompanyProfile } from "@toko-manur/mock-data";
+import { getCompanyProfile } from "@/../admin/app/actions/company";
 import { getContactInfo } from "@/../admin/app/actions/contact";
 
 export const metadata: Metadata = {
@@ -18,10 +18,14 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   heart: Heart,
   zap: Zap,
   star: Star,
+  fire: Fire,
+  award: Award,
+  activity: Activity,
 };
 
 export default async function AboutPage() {
-  const profile = mockCompanyProfile;
+  const profileResponse = await getCompanyProfile();
+  const profile = profileResponse.success ? profileResponse.data : null;
   const contactResponse = await getContactInfo();
   const contact = contactResponse.success ? contactResponse.data : undefined;
 

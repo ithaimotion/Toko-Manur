@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle, Loader2 } from "lucide-react";
+import { submitContactMessage } from "../../../admin/app/actions/contact";
 
 interface ContactFormData {
   name: string;
@@ -13,6 +14,7 @@ interface ContactFormData {
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [form, setForm] = useState<ContactFormData>({
     name: "",
     email: "",
@@ -28,9 +30,17 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1500));
-    setStatus("success");
+    setErrorMessage("");
+
+    const response = await submitContactMessage(form);
+
+    if (response.success) {
+      setStatus("success");
+      setForm({ name: "", email: "", phone: "", subject: "", message: "" });
+    } else {
+      setStatus("error");
+      setErrorMessage(response.error || "Gagal mengirim pesan. Silakan coba lagi.");
+    }
   };
 
   if (status === "success") {
@@ -55,6 +65,12 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" id="contact-form">
+      {status === "error" && errorMessage ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {errorMessage}
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1.5">

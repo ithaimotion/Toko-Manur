@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,6 +19,7 @@ export default function AdminRootLayout({ children }: { children: React.ReactNod
   return (
     <html lang="id" className={inter.variable}>
       <body className="min-h-screen bg-background font-sans antialiased">
+        <ToastProvider />
         {children}
       </body>
     </html>

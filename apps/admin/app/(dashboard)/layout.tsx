@@ -1,7 +1,16 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("admin_session");
+
+  if (!session?.value) {
+    redirect("/login");
+  }
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}

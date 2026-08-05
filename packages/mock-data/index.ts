@@ -605,7 +605,8 @@ export const mockContactInfo: ContactInfo = {
   whatsapp: "6281234567890",
   whatsappMessage: "Halo Toko Manur Baby Care, saya mau tanya stok popok ukuran...",
   googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.27!2d106.79!3d-6.24!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTQnMjQuMCJTIDEwNsKwNDcnMjQuMCJF!5e0!3m2!1sen!2sid!4v1",
-  googleMapsUrl: "https://maps.google.com",
+  latitude: "-6.240000",
+  longitude: "106.790000",
   businessHours: "Setiap Hari (Termasuk Tanggal Merah): 07.00 – 22.00 WIB",
   updatedAt: "2024-06-01T00:00:00Z",
 };

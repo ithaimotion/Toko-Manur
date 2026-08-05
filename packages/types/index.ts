@@ -202,8 +202,20 @@ export interface ContactInfo {
   whatsapp: string;
   whatsappMessage?: string;
   googleMapsEmbed?: string;
-  googleMapsUrl?: string;
+  latitude?: string;
+  longitude?: string;
   businessHours?: string;
+  updatedAt: string;
+}
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  subject: string;
+  message: string;
+  createdAt: string;
   updatedAt: string;
 }
 

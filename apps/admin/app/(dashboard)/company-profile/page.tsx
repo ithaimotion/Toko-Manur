@@ -1,31 +1,132 @@
 "use client";
 
-import { useState } from "react";
-import { Save, Loader2, Globe, Target, Heart, Zap, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Fire, Award, Activity } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { mockCompanyProfile } from "@toko-manur/mock-data";
 
 const iconOptions = [
-  { value: "shield", label: "Shield", icon: "🛡️" },
-  { value: "heart", label: "Heart", icon: "❤️" },
-  { value: "zap", label: "Zap", icon: "⚡" },
-  { value: "star", label: "Star", icon: "⭐" },
+  { value: "shield", label: "Shield", Icon: Shield },
+  { value: "heart", label: "Heart", Icon: Heart },
+  { value: "zap", label: "Zap", Icon: Zap },
+  { value: "star", label: "Star", Icon: Star },
+  { value: "fire", label: "Fire", Icon: Fire },
+  { value: "award", label: "Award", Icon: Award },
+  { value: "activity", label: "Activity", Icon: Activity },
 ];
 
 export default function AdminCompanyProfilePage() {
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    about: mockCompanyProfile.about,
-    vision: mockCompanyProfile.vision,
-    mission: mockCompanyProfile.mission.join("\n"),
-    brandStory: mockCompanyProfile.brandStory,
-    founded: mockCompanyProfile.founded,
-  });
+  const [form, setForm] = useState(() => ({
+    about: "",
+    vision: "",
+    mission: "",
+    brandStory: "",
+    founded: "",
+    values: [] as any[],
+    legalDocuments: [] as any[],
+  }));
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/company');
+        const json = await res.json();
+        if (json.success && json.data && mounted) {
+          const p = json.data;
+          setForm({
+            about: p.about || "",
+            vision: p.vision || "",
+            mission: Array.isArray(p.mission) ? p.mission.join('\n') : (p.mission || '').toString(),
+            brandStory: p.brandStory || "",
+            founded: p.founded || "",
+            values: (p.values || []).map((v: any) => ({ ...v })),
+            legalDocuments: (p.legalDocuments || []).map((d: any) => ({ ...d })),
+          });
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => { mounted = false };
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSaving(false);
+    try {
+      const payload = {
+        about: form.about,
+        vision: form.vision,
+        mission: form.mission.split("\n").filter(Boolean),
+        brandStory: form.brandStory,
+        founded: form.founded,
+        values: form.values,
+        legalDocuments: form.legalDocuments,
+      };
+
+      const res = await fetch("/api/company", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!json.success) {
+        toast.error(json.error || "Gagal menyimpan.");
+      } else {
+        toast.success("Profil perusahaan berhasil disimpan.");
+      }
+    } catch (error) {
+      toast.error("Gagal menyimpan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddValue = () => {
+    setForm((prev) => ({
+      ...prev,
+      values: [
+        ...prev.values,
+        {
+          id: crypto.randomUUID(),
+          icon: "star",
+          title: "",
+          description: "",
+        },
+      ],
+    }));
+  };
+
+  const handleValueChange = (index: number, field: "icon" | "title" | "description", value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      values: prev.values.map((item, itemIndex) => (itemIndex === index ? { ...item, [field]: value } : item)),
+    }));
+  };
+
+  const handleAddDocument = () => {
+    setForm((prev) => ({
+      ...prev,
+      legalDocuments: [
+        ...prev.legalDocuments,
+        {
+          id: crypto.randomUUID(),
+          name: "",
+          number: "",
+          issuedBy: "",
+          issuedDate: "",
+        },
+      ],
+    }));
+  };
+
+  const handleDocumentChange = (index: number, field: "name" | "number" | "issuedBy" | "issuedDate", value: string) => {
+    setForm((prev) => ({
+      ...prev,
+      legalDocuments: prev.legalDocuments.map((item, itemIndex) => (itemIndex === index ? { ...item, [field]: value } : item)),
+    }));
   };
 
   return (
@@ -96,22 +197,28 @@ export default function AdminCompanyProfilePage() {
               <Star className="w-5 h-5 text-primary" />
               <h2 className="font-bold text-base">Nilai-Nilai Perusahaan</h2>
             </div>
-            <button className="btn-admin-secondary text-xs">+ Tambah Nilai</button>
+            <button type="button" onClick={handleAddValue} className="btn-admin-secondary text-xs">+ Tambah Nilai</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mockCompanyProfile.values.map((val) => (
-              <div key={val.id} className="border border-border rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <select defaultValue={val.icon} className="admin-input w-24 text-xs py-1.5">
-                    {iconOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.icon} {opt.label}</option>
-                    ))}
-                  </select>
-                  <input defaultValue={val.title} className="admin-input flex-1 text-sm" placeholder="Judul nilai" />
+            {form.values.map((val, index) => {
+              const Opt = iconOptions.find((o) => o.value === val.icon)?.Icon ?? Star;
+              return (
+                <div key={val.id} className="border border-border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+                      <Opt className="w-5 h-5 text-primary" />
+                    </div>
+                    <select value={val.icon} onChange={(e) => handleValueChange(index, "icon", e.target.value)} className="admin-input w-28 text-xs py-1.5">
+                      {iconOptions.map((opt) => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <input value={val.title} onChange={(e) => handleValueChange(index, "title", e.target.value)} className="admin-input flex-1 text-sm" placeholder="Judul nilai" />
+                  </div>
+                  <textarea value={val.description} onChange={(e) => handleValueChange(index, "description", e.target.value)} rows={2} className="admin-input resize-none text-sm" />
                 </div>
-                <textarea defaultValue={val.description} rows={2} className="admin-input resize-none text-sm" />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -119,15 +226,15 @@ export default function AdminCompanyProfilePage() {
         <div className="admin-card p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-bold text-base">Dokumen Legal</h2>
-            <button className="btn-admin-secondary text-xs">+ Tambah Dokumen</button>
+            <button type="button" onClick={handleAddDocument} className="btn-admin-secondary text-xs">+ Tambah Dokumen</button>
           </div>
           <div className="space-y-3">
-            {mockCompanyProfile.legalDocuments.map((doc) => (
+            {form.legalDocuments.map((doc, index) => (
               <div key={doc.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-border rounded-lg">
-                <input defaultValue={doc.name} placeholder="Nama dokumen" className="admin-input text-sm" />
-                <input defaultValue={doc.number} placeholder="Nomor dokumen" className="admin-input text-sm" />
-                <input defaultValue={doc.issuedBy} placeholder="Diterbitkan oleh" className="admin-input text-sm" />
-                <input type="date" defaultValue={doc.issuedDate} className="admin-input text-sm" />
+                <input value={doc.name} onChange={(e) => handleDocumentChange(index, "name", e.target.value)} placeholder="Nama dokumen" className="admin-input text-sm" />
+                <input value={doc.number} onChange={(e) => handleDocumentChange(index, "number", e.target.value)} placeholder="Nomor dokumen" className="admin-input text-sm" />
+                <input value={doc.issuedBy} onChange={(e) => handleDocumentChange(index, "issuedBy", e.target.value)} placeholder="Diterbitkan oleh" className="admin-input text-sm" />
+                <input type="date" value={doc.issuedDate} onChange={(e) => handleDocumentChange(index, "issuedDate", e.target.value)} className="admin-input text-sm" />
               </div>
             ))}
           </div>

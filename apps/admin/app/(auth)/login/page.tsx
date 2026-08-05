@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Package, Lock, Mail, ArrowLeft, Send } from "lucide-react";
+import { toast } from "sonner";
 import { loginAction } from "@/app/actions/auth";
 import { createResetRequest } from "@/app/actions/users";
 
@@ -37,7 +38,7 @@ export default function LoginPage() {
     if (res.success) {
       setSubmitted(true);
     } else {
-      alert(res.error || "Gagal mengirim permintaan.");
+      toast.error(res.error || "Gagal mengirim permintaan.");
     }
   };
 

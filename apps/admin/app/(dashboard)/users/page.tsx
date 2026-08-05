@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Shield, User, RefreshCw, ToggleLeft, ToggleRight } from "lucide-react";
+import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 import { getUsers, createUser, deleteUser, toggleUserStatus } from "@/app/actions/users";
@@ -52,8 +53,9 @@ export default function AdminUsersPage() {
       setShowModal(false);
       setFormData({ name: "", email: "", role: "EDITOR" });
       fetchUsers();
+      toast.success("Pengguna berhasil dibuat.");
     } else {
-      alert(res.error || "Gagal membuat pengguna.");
+      toast.error(res.error || "Gagal membuat pengguna.");
     }
   };
 
@@ -65,8 +67,9 @@ export default function AdminUsersPage() {
     setDeleteTarget(null);
     if (res.success) {
       fetchUsers();
+      toast.success("Pengguna berhasil dihapus.");
     } else {
-      alert(res.error || "Gagal menghapus pengguna.");
+      toast.error(res.error || "Gagal menghapus pengguna.");
     }
   };
 
