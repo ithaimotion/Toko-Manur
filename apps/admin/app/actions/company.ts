@@ -111,11 +111,11 @@ export async function getCompanyProfile() {
         data: {
           about: fallbackProfile.about,
           vision: fallbackProfile.vision,
-          mission: fallbackProfile.mission,
-          values: fallbackProfile.values,
+          mission: fallbackProfile.mission as any,
+          values: fallbackProfile.values as any,
           brandStory: fallbackProfile.brandStory,
           founded: fallbackProfile.founded,
-          legalDocuments: fallbackProfile.legalDocuments,
+          legalDocuments: fallbackProfile.legalDocuments as any,
         },
       });
 
@@ -146,11 +146,11 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
     const data = {
       about: payload.about ?? "",
       vision: payload.vision ?? "",
-      mission: payload.mission ?? [],
-      values: payload.values ?? [],
+      mission: (payload.mission ?? []) as any,
+      values: (payload.values ?? []) as any,
       brandStory: payload.brandStory ?? "",
       founded: payload.founded ?? "",
-      legalDocuments: payload.legalDocuments ?? [],
+      legalDocuments: (payload.legalDocuments ?? []) as any,
     };
 
     const updated = existing

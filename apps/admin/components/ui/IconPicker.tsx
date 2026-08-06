@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
-import type { Icon as LucideIcon } from "lucide-react";
 import {
   Shield,
   Heart,
@@ -22,9 +20,11 @@ import {
   Lock,
   BookOpen,
   Smile,
+  Search,
+  X,
 } from "lucide-react";
 
-type IconOption = { value: string; label: string; Icon: LucideIcon; category: string };
+type IconOption = { value: string; label: string; Icon: React.ComponentType<{ className?: string }>; category: string };
 
 const ALL_ICONS: IconOption[] = [
   { value: "shield", label: "Shield", Icon: Shield, category: "Security" },
