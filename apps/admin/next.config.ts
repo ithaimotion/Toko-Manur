@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@toko-manur/types", "@toko-manur/mock-data", "@toko-manur/utils"],
+  transpilePackages: ["@toko-manur/db", "@toko-manur/types", "@toko-manur/mock-data", "@toko-manur/utils"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },

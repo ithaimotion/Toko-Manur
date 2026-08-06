@@ -10,6 +10,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@prisma/client": "^6.3.0",
+    "@toko-manur/db": "workspace:*",
     "@toko-manur/types": "workspace:*",
     "@toko-manur/mock-data": "workspace:*",
     "@toko-manur/utils": "workspace:*",

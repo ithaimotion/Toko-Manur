@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@toko-manur/db": ["../../packages/db/src/index.ts"],
       "@toko-manur/types": ["../../packages/types/index.ts"],
       "@toko-manur/mock-data": ["../../packages/mock-data/index.ts"],
       "@toko-manur/utils": ["../../packages/utils/index.ts"]
