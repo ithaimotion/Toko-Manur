@@ -67,9 +67,9 @@ async function writeStoredProfile(payload: Partial<CompanyProfile>): Promise<Com
 
 async function ensureCompanyProfileTableExists(): Promise<boolean> {
   try {
-    const tables = await db.$queryRawUnsafe<Array<{ Tables_in_toko_manur?: string }>>(
+    const tables = (await db.$queryRawUnsafe(
       "SHOW TABLES LIKE 'company_profile'"
-    );
+    )) as Array<{ Tables_in_toko_manur?: string }>;
 
     if (tables.length > 0) return true;
 

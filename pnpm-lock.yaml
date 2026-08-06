@@ -26,6 +26,9 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.83.0(react@19.2.8))
+      '@prisma/client':
+        specifier: ^6.3.0
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
       '@tanstack/react-query':
         specifier: ^5.66.0
         version: 5.101.4(react@19.2.8)
@@ -117,6 +120,12 @@ importers:
       '@hookform/resolvers':
         specifier: ^3.9.1
         version: 3.10.0(react-hook-form@7.83.0(react@19.2.8))
+      '@prisma/client':
+        specifier: ^6.3.0
+        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
+      '@toko-manur/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@toko-manur/mock-data':
         specifier: workspace:*
         version: link:../../packages/mock-data

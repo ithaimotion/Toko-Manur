@@ -4,6 +4,7 @@ import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users, Flame as Fire
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";
+import { mockCompanyProfile } from "@toko-manur/mock-data";
 import { getCompanyProfile } from "@/../admin/app/actions/company";
 import { getContactInfo } from "@/../admin/app/actions/contact";
 
@@ -25,7 +26,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 export default async function AboutPage() {
   const profileResponse = await getCompanyProfile();
-  const profile = profileResponse.success ? profileResponse.data : null;
+  const profile = (profileResponse.success && profileResponse.data) ? profileResponse.data : mockCompanyProfile;
   const contactResponse = await getContactInfo();
   const contact = contactResponse.success ? contactResponse.data : undefined;
 

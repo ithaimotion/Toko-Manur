@@ -139,7 +139,7 @@ async function readStoredContactMessages(): Promise<ContactMessage[]> {
     const parsed = JSON.parse(content) as StoredContactMessage[];
     return parsed
       .filter(Boolean)
-      .map((message) => ({
+      .map((message: any) => ({
         id: message.id ?? crypto.randomUUID(),
         name: message.name ?? "",
         email: message.email ?? "",
@@ -179,9 +179,9 @@ async function writeStoredContactMessages(payload: Partial<ContactMessage>): Pro
 
 async function ensureContactTableExists(): Promise<boolean> {
   try {
-    const tables = await db.$queryRawUnsafe<Array<{ Tables_in_toko_manur?: string }>>(
+    const tables = (await db.$queryRawUnsafe(
       "SHOW TABLES LIKE 'contact_info'"
-    );
+    )) as Array<{ Tables_in_toko_manur?: string }>;
 
     if (tables.length > 0) {
       return true;
@@ -213,9 +213,9 @@ async function ensureContactTableExists(): Promise<boolean> {
 
 async function ensureContactMessagesTableExists(): Promise<boolean> {
   try {
-    const tables = await db.$queryRawUnsafe<Array<{ Tables_in_toko_manur?: string }>>(
+    const tables = (await db.$queryRawUnsafe(
       "SHOW TABLES LIKE 'contact_messages'"
-    );
+    )) as Array<{ Tables_in_toko_manur?: string }>;
 
     if (tables.length > 0) {
       return true;
@@ -348,7 +348,7 @@ export async function getContactMessages() {
 
     return {
       success: true,
-      data: messages.map((message) => normalizeContactMessage(message)),
+      data: messages.map((message: any) => normalizeContactMessage(message)),
     };
   } catch (error) {
     console.error("Failed to fetch contact messages from Prisma, using fallback storage:", error);
