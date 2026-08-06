@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Truck, Shield, Award, Leaf } from "lucide-react";
+import { ArrowRight, Truck, Shield, Award, Leaf, Banknote, Gift } from "lucide-react";
 import type { HeroBanner } from "@toko-manur/types";
 
 interface HeroSectionProps {
@@ -23,15 +23,18 @@ export function HeroSection({ banner }: HeroSectionProps) {
           <div className="animate-fade-in-up">
             {/* Badge */}
             <div className="badge-primary inline-flex mb-6 animate-fade-in-up">
-              Sahabat Belanja Bunda #1
+              Selamat Datang Para Bunda
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.1] mb-6 text-balance">
-              {banner.title.split(" ").slice(0, 3).join(" ")}{" "}
-              <span className="gradient-text">
-                {banner.title.split(" ").slice(3).join(" ")}
-              </span>
-            </h1>
+            <div className="relative h-28 sm:h-40 lg:h-52 w-full max-w-[800px] mb-8">
+              <Image 
+                src="/logo-manur.png"
+                alt="Toko Manur"
+                fill
+                className="object-contain object-left"
+                priority
+              />
+            </div>
 
             <p className="text-lg text-slate-600 mb-3 font-medium">{banner.subtitle}</p>
             <p className="text-base text-slate-500 mb-8 max-w-lg leading-relaxed">
@@ -58,24 +61,53 @@ export function HeroSection({ banner }: HeroSectionProps) {
               )}
             </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {[
-                { icon: Shield, label: "Produk Tersertifikasi" },
-                { icon: Truck, label: "Pengiriman Cepat" },
-                { icon: Award, label: "Kualitas Premium" },
-                { icon: Leaf, label: "Ramah Lingkungan" },
-              ].map(({ icon: Icon, label }) => (
-                <div
-                  key={label}
-                  className="flex items-center gap-2 text-sm text-slate-600"
-                >
-                  <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center shrink-0">
-                    <Icon className="w-4 h-4 text-primary-600" />
+            {/* Trust Badges Marquee */}
+            <div className="relative mt-12 space-y-4 overflow-hidden w-full mask-edges">
+              {/* Row 1: Marquee Left */}
+              <div className="flex w-max animate-marquee-left hover:[animation-play-state:paused]">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex gap-4 pr-4">
+                    {[
+                      { icon: Shield, label: "Produk Tersertifikasi" },
+                      { icon: Truck, label: "Pengiriman Cepat" },
+                      { icon: Award, label: "Kualitas Premium" },
+                    ].map(({ icon: Icon, label }) => (
+                      <div
+                        key={label + i}
+                        className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl shadow-sm text-sm text-slate-700 whitespace-nowrap border border-slate-100"
+                      >
+                        <div className="w-7 h-7 bg-primary-50 rounded-md flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4 text-primary-600" />
+                        </div>
+                        <span className="font-semibold">{label}</span>
+                      </div>
+                    ))}
                   </div>
-                  <span className="font-medium leading-tight">{label}</span>
-                </div>
-              ))}
+                ))}
+              </div>
+
+              {/* Row 2: Marquee Right */}
+              <div className="flex w-max animate-marquee-right hover:[animation-play-state:paused]">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex gap-4 pr-4">
+                    {[
+                      { icon: Leaf, label: "Ramah Lingkungan" },
+                      { icon: Banknote, label: "Harga Terbaik" },
+                      { icon: Gift, label: "Promo Spesial" },
+                    ].map(({ icon: Icon, label }) => (
+                      <div
+                        key={label + i}
+                        className="flex items-center gap-3 px-4 py-2.5 bg-white rounded-xl shadow-sm text-sm text-slate-700 whitespace-nowrap border border-slate-100"
+                      >
+                        <div className="w-7 h-7 bg-emerald-50 rounded-md flex items-center justify-center shrink-0">
+                          <Icon className="w-4 h-4 text-emerald-600" />
+                        </div>
+                        <span className="font-semibold">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 

@@ -202,6 +202,12 @@
   .scrollbar-thin::-webkit-scrollbar-track { @apply bg-muted; }
   .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground; }
+
+  /* Marquee edges mask */
+  .mask-edges {
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  }
 }
 
 /* ================================

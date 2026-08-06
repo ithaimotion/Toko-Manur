@@ -3,7 +3,6 @@ import Link from "next/link";
 import { ArrowRight, Package } from "lucide-react";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PromoSection } from "@/components/sections/PromoSection";
-import { WhyChooseUs } from "@/components/sections/WhyChooseUs";
 import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { MarketplaceSection } from "@/components/sections/MarketplaceSection";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";
@@ -98,9 +97,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Why Choose Us */}
-      <WhyChooseUs />
 
       {/* Testimonials */}
       <TestimonialSection testimonials={mockTestimonials} />

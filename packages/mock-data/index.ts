@@ -139,7 +139,8 @@ export const mockProducts: Product[] = [
     marketplaceLinks: [
       { platform: "tokopedia", url: "https://tokopedia.com" },
       { platform: "shopee", url: "https://shopee.co.id" },
-      { platform: "lazada", url: "https://lazada.co.id" },
+      { platform: "tiktok", url: "https://tiktok.com" },
+      { platform: "akulaku", url: "https://akulaku.com" },
     ],
     createdAt: "2024-02-01T00:00:00Z",
     updatedAt: "2024-06-15T00:00:00Z",
@@ -429,7 +430,7 @@ export const mockHeroBanners: HeroBanner[] = [
   {
     id: "hero-1",
     title: "Kebutuhan Bunda & Si Kecil, Cukup Satu Klik!",
-    subtitle: "Pusat Popok & Perlengkapan Bayi Termurah",
+    subtitle: "Distributor popok dan perlengkapan bayi terlengkap",
     description: "Temukan berbagai macam popok bayi dari brand ternama, tisu basah, susu, hingga perlengkapan menyusui dengan harga spesial dan jaminan 100% original.",
     image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=1920&h=1080&fit=crop",
     ctaText: "Belanja Popok",
@@ -534,10 +535,10 @@ export const mockMarketplaceLinks: MarketplaceLink[] = [
   },
   {
     id: "mp-4",
-    platform: "lazada",
-    name: "Lazada LazMall",
-    url: "https://lazada.co.id/tokomanurbaby",
-    description: "Jaminan harga termurah LazMall",
+    platform: "akulaku",
+    name: "Akulaku Mall",
+    url: "https://akulaku.com/tokomanurbaby",
+    description: "Cicilan 0% untuk pembelian popok dan perlengkapan bayi",
     isActive: true,
     order: 4,
   },

@@ -73,11 +73,10 @@ export default function BlogPage() {
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
             <button
               onClick={() => handleCategory("all")}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                selectedCategory === "all"
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === "all"
                   ? "bg-primary text-white"
                   : "bg-slate-100 text-slate-600 hover:bg-primary-50 hover:text-primary"
-              }`}
+                }`}
             >
               Semua Topik
             </button>
@@ -85,11 +84,10 @@ export default function BlogPage() {
               <button
                 key={cat}
                 onClick={() => handleCategory(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                  selectedCategory === cat
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${selectedCategory === cat
                     ? "bg-primary text-white"
                     : "bg-slate-100 text-slate-600 hover:bg-primary-50 hover:text-primary"
-                }`}
+                  }`}
               >
                 {cat}
               </button>

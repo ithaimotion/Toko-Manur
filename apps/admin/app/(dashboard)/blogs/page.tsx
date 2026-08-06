@@ -88,7 +88,7 @@ export default function AdminBlogsPage() {
                     <Link href={`/blogs/${blog.id}/edit`} className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors text-muted-foreground">
                       <Pencil className="w-4 h-4" />
                     </Link>
-                    <button 
+                    <button
                       onClick={() => setDeleteTarget({ id: blog.id, title: blog.title })}
                       className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
                     >

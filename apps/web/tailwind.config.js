@@ -88,6 +88,8 @@ module.exports = {
         "slide-in-right": "slideInRight 0.4s ease-out",
         float: "float 6s ease-in-out infinite",
         shimmer: "shimmer 2s linear infinite",
+        "marquee-left": "marqueeLeft 20s linear infinite",
+        "marquee-right": "marqueeRight 20s linear infinite",
       },
       keyframes: {
         fadeIn: { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
@@ -95,6 +97,8 @@ module.exports = {
         slideInRight: { "0%": { opacity: "0", transform: "translateX(20px)" }, "100%": { opacity: "1", transform: "translateX(0)" } },
         float: { "0%, 100%": { transform: "translateY(0px)" }, "50%": { transform: "translateY(-10px)" } },
         shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } },
+        marqueeLeft: { "0%": { transform: "translateX(0%)" }, "100%": { transform: "translateX(-50%)" } },
+        marqueeRight: { "0%": { transform: "translateX(-50%)" }, "100%": { transform: "translateX(0%)" } },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

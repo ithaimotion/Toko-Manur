@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, ShoppingBag, ChevronLeft, CheckCircle, ExternalLink } from "lucide-react";
+import { MessageCircle, ShoppingBag, ExternalLink } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ProductCard } from "@/components/products/ProductCard";
 import { mockProducts } from "@toko-manur/mock-data";
-import { formatRupiah, getMarketplaceName, buildWhatsAppUrl } from "@toko-manur/utils";
+import { buildWhatsAppUrl } from "@toko-manur/utils";
+import { getMarketplaceIcon } from "@/components/ui/MarketplaceIcons";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -120,20 +121,39 @@ export default async function ProductDetailPage({ params }: Props) {
                 {product.name}
               </h1>
 
-              {/* Price */}
-              <div className="mb-6 p-4 bg-primary-50 rounded-xl border border-primary-100">
-                {product.price ? (
-                  <>
-                    <p className="text-sm text-slate-500 mb-1">Harga</p>
-                    <p className="text-3xl font-bold text-primary">{formatRupiah(product.price)}</p>
-                    <p className="text-xs text-slate-400 mt-1">* Harga dapat berubah. Hubungi kami untuk penawaran terbaik.</p>
-                  </>
+              {/* Marketplace / CTA */}
+              <div className="mb-6 p-4 bg-slate-50 rounded-xl border border-border">
+                <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4" />
+                  Beli Produk Ini Di:
+                </p>
+                {product.marketplaceLinks && product.marketplaceLinks.length > 0 ? (
+                  <div className="flex flex-wrap gap-3">
+                    {product.marketplaceLinks.map((link) => {
+                      const LogoIcon = getMarketplaceIcon(link.platform);
+                      return (
+                        <a
+                          key={link.platform}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-border bg-white hover:border-slate-300 hover:shadow-md transition-all hover:-translate-y-0.5"
+                          title={link.platform}
+                        >
+                          {LogoIcon ? (
+                            <LogoIcon className="h-7 w-auto" />
+                          ) : (
+                            <span className="font-bold uppercase text-slate-700">{link.platform}</span>
+                          )}
+                          <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                        </a>
+                      );
+                    })}
+                  </div>
                 ) : (
-                  <>
-                    <p className="text-sm text-slate-500 mb-1">Harga</p>
-                    <p className="text-xl font-bold text-slate-900">Hubungi Kami</p>
-                    <p className="text-xs text-slate-400 mt-1">Dapatkan penawaran terbaik via WhatsApp</p>
-                  </>
+                  <p className="text-sm text-slate-500">
+                    Produk ini belum tersedia di marketplace. Silakan hubungi kami via WhatsApp.
+                  </p>
                 )}
               </div>
 
@@ -153,29 +173,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 </a>
               </div>
 
-              {/* Marketplace */}
-              {product.marketplaceLinks && product.marketplaceLinks.length > 0 && (
-                <div className="mb-8">
-                  <p className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
-                    <ShoppingBag className="w-4 h-4" />
-                    Beli di Marketplace
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {product.marketplaceLinks.map((link) => (
-                      <a
-                        key={link.platform}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border text-sm font-medium text-slate-700 hover:border-primary hover:text-primary transition-all"
-                      >
-                        {getMarketplaceName(link.platform)}
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
               {/* Specs */}
               {product.specifications.length > 0 && (
