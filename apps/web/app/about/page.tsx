@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users, Fire, Activity } from "lucide-react";
+import { Shield, Heart, Zap, Star, Target, BookOpen, Award, Users, Flame as Fire, Activity } from "lucide-react";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { SectionTitle } from "@/components/ui/SectionTitle";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";

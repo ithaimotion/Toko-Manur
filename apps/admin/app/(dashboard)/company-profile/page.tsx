@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Fire, Award, Activity } from "lucide-react";
+import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Flame as Fire, Award, Activity } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { mockCompanyProfile } from "@toko-manur/mock-data";

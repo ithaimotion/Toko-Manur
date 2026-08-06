@@ -8,7 +8,7 @@ import {
   Heart,
   Zap,
   Star,
-  Fire,
+  Flame as Fire,
   Award,
   Activity,
   Globe,
