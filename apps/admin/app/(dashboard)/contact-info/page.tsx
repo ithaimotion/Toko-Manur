@@ -89,7 +89,7 @@ export default function AdminContactInfoPage() {
       if (response.success) {
         toast.success("Informasi kontak berhasil disimpan.");
       } else {
-        toast.error(response.error || "Gagal menyimpan informasi kontak.");
+        toast.error((response as any).error || "Gagal menyimpan informasi kontak.");
       }
     } catch (err) {
       toast.error("Gagal menyimpan informasi kontak.");

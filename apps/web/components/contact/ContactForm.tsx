@@ -39,7 +39,7 @@ export function ContactForm() {
       setForm({ name: "", email: "", phone: "", subject: "", message: "" });
     } else {
       setStatus("error");
-      setErrorMessage(response.error || "Gagal mengirim pesan. Silakan coba lagi.");
+      setErrorMessage((response as any).error || "Gagal mengirim pesan. Silakan coba lagi.");
     }
   };
 
