@@ -15,6 +15,7 @@
     "@tanstack/react-table": "^8.21.2",
     "@toko-manur/db": "workspace:*",
     "@toko-manur/mock-data": "workspace:*",
+    "@toko-manur/review-sync": "workspace:*",
     "@toko-manur/types": "workspace:*",
     "@toko-manur/utils": "workspace:*",
     "bcryptjs": "^3.0.3",

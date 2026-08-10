@@ -3,8 +3,8 @@ import Link from "next/link";
 import { ArrowRight, Package } from "lucide-react";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PromoSection } from "@/components/sections/PromoSection";
-import { TestimonialSection } from "@/components/sections/TestimonialSection";
 import { MarketplaceSection } from "@/components/sections/MarketplaceSection";
+import { Testimonials } from "@/components/sections/Testimonials";
 import { CTAWhatsApp } from "@/components/sections/CTAWhatsApp";
 import { ProductCard } from "@/components/products/ProductCard";
 import { BlogCard } from "@/components/blog/BlogCard";
@@ -13,11 +13,10 @@ import {
   mockHeroBanners,
   mockPromos,
   mockProducts,
-  mockBlogs,
-  mockTestimonials,
   mockMarketplaceLinks,
 } from "@toko-manur/mock-data";
 import { getContactInfo } from "@/../admin/app/actions/contact";
+import { getPublishedBlogs } from "@/app/actions/blog";
 
 export const metadata: Metadata = {
   title: "Toko Manur Baby Care — Pusat Popok & Perlengkapan Bayi Termurah",
@@ -42,11 +41,15 @@ const jsonLd = {
   },
 };
 
+export const revalidate = 300;
+
 export default async function HomePage() {
   const hero = mockHeroBanners.find((b) => b.isActive && b.order === 1) ?? mockHeroBanners[0];
   const featuredProducts = mockProducts.filter((p) => p.isFeatured && p.status === "published").slice(0, 4);
-  const recentBlogs = mockBlogs.filter((b) => b.status === "published").slice(0, 3);
-  const contactResponse = await getContactInfo();
+  const [recentBlogs, contactResponse] = await Promise.all([
+    getPublishedBlogs({ limit: 3 }),
+    getContactInfo(),
+  ]);
   const contact = contactResponse.success ? contactResponse.data : undefined;
 
   return (
@@ -98,8 +101,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <TestimonialSection testimonials={mockTestimonials} />
+      {/* Reviews - Apa Kata Mereka */}
+      <Testimonials />
 
       {/* Blog Preview */}
       <section className="section bg-white">

@@ -52,7 +52,7 @@ export const mockCategories: Category[] = [
     name: "Perawatan Kulit Bayi",
     slug: "perawatan-kulit-bayi",
     description: "Baby oil, lotion, diaper cream, dan sabun mandi khusus kulit sensitif bayi",
-    image: "https://images.unsplash.com/photo-1555252117-426bc81d11f5?w=400&h=300&fit=crop",
+    image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400&h=300&fit=crop",
     productCount: 30,
     createdAt: "2024-01-01T00:00:00Z",
     updatedAt: "2024-06-01T00:00:00Z",
@@ -226,7 +226,7 @@ export const mockProducts: Product[] = [
       "Krim pelindung ruam popok dengan pH 5.5 yang ideal untuk kulit bayi. Mengandung Titanium Dioxide dan Panthenol untuk melindungi dari iritasi ekskresi dan merangsang proses penyembuhan kulit.",
     shortDescription: "Krim anti ruam popok teruji klinis dengan pH 5.5.",
     images: [
-      { id: "img-7", url: "https://images.unsplash.com/photo-1555252117-426bc81d11f5?w=800&h=600&fit=crop", alt: "Sebamed Rash Cream", isPrimary: true },
+      { id: "img-7", url: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop", alt: "Sebamed Rash Cream", isPrimary: true },
     ],
     categoryId: "cat-4",
     category: mockCategories[3],
@@ -250,7 +250,7 @@ export const mockProducts: Product[] = [
       "Pembersih 2-in-1 dari ujung rambut hingga ujung kaki. Diperkaya dengan ekstrak Calendula organik yang menenangkan kulit bayi, bebas pedih di mata, hypoallergenic, dan teruji oleh dermatologis.",
     shortDescription: "Sabun dan sampo bayi lembut dengan ekstrak Calendula.",
     images: [
-      { id: "img-8", url: "https://images.unsplash.com/photo-1555252117-426bc81d11f5?w=800&h=600&fit=crop", alt: "Cetaphil Baby Wash", isPrimary: true },
+      { id: "img-8", url: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop", alt: "Cetaphil Baby Wash", isPrimary: true },
     ],
     categoryId: "cat-4",
     category: mockCategories[3],

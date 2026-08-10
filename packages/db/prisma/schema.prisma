@@ -34,6 +34,7 @@ model User {
   lastLogin DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  blogs     Blog[]
 
   @@map("users")
 }
@@ -90,4 +91,70 @@ model ContactInfo {
   updatedAt       DateTime @updatedAt
 
   @@map("contact_info")
+}
+
+enum Marketplace {
+  SHOPEE
+  TOKOPEDIA
+  LAZADA
+}
+
+model Review {
+  id          String      @id @default(cuid())
+  marketplace Marketplace
+  reviewId    String      @unique
+  productName String
+  username    String
+  rating      Int
+  comment     String?     @db.Text
+  reviewDate  DateTime
+  images      Json?
+  videos      Json?
+  featured    Boolean     @default(false)
+  category    String?
+  sentiment   String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("marketplace_reviews")
+}
+
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  blogs       Blog[]
+
+  @@map("blog_categories")
+}
+
+enum BlogStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Blog {
+  id             String        @id @default(cuid())
+  title          String
+  slug           String        @unique
+  excerpt        String        @db.Text
+  content        String        @db.Text
+  coverImage     String?
+  seoTitle       String?
+  seoDescription String?       @db.Text
+  status         BlogStatus    @default(DRAFT)
+  publishedAt    DateTime?
+  readingTime    Int           @default(5)
+  authorId       String
+  author         User          @relation(fields: [authorId], references: [id])
+  categoryId     String?
+  category       BlogCategory? @relation(fields: [categoryId], references: [id])
+  tags           Json?         // Store array of strings
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("blogs")
 }

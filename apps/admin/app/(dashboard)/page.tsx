@@ -43,7 +43,7 @@ export default function DashboardPage() {
           color="green"
         />
         <StatsCard
-          label="Testimoni"
+          label="Review Terkumpul"
           value={stats.totalTestimonials}
           change={5}
           changeLabel="baru bulan ini"
@@ -147,7 +147,6 @@ export default function DashboardPage() {
               {[
                 { label: "Tambah Produk", href: "/products/new", icon: Package },
                 { label: "Tulis Artikel", href: "/blogs/new", icon: FileText },
-                { label: "Kelola Testimoni", href: "/testimonials", icon: Star },
                 { label: "Edit Hero Banner", href: "/hero-banner", icon: Activity },
               ].map(({ label, href, icon: Icon }) => (
                 <Link

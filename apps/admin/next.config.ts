@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@toko-manur/types", "@toko-manur/mock-data", "@toko-manur/utils"],
+  serverExternalPackages: ["playwright", "playwright-core", "chromium-bidi"],
+  transpilePackages: ["@toko-manur/types", "@toko-manur/mock-data", "@toko-manur/utils", "@toko-manur/review-sync"],
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
@@ -11,6 +12,15 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react"],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals = [...(config.externals || []), 
+        'playwright', 'playwright-core', 'chromium-bidi',
+        'playwright-extra', 'playwright-extra-plugin-stealth',
+      ];
+    }
+    return config;
   },
 };
 

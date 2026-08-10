@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Save, X, ImagePlus, Loader2, AlertCircle } from "lucide-react";
+import { useRouter, useParams } from "next/navigation";
+import { Save, X, ImagePlus, Loader2, AlertCircle, Trash2, ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ConfirmDeleteModal } from "@/components/ui/ConfirmDeleteModal";
 
 interface BlogCategory {
   id: string;
@@ -11,11 +13,19 @@ interface BlogCategory {
   slug: string;
 }
 
-export default function NewBlogPage() {
+export default function EditBlogPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [blogTitle, setBlogTitle] = useState("");
+
   const [form, setForm] = useState({
     title: "",
     slug: "",
@@ -27,35 +37,50 @@ export default function NewBlogPage() {
     status: "draft" as "draft" | "published",
   });
 
-  // Fetch kategori dari database
+  // Fetch blog data & kategori
   useEffect(() => {
-    fetch("/api/blog-categories")
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setCategories(data);
-      })
-      .catch(() => {
-        // Kategori tidak tersedia, biarkan dropdown kosong
-      });
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [blogRes, catsRes] = await Promise.all([
+          fetch(`/api/blogs/${id}`),
+          fetch("/api/blog-categories"),
+        ]);
+
+        if (!blogRes.ok) {
+          throw new Error("Blog tidak ditemukan");
+        }
+
+        const blog = await blogRes.json();
+        const cats = await catsRes.json();
+
+        setBlogTitle(blog.title);
+        setForm({
+          title: blog.title,
+          slug: blog.slug,
+          categoryId: blog.categoryId ?? "",
+          excerpt: blog.excerpt ?? "",
+          content: blog.content,
+          seoTitle: blog.seoTitle ?? "",
+          seoDescription: blog.seoDescription ?? "",
+          status: blog.status === "PUBLISHED" ? "published" : "draft",
+        });
+
+        if (Array.isArray(cats)) setCategories(cats);
+      } catch (err: any) {
+        setError(err.message || "Gagal memuat data artikel");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setForm((p) => ({
-      ...p,
-      [name]: value,
-      ...(name === "title"
-        ? {
-            slug: value
-              .toLowerCase()
-              .replace(/\s+/g, "-")
-              .replace(/[^a-z0-9-]/g, ""),
-            seoTitle: value,
-          }
-        : {}),
-    }));
+    setForm((p) => ({ ...p, [name]: value }));
   };
 
   const handleSave = async (status: "draft" | "published") => {
@@ -72,22 +97,16 @@ export default function NewBlogPage() {
     setSaving(true);
 
     try {
-      const payload = {
-        ...form,
-        status,
-        slug: form.slug || form.title.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""),
-      };
-
-      const res = await fetch("/api/blogs", {
-        method: "POST",
+      const res = await fetch(`/api/blogs/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...form, status }),
       });
 
       const result = await res.json();
 
       if (!res.ok) {
-        throw new Error(result.error || "Gagal menyimpan artikel");
+        throw new Error(result.error || "Gagal menyimpan perubahan");
       }
 
       router.push("/blogs");
@@ -99,23 +118,70 @@ export default function NewBlogPage() {
     }
   };
 
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/blogs/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Gagal menghapus artikel");
+      }
+      router.push("/blogs");
+      router.refresh();
+    } catch (err: any) {
+      setError(err.message || "Terjadi kesalahan saat menghapus");
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3 text-muted-foreground">
+        <Loader2 className="w-8 h-8 animate-spin" />
+        <p className="text-sm">Memuat artikel...</p>
+      </div>
+    );
+  }
+
+  if (error && !form.title) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+        <AlertCircle className="w-10 h-10 text-destructive" />
+        <p className="text-muted-foreground text-sm">{error}</p>
+        <Link href="/blogs" className="btn-admin-secondary">
+          <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div>
       <PageHeader
-        title="Tulis Artikel Baru"
+        title="Edit Artikel"
+        description={blogTitle}
         breadcrumb={[
           { label: "Dashboard", href: "/" },
           { label: "Blog", href: "/blogs" },
-          { label: "Baru" },
+          { label: "Edit" },
         ]}
         action={
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => router.back()}
               disabled={saving}
               className="btn-admin-secondary"
             >
               <X className="w-4 h-4" /> Batal
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-red-200 text-destructive hover:bg-red-50 transition-all disabled:opacity-60"
+            >
+              <Trash2 className="w-4 h-4" /> Hapus
             </button>
             <button
               onClick={() => handleSave("draft")}
@@ -139,7 +205,7 @@ export default function NewBlogPage() {
               ) : (
                 <Save className="w-4 h-4" />
               )}{" "}
-              Publikasikan
+              {form.status === "published" ? "Perbarui" : "Publikasikan"}
             </button>
           </div>
         }
@@ -199,7 +265,7 @@ export default function NewBlogPage() {
                   value={form.excerpt}
                   onChange={handleChange}
                   rows={3}
-                  placeholder="Ringkasan singkat artikel untuk preview dan SEO..."
+                  placeholder="Ringkasan singkat artikel..."
                   className="admin-input resize-none"
                 />
               </div>
@@ -296,14 +362,9 @@ export default function NewBlogPage() {
                     </option>
                   ))}
                 </select>
-                {categories.length === 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Belum ada kategori tersedia
-                  </p>
-                )}
               </div>
               <div>
-                <label className="admin-label">Status Awal</label>
+                <label className="admin-label">Status</label>
                 <select
                   name="status"
                   value={form.status}
@@ -311,7 +372,7 @@ export default function NewBlogPage() {
                   className="admin-input"
                 >
                   <option value="draft">Draft</option>
-                  <option value="published">Langsung Publik</option>
+                  <option value="published">Aktif / Publik</option>
                 </select>
               </div>
             </div>
@@ -319,7 +380,7 @@ export default function NewBlogPage() {
 
           {/* Preview info */}
           <div className="admin-card p-5 bg-muted/40">
-            <h3 className="font-semibold text-sm mb-3 text-muted-foreground uppercase tracking-wide">Preview Info</h3>
+            <h3 className="font-semibold text-sm mb-3 text-muted-foreground uppercase tracking-wide">Info Artikel</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Panjang konten</span>
@@ -332,13 +393,35 @@ export default function NewBlogPage() {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status</span>
                 <span className={`font-medium ${form.status === "published" ? "text-emerald-600" : "text-amber-600"}`}>
-                  {form.status === "published" ? "Akan dipublikasikan" : "Akan disimpan draft"}
+                  {form.status === "published" ? "Aktif" : "Draft"}
                 </span>
               </div>
             </div>
           </div>
+
+          {/* Danger zone */}
+          <div className="admin-card p-5 border border-red-100">
+            <h3 className="font-semibold text-sm mb-3 text-destructive uppercase tracking-wide">Zona Berbahaya</h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              Menghapus artikel bersifat permanen dan tidak bisa dibatalkan.
+            </p>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 text-sm font-medium text-destructive border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" /> Hapus Artikel Ini
+            </button>
+          </div>
         </div>
       </div>
+
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        itemName={blogTitle}
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => !deleting && setShowDeleteModal(false)}
+      />
     </div>
   );
 }

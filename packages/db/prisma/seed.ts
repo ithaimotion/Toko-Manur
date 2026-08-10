@@ -7,7 +7,6 @@ const defaultContact = {
   whatsapp: "6281234567890",
   whatsappMessage: "Halo, saya ingin tahu lebih lanjut tentang Toko Manur.",
   googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3951.0000000000004!2d112.63000000000001!3d-7.9800000000000005!2m3!1f0!2f0!3f0!3m2!1m1!2s0x0%3A0x0!5e0!3m2!1sid!2sid!4v1710000000000",
-  googleMapsUrl: "https://maps.google.com/?q=Toko+Manur",
   businessHours: "Senin – Sabtu: 08.00 – 17.00 WIB",
 };
 
