@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import "tw-animate-css/dist/tw-animate.css";
 import "./globals.css";
 import { Navbar } from "@/components/web/layout/Navbar";
 import { Footer } from "@/components/web/layout/Footer";
