@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 280px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #333;
+    }
+    h2 {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 12px;
+      color: #111;
+    }
+    p {
+      font-size: 13px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+      color: #555;
+    }
+    button {
+      background-color: #f97316;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s;
+    }
+    button:hover {
+      background-color: #ea580c;
+    }
+    button:disabled {
+      background-color: #fdba74;
+      cursor: not-allowed;
+    }
+    #status {
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+    .success { color: #16a34a; }
+    .error { color: #dc2626; }
+    .warning { color: #d97706; }
+  </style>
+</head>
+<body>
+  <h2>Toko Manur Sync</h2>
+  <p>Pastikan Anda sedang berada di halaman produk Shopee dan bagian ulasan (bintang) sudah terlihat di layar browser.</p>
+  <button id="syncBtn">Tarik Review Sekarang</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

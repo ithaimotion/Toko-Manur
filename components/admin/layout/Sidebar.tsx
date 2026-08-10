@@ -1,0 +1,162 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard, Package, Tag, FileText, Star, Image as ImageIcon, Megaphone,
+  ShoppingBag, Building2, Phone, Users, Settings, Baby, ChevronLeft,
+  ChevronRight, ExternalLink, Key, MessageSquare
+} from "lucide-react";
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: number;
+}
+
+const navSections: { title: string; items: NavItem[] }[] = [
+  {
+    title: "Utama",
+    items: [
+      { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: "Konten",
+    items: [
+      { label: "Produk", href: "/admin/products", icon: Package, badge: 8 },
+      { label: "Kategori Blog", href: "/admin/categories", icon: Tag },
+      { label: "Blog", href: "/admin/blogs", icon: FileText, badge: 6 },
+      { label: "Review Sync", href: "/admin/reviews", icon: MessageSquare },
+    ],
+  },
+  {
+    title: "Tampilan",
+    items: [
+      { label: "Hero Banner", href: "/admin/hero-banner", icon: ImageIcon },
+      { label: "Promo", href: "/admin/promo", icon: Megaphone },
+      { label: "Marketplace", href: "/admin/marketplace", icon: ShoppingBag },
+    ],
+  },
+  {
+    title: "Perusahaan",
+    items: [
+      { label: "Profil Perusahaan", href: "/admin/company-profile", icon: Building2 },
+      { label: "Info Kontak", href: "/admin/contact-info", icon: Phone },
+    ],
+  },
+  {
+    title: "Sistem",
+    items: [
+      { label: "Pengguna", href: "/admin/users", icon: Users },
+      { label: "Permintaan Reset", href: "/admin/users/reset-requests", icon: Key },
+      { label: "Pengaturan", href: "/admin/settings", icon: Settings },
+    ],
+  },
+];
+
+export function Sidebar() {
+  const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === "/admin") return pathname === "/admin";
+    
+    // Temukan semua href (selain "/admin") yang cocok dengan pathname
+    const allHrefs = navSections.flatMap(s => s.items.map(i => i.href)).filter(h => h !== "/admin");
+    const matchedHrefs = allHrefs.filter(h => pathname === h || pathname.startsWith(`${h}/`));
+    
+    if (matchedHrefs.length > 0) {
+      // Cari href yang paling spesifik (paling panjang)
+      const longestMatch = matchedHrefs.reduce((a, b) => a.length > b.length ? a : b);
+      return href === longestMatch;
+    }
+    
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  return (
+    <aside
+      className={`bg-sidebar flex flex-col h-full transition-all duration-300 shrink-0 ${
+        collapsed ? "w-[72px]" : "w-[260px]"
+      }`}
+    >
+      {/* Logo */}
+      <div className={`flex items-center h-16 border-b border-sidebar-border px-4 ${collapsed ? "justify-center" : "gap-3"}`}>
+        <div className="w-8 h-8 relative rounded-lg overflow-hidden shrink-0">
+          <Image src="/logo-manur.jpeg" alt="Toko Manur Logo" fill className="object-cover" />
+        </div>
+        {!collapsed && (
+          <div>
+            <p className="text-[#2f2a33] font-bold text-sm">Toko Manur Baby</p>
+            <p className="text-[#7c6d7e] text-xs">Admin Panel</p>
+          </div>
+        )}
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin px-3">
+        {navSections.map((section) => (
+          <div key={section.title} className="mb-6">
+            {!collapsed && (
+              <p className="text-xs font-semibold text-[#8a7d8d] uppercase tracking-wider px-3 mb-2">
+                {section.title}
+              </p>
+            )}
+            <div className="space-y-1">
+              {section.items.map(({ label, href, icon: Icon, badge }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  title={collapsed ? label : undefined}
+                  className={`${
+                    isActive(href) ? "sidebar-link-active" : "sidebar-link"
+                  } ${collapsed ? "justify-center px-0" : ""}`}
+                >
+                  <Icon className="w-5 h-5 shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1">{label}</span>
+                      {badge !== undefined && (
+                        <span className="ml-auto bg-[#78a4cb] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                          {badge}
+                        </span>
+                      )}
+                    </>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* View Site */}
+      {!collapsed && (
+        <div className="px-3 py-3 border-t border-sidebar-border">
+          <a
+            href="http://localhost:3000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="sidebar-link text-xs opacity-70 hover:opacity-100"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Lihat Website
+          </a>
+        </div>
+      )}
+
+      {/* Collapse toggle */}
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="flex items-center justify-center h-10 border-t border-sidebar-border text-[#8a7d8d] hover:text-[#78a4cb] transition-colors"
+        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+      >
+        {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+      </button>
+    </aside>
+  );
+}

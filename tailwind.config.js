@@ -1,0 +1,129 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: ["class"],
+  content: [
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
+  ],
+  theme: {
+    container: {
+      center: true,
+      padding: { DEFAULT: "1rem", sm: "2rem", lg: "4rem", xl: "5rem", "2xl": "6rem" },
+    },
+    extend: {
+      colors: {
+        primary: {
+          50: "#f7fbfd",
+          100: "#edf7fb",
+          200: "#dcecf4",
+          300: "#c5e2eb",
+          400: "#b4e1eb",
+          500: "#9ed0de",
+          600: "#78a4cb",
+          700: "#5f88af",
+          800: "#4d6e92",
+          900: "#405b78",
+          950: "#2f4458",
+          DEFAULT: "#78a4cb",
+          foreground: "#ffffff",
+        },
+        secondary: {
+          50: "#fdf7fc",
+          100: "#f9eaf6",
+          200: "#f2d6eb",
+          300: "#e8c5e5",
+          400: "#f19ed2",
+          500: "#e07bbf",
+          600: "#c95fa4",
+          DEFAULT: "#e8c5e5",
+          foreground: "#5b3a53",
+        },
+        accent: {
+          DEFAULT: "#f19ed2",
+          foreground: "#ffffff",
+        },
+        // Admin-specific colors
+        sidebar: {
+          DEFAULT: "#fdfcff",
+          foreground: "#4b3f49",
+          hover: "#f6edf7",
+          active: "#eef7fb",
+          "active-foreground": "#2f2a33",
+          border: "#e8dce7",
+        },
+        destructive: {
+          DEFAULT: "#ef4444",
+          foreground: "#ffffff",
+        },
+        warning: {
+          DEFAULT: "#f59e0b",
+          foreground: "#ffffff",
+        },
+        success: {
+          DEFAULT: "#22c55e",
+          foreground: "#ffffff",
+        },
+        muted: {
+          DEFAULT: "#f8fafc",
+          foreground: "#64748b",
+        },
+        border: "#e9dce8",
+        input: "#e9dce8",
+        ring: "#78a4cb",
+        background: "#fffcfe",
+        foreground: "#2f2a33",
+        card: {
+          DEFAULT: "#ffffff",
+          foreground: "#2f2a33",
+        },
+        popover: {
+          DEFAULT: "#ffffff",
+          foreground: "#2f2a33",
+        },
+      },
+      borderRadius: {
+        lg: "1rem",
+        md: "0.75rem",
+        sm: "0.5rem",
+        xl: "1.25rem",
+        "2xl": "1.5rem",
+        "3xl": "2rem",
+      },
+      fontFamily: {
+        sans: ["var(--font-plus-jakarta)", "var(--font-inter)", "system-ui", "sans-serif"],
+        admin: ["var(--font-inter)", "system-ui", "sans-serif"],
+      },
+      boxShadow: {
+        soft: "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
+        card: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
+        "card-hover": "0 4px 24px rgba(120, 164, 203, 0.18), 0 1px 3px rgba(0,0,0,0.08)",
+        glow: "0 0 40px rgba(120, 164, 203, 0.16)",
+      },
+      animation: {
+        "fade-in": "fadeIn 0.5s ease-in-out",
+        "slide-up": "slideUp 0.5s ease-out",
+        "slide-in-right": "slideInRight 0.4s ease-out",
+        float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2s linear infinite",
+        "marquee-left": "marqueeLeft 20s linear infinite",
+        "marquee-right": "marqueeRight 20s linear infinite",
+      },
+      keyframes: {
+        fadeIn: { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
+        slideUp: { "0%": { opacity: "0", transform: "translateY(20px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+        slideInRight: { "0%": { opacity: "0", transform: "translateX(20px)" }, "100%": { opacity: "1", transform: "translateX(0)" } },
+        float: { "0%, 100%": { transform: "translateY(0px)" }, "50%": { transform: "translateY(-10px)" } },
+        shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } },
+        marqueeLeft: { "0%": { transform: "translateX(0%)" }, "100%": { transform: "translateX(-50%)" } },
+        marqueeRight: { "0%": { transform: "translateX(-50%)" }, "100%": { transform: "translateX(0%)" } },
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "hero-pattern": "linear-gradient(135deg, #b4e1eb 0%, #f7fbfd 50%, #e8c5e5 100%)",
+        shimmer: "linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)",
+      },
+    },
+  },
+  plugins: [],
+};
