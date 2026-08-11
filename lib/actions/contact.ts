@@ -180,7 +180,7 @@ async function writeStoredContactMessages(payload: Partial<ContactMessage>): Pro
 async function ensureContactTableExists(): Promise<boolean> {
   try {
     const tables = (await db.$queryRawUnsafe(
-      "SHOW TABLES LIKE 'contact_info'"
+      "SELECT table_name as \"Tables_in_toko_manur\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'contact_info'"
     )) as Array<{ Tables_in_toko_manur?: string }>;
 
     if (tables.length > 0) {
@@ -214,7 +214,7 @@ async function ensureContactTableExists(): Promise<boolean> {
 async function ensureContactMessagesTableExists(): Promise<boolean> {
   try {
     const tables = (await db.$queryRawUnsafe(
-      "SHOW TABLES LIKE 'contact_messages'"
+      "SELECT table_name as \"Tables_in_toko_manur\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'contact_messages'"
     )) as Array<{ Tables_in_toko_manur?: string }>;
 
     if (tables.length > 0) {
