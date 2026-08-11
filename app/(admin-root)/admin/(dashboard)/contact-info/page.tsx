@@ -75,8 +75,7 @@ export default function AdminContactInfoPage() {
           }
         }
       }
-      
-      setForm((p) => ({ ...p, [name]: value, latitude: lat || "", longitude: lng || "" }));
+      setForm((p) => ({ ...p, [name]: url, latitude: lat || "", longitude: lng || "" }));
     } else {
       setForm((p) => ({ ...p, [name]: value }));
     }

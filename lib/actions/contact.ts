@@ -178,68 +178,11 @@ async function writeStoredContactMessages(payload: Partial<ContactMessage>): Pro
 }
 
 async function ensureContactTableExists(): Promise<boolean> {
-  try {
-    const tables = (await db.$queryRawUnsafe(
-      "SELECT table_name as \"Tables_in_toko_manur\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'contact_info'"
-    )) as Array<{ Tables_in_toko_manur?: string }>;
-
-    if (tables.length > 0) {
-      return true;
-    }
-
-    await db.$executeRawUnsafe(`
-      CREATE TABLE contact_info (
-        id VARCHAR(191) NOT NULL,
-        address TEXT NOT NULL,
-        email VARCHAR(191) NOT NULL,
-        whatsapp VARCHAR(191) NOT NULL,
-        whatsappMessage TEXT NULL,
-        googleMapsEmbed TEXT NULL,
-        latitude VARCHAR(191) NULL,
-        longitude VARCHAR(191) NULL,
-        businessHours VARCHAR(191) NULL,
-        createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        PRIMARY KEY (id)
-      ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-    `);
-
-    return true;
-  } catch (error) {
-    console.warn("Unable to ensure contact_info table exists:", error);
-    return false;
-  }
+  return true;
 }
 
 async function ensureContactMessagesTableExists(): Promise<boolean> {
-  try {
-    const tables = (await db.$queryRawUnsafe(
-      "SELECT table_name as \"Tables_in_toko_manur\" FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'contact_messages'"
-    )) as Array<{ Tables_in_toko_manur?: string }>;
-
-    if (tables.length > 0) {
-      return true;
-    }
-
-    await db.$executeRawUnsafe(`
-      CREATE TABLE contact_messages (
-        id VARCHAR(191) NOT NULL,
-        name VARCHAR(191) NOT NULL,
-        email VARCHAR(191) NOT NULL,
-        phone VARCHAR(191) NULL,
-        subject VARCHAR(191) NOT NULL,
-        message TEXT NOT NULL,
-        createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        PRIMARY KEY (id)
-      ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-    `);
-
-    return true;
-  } catch (error) {
-    console.warn("Unable to ensure contact_messages table exists:", error);
-    return false;
-  }
+  return true;
 }
 
 export async function getContactInfo() {

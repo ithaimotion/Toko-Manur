@@ -432,7 +432,7 @@ export const mockHeroBanners: HeroBanner[] = [
     title: "Kebutuhan Bunda & Si Kecil, Cukup Satu Klik!",
     subtitle: "Distributor popok dan perlengkapan bayi terlengkap",
     description: "Temukan berbagai macam popok bayi dari brand ternama, tisu basah, susu, hingga perlengkapan menyusui dengan harga spesial dan jaminan 100% original.",
-    image: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=1920&h=1080&fit=crop",
+    image: "/red-hero.png",
     ctaText: "Belanja Popok",
     ctaUrl: "/products",
     ctaSecondaryText: "Konsultasi Bunda",

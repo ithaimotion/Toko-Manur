@@ -17,6 +17,8 @@ import {
 import { getContactInfo } from "@/lib/actions/contact";
 import { getPublishedBlogs } from "@/app/(web)/actions/blog";
 import { getPromos } from "@/lib/actions/promo";
+import { getMarketplaceLinks } from "@/lib/actions/marketplace-links";
+import type { MarketplaceLink } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Toko Manur Baby Care — Pusat Popok & Perlengkapan Bayi Termurah",
@@ -46,13 +48,15 @@ export const revalidate = 300;
 export default async function HomePage() {
   const hero = mockHeroBanners.find((b) => b.isActive && b.order === 1) ?? mockHeroBanners[0];
   const featuredProducts = mockProducts.filter((p) => p.isFeatured && p.status === "published").slice(0, 4);
-  const [recentBlogs, contactResponse, promoResponse] = await Promise.all([
+  const [recentBlogs, contactResponse, promoResponse, marketplaceResponse] = await Promise.all([
     getPublishedBlogs({ limit: 3 }),
     getContactInfo(),
     getPromos(true),
+    getMarketplaceLinks(),
   ]);
   const contact = contactResponse.success ? contactResponse.data : undefined;
   const promos = promoResponse.success && promoResponse.data ? promoResponse.data : [];
+  const marketplaceLinks = (marketplaceResponse.success && marketplaceResponse.data ? marketplaceResponse.data : []) as MarketplaceLink[];
 
   return (
     <>
@@ -136,7 +140,7 @@ export default async function HomePage() {
       </section>
 
       {/* Marketplace */}
-      <MarketplaceSection links={mockMarketplaceLinks} />
+      {marketplaceLinks.length > 0 && <MarketplaceSection links={marketplaceLinks} />}
 
       {/* CTA WhatsApp */}
       <CTAWhatsApp

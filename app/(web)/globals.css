@@ -11,15 +11,15 @@
   --font-sans: var(--font-plus-jakarta), var(--font-inter), system-ui, sans-serif;
 
   /* Colors */
-  --color-primary: #78a4cb;
-  --color-primary-light: #b4e1eb;
-  --color-primary-dark: #5f88af;
-  --color-accent: #f19ed2;
+  --color-primary: #cf2525;
+  --color-primary-light: #ff4f4f;
+  --color-primary-dark: #991b1b;
+  --color-accent: #ffe7ce;
   --color-text: #2f2a33;
   --color-text-muted: #7a6e7d;
-  --color-border: #e9dce8;
-  --color-bg: #fffcfe;
-  --color-bg-subtle: #fdf7fc;
+  --color-border: #e2dcd3;
+  --color-bg: #f4f1ec;
+  --color-bg-subtle: #eae5de;
 
   /* Spacing */
   --section-padding: 5rem 0;
@@ -27,7 +27,7 @@
 
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  --shadow-card-hover: 0 4px 24px rgba(37, 99, 235, 0.12), 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-card-hover: 0 4px 24px rgba(207, 37, 37, 0.12), 0 1px 3px rgba(0,0,0,0.08);
 }
 
 /* ================================
@@ -177,8 +177,8 @@
   /* Buttons */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 
-           bg-gradient-to-r from-primary-600 via-primary-400 to-secondary-400 text-white font-semibold rounded-xl
-           hover:from-primary-700 hover:via-primary-500 hover:to-secondary-500
+           bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 text-white font-semibold rounded-xl
+           hover:from-primary-800 hover:via-primary-700 hover:to-primary-600
            transition-all duration-200 shadow-sm hover:shadow-md
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
   }
@@ -199,8 +199,8 @@
 
   .btn-whatsapp {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3
-           bg-gradient-to-r from-secondary-400 to-primary-400 text-slate-900 font-semibold rounded-xl
-           hover:from-secondary-500 hover:to-primary-500 transition-all duration-200 shadow-sm hover:shadow-md;
+           bg-gradient-to-r from-green-500 to-green-400 text-white font-semibold rounded-xl
+           hover:from-green-600 hover:to-green-500 transition-all duration-200 shadow-sm hover:shadow-md;
   }
 
   /* Badge */
@@ -230,7 +230,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 via-primary-400 to-secondary-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 bg-clip-text text-transparent;
   }
 
   /* Loading skeleton */
@@ -259,7 +259,8 @@
 
   /* Gradient backgrounds */
   .bg-hero {
-    background: linear-gradient(135deg, #b4e1eb 0%, #fffdfd 50%, #e8c5e5 100%);
+    background: #f4f1ec;
+    /* Optional: Add a subtle paper texture overlay if desired, but this solid color matches the image */
   }
 
   .bg-section-alt {
