@@ -19,7 +19,7 @@ export async function createMarketplaceLink(data: {
   platform: string;
   name: string;
   url: string;
-  description?: string;
+  description?: string | null;
   isActive: boolean;
   order: number;
 }) {
@@ -42,7 +42,7 @@ export async function updateMarketplaceLink(
     platform?: string;
     name?: string;
     url?: string;
-    description?: string;
+    description?: string | null;
     isActive?: boolean;
     order?: number;
   }
