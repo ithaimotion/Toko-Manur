@@ -97,7 +97,7 @@ export default async function AboutPage() {
             </div>
             <div className="relative rounded-3xl overflow-hidden aspect-[4/3] bg-slate-100">
               <Image
-                src="https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&h=600&fit=crop"
+                src="https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&h=600&fit=crop"
                 alt="Tentang Toko Manur"
                 fill
                 className="object-cover"

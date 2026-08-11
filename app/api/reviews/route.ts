@@ -8,10 +8,15 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const marketplace = searchParams.get('marketplace');
     const search = searchParams.get('search');
+    const featured = searchParams.get('featured');
     
     const where: any = {};
     if (marketplace && marketplace !== 'ALL') {
       where.marketplace = marketplace;
+    }
+    
+    if (featured === 'true') {
+      where.featured = true;
     }
     
     if (search) {

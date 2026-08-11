@@ -8,7 +8,7 @@
     "https://shopee.co.id/*",
     "https://*.tokopedia.com/*",
     "https://*.lazada.co.id/*",
-    "http://localhost:3001/*"
+    "http://localhost:3000/*"
   ],
   "action": {
     "default_popup": "popup.html",

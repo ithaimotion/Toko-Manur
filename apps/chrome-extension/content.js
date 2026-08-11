@@ -229,7 +229,7 @@
     }
 
     // Send to Localhost API
-    const response = await fetch('http://localhost:3001/api/reviews/extension-sync', {
+    const response = await fetch('http://localhost:3000/api/reviews/extension-sync', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
