@@ -1,14 +1,28 @@
 "use client";
 
 import { Bell, Search, User, LogOut, Settings, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logoutAction } from "@/lib/actions/auth";
 
+import { getMyProfile } from "@/lib/actions/users";
+import Image from "next/image";
+
 export function Header() {
   const router = useRouter();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [profile, setProfile] = useState<{name: string, role: string, avatar?: string | null} | null>(null);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const res = await getMyProfile();
+      if (res.success && res.data) {
+        setProfile(res.data);
+      }
+    }
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
@@ -47,12 +61,16 @@ export function Header() {
             onClick={() => setUserMenuOpen(!userMenuOpen)}
             className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#f8ebf6] transition-colors"
           >
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden border border-primary-200">
+              {profile?.avatar ? (
+                <Image src={profile.avatar} alt="Avatar" width={32} height={32} className="object-cover w-full h-full" />
+              ) : (
+                <User className="w-4 h-4 text-white" />
+              )}
             </div>
             <div className="hidden sm:block text-left">
-              <p className="text-sm font-semibold text-[#4b3f49] leading-none">Admin Utama</p>
-              <p className="text-xs text-[#8a7d8d] mt-0.5">Super Admin</p>
+              <p className="text-sm font-semibold text-[#4b3f49] leading-none">{profile?.name || "Memuat..."}</p>
+              <p className="text-[10px] uppercase font-bold text-primary mt-0.5">{profile?.role?.replace("_", " ") || "ADMIN"}</p>
             </div>
             <ChevronDown className="w-4 h-4 text-[#8a7d8d] hidden sm:block" />
           </button>
@@ -60,12 +78,12 @@ export function Header() {
           {userMenuOpen && (
             <div className="absolute right-0 top-12 w-48 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-1 z-50">
               <Link
-                href="/settings"
+                href="/admin/profile"
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
                 onClick={() => setUserMenuOpen(false)}
               >
-                <Settings className="w-4 h-4 text-muted-foreground" />
-                Pengaturan
+                <User className="w-4 h-4 text-muted-foreground" />
+                Profil Saya
               </Link>
               <hr className="my-1 border-border" />
               <button 

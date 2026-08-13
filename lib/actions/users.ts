@@ -2,6 +2,7 @@
 
 import { db, Role, UserStatus, RequestStatus } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 
 export async function getUsers() {
@@ -29,6 +30,9 @@ export async function createUser(formData: { name: string; email: string; role: 
         status: UserStatus.ACTIVE,
       },
     });
+
+    await logUserActivity(newUser.id, "Akun Dibuat", `Akun pengguna dengan peran ${formData.role} telah dibuat.`);
+
     revalidatePath("/users");
     return { success: true, data: newUser };
   } catch (error) {
@@ -62,6 +66,68 @@ export async function toggleUserStatus(id: string, currentStatus: UserStatus) {
   } catch (error) {
     console.error("Failed to toggle status:", error);
     return { success: false, error: "Gagal mengubah status pengguna." };
+  }
+}
+
+// ================= PROFILE ACTIONS =================
+
+export async function getMyProfile() {
+  try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("admin_session")?.value;
+    
+    if (!sessionId) {
+      return { success: false, error: "Tidak ada sesi aktif." };
+    }
+
+    const user = await db.user.findUnique({
+      where: { id: sessionId },
+    });
+
+    if (!user) {
+      return { success: false, error: "Pengguna tidak ditemukan." };
+    }
+
+    return { success: true, data: { id: user.id, name: user.name, email: user.email, role: user.role, avatar: user.avatar } };
+  } catch (error) {
+    console.error("Failed to fetch profile:", error);
+    return { success: false, error: "Gagal mengambil profil." };
+  }
+}
+
+export async function updateMyProfile(formData: { name: string; email: string; password?: string; avatar?: string }) {
+  try {
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("admin_session")?.value;
+    
+    if (!sessionId) {
+      return { success: false, error: "Tidak ada sesi aktif." };
+    }
+
+    const dataToUpdate: any = {
+      name: formData.name,
+      email: formData.email,
+    };
+
+    if (formData.avatar !== undefined) {
+      dataToUpdate.avatar = formData.avatar;
+    }
+
+    if (formData.password && formData.password.trim() !== "") {
+      dataToUpdate.password = await bcrypt.hash(formData.password, 10);
+    }
+
+    const updated = await db.user.update({
+      where: { id: sessionId },
+      data: dataToUpdate,
+    });
+
+    await logUserActivity(sessionId, "Update Profil", "Berhasil memperbarui informasi profil atau password.");
+
+    return { success: true, data: { id: updated.id, name: updated.name, email: updated.email, avatar: updated.avatar } };
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    return { success: false, error: "Gagal memperbarui profil. Email mungkin sudah digunakan." };
   }
 }
 
@@ -106,5 +172,34 @@ export async function updateResetRequestStatus(id: string, status: RequestStatus
   } catch (error) {
     console.error("Failed to update reset request:", error);
     return { success: false, error: "Gagal memperbarui status permintaan." };
+  }
+}
+
+// ================= USER ACTIVITY ACTIONS =================
+
+export async function logUserActivity(userId: string, action: string, details?: string) {
+  try {
+    await db.userActivity.create({
+      data: {
+        userId,
+        action,
+        details,
+      },
+    });
+  } catch (error) {
+    console.error("Failed to log user activity:", error);
+  }
+}
+
+export async function getUserActivity(userId: string) {
+  try {
+    const activities = await db.userActivity.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+    return { success: true, data: activities };
+  } catch (error) {
+    console.error("Failed to fetch user activity:", error);
+    return { success: false, error: "Gagal mengambil log aktivitas." };
   }
 }

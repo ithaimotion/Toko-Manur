@@ -52,8 +52,6 @@ const navSections: { title: string; items: NavItem[] }[] = [
     title: "Sistem",
     items: [
       { label: "Pengguna", href: "/admin/users", icon: Users },
-      { label: "Permintaan Reset", href: "/admin/users/reset-requests", icon: Key },
-      { label: "Pengaturan", href: "/admin/settings", icon: Settings },
     ],
   },
 ];

@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
+import { logUserActivity } from "./users";
 
 export async function loginAction(email: string, password: string) {
   try {
@@ -28,6 +29,8 @@ export async function loginAction(email: string, password: string) {
       where: { id: user.id },
       data: { lastLogin: new Date() },
     });
+
+    await logUserActivity(user.id, "Login Berhasil", "Pengguna berhasil masuk ke sistem admin panel.");
 
     // Save simple session cookie
     const cookieStore = await cookies();

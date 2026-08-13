@@ -32,10 +32,12 @@ model User {
   password  String     @default("12345678")
   role      Role       @default(EDITOR)
   status    UserStatus @default(ACTIVE)
+  avatar    String?
   lastLogin DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   blogs     Blog[]
+  activities UserActivity[]
 
   @@map("users")
 }
@@ -48,6 +50,17 @@ model ResetRequest {
   updatedAt DateTime      @updatedAt
 
   @@map("reset_requests")
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  details   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  @@map("user_activities")
 }
 
 model ContactMessage {

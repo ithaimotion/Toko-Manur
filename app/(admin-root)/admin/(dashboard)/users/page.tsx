@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Shield, User, RefreshCw, ToggleLeft, ToggleRight } from "lucide-react";
+import { Plus, Trash2, Shield, User, RefreshCw, ToggleLeft, ToggleRight, Eye, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
-import { getUsers, createUser, deleteUser, toggleUserStatus } from "@/lib/actions/users";
+import { getUsers, createUser, deleteUser, toggleUserStatus, getUserActivity } from "@/lib/actions/users";
 import type { Role, UserStatus } from "@/lib/db";
 
 interface UserItem {
@@ -25,6 +25,9 @@ export default function AdminUsersPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [detailTarget, setDetailTarget] = useState<UserItem | null>(null);
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -78,6 +81,18 @@ export default function AdminUsersPage() {
     if (res.success) {
       fetchUsers();
     }
+  };
+
+  const handleViewDetail = async (user: UserItem) => {
+    setDetailTarget(user);
+    setLoadingActivities(true);
+    const res = await getUserActivity(user.id);
+    if (res.success && res.data) {
+      setActivities(res.data);
+    } else {
+      setActivities([]);
+    }
+    setLoadingActivities(false);
   };
 
   return (
@@ -151,6 +166,13 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-2 justify-end">
+                    <button 
+                      onClick={() => handleViewDetail(u)} 
+                      className="p-1.5 hover:bg-primary-50 hover:text-primary-600 rounded-md transition-colors text-muted-foreground"
+                      title="Detail Pengguna"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
                     {u.role !== "SUPER_ADMIN" && (
                       <button 
                         onClick={() => setDeleteTarget({ id: u.id, name: u.name })} 
@@ -227,6 +249,51 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+      {/* Modal Detail User */}
+      {detailTarget && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-background border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl flex flex-col max-h-[85vh]">
+            <h2 className="text-lg font-bold text-foreground mb-1">Detail Pengguna</h2>
+            <p className="text-sm text-muted-foreground mb-4">Melihat log aktivitas {detailTarget.name}</p>
+            
+            <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin">
+              {loadingActivities ? (
+                <div className="flex items-center justify-center py-10">
+                  <RefreshCw className="w-5 h-5 animate-spin text-muted-foreground" />
+                </div>
+              ) : activities.length > 0 ? (
+                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
+                  {activities.map((log: any) => (
+                    <div key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 group-[.is-active]:bg-primary-100 text-slate-500 group-[.is-active]:text-primary-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
+                        <Clock className="w-4 h-4" />
+                      </div>
+                      <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] admin-card p-3 rounded-xl border border-border">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-semibold text-sm text-foreground">{log.action}</span>
+                          <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{new Date(log.createdAt).toLocaleString("id-ID", { dateStyle: "short", timeStyle: "short" })}</span>
+                        </div>
+                        <p className="text-xs text-slate-500">{log.details}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-border">
+                  <p className="text-sm text-muted-foreground">Belum ada aktivitas tercatat untuk pengguna ini.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4 mt-4 border-t border-border flex justify-end">
+              <button type="button" onClick={() => setDetailTarget(null)} className="btn-admin-secondary">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         itemName={deleteTarget?.name}
