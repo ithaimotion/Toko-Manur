@@ -9,9 +9,7 @@ import { CTAWhatsApp } from "@/components/web/sections/CTAWhatsApp";
 import { ProductCard } from "@/components/web/products/ProductCard";
 import { BlogCard } from "@/components/web/blog/BlogCard";
 import { SectionTitle } from "@/components/web/ui/SectionTitle";
-import {
-  mockProducts,
-} from "@/lib/mock-data";
+import { getFeaturedProducts } from "@/app/(web)/actions/product";
 import { getContactInfo } from "@/lib/actions/contact";
 import { getPublishedBlogs } from "@/app/(web)/actions/blog";
 import { getPromos } from "@/lib/actions/promo";
@@ -45,14 +43,15 @@ const jsonLd = {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const featuredProducts = mockProducts.filter((p) => p.isFeatured && p.status === "published").slice(0, 4);
-  const [recentBlogs, contactResponse, promoResponse, marketplaceResponse, heroBannersResponse] = await Promise.all([
+  const [featuredProductsRes, recentBlogs, contactResponse, promoResponse, marketplaceResponse, heroBannersResponse] = await Promise.all([
+    getFeaturedProducts({ limit: 4 }),
     getPublishedBlogs({ limit: 3 }),
     getContactInfo(),
     getPromos(true),
     getMarketplaceLinks(),
     getHeroBanners(true),
   ]);
+  const featuredProducts = (featuredProductsRes.success && featuredProductsRes.data ? featuredProductsRes.data : []) as any[];
   const contact = contactResponse.success ? contactResponse.data : undefined;
   const promos = promoResponse.success && promoResponse.data ? promoResponse.data : [];
   const marketplaceLinks = (marketplaceResponse.success && marketplaceResponse.data ? marketplaceResponse.data : []) as MarketplaceLink[];

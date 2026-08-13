@@ -30,11 +30,11 @@ export function ProductCard({ product }: ProductCardProps) {
               <Tag className="w-12 h-12 text-slate-300" />
             </div>
           )}
-          {/* Category Badge */}
-          {product.category && (
+          {/* Brand Badge */}
+          {product.brand && (
             <div className="absolute top-3 left-3">
               <span className="badge-primary text-xs">
-                {product.category.name}
+                {product.brand.name}
               </span>
             </div>
           )}
