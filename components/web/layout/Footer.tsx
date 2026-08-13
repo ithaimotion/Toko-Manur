@@ -19,12 +19,6 @@ const footerLinks = {
     { label: "Product", href: "/products" },
     { label: "Categories", href: "/categories" },
   ],
-  shop: [
-    { label: "Jacket", href: "/products?category=jacket" },
-    { label: "Torebag", href: "/products?category=torebag" },
-    { label: "Hat", href: "/products?category=hat" },
-    { label: "Blouse", href: "/products?category=blouse" },
-  ],
   cart: [
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
@@ -44,7 +38,7 @@ export function Footer({ contactInfo, settings }: FooterProps) {
       {/* Main Footer */}
       <div className="container mx-auto px-6 lg:px-12 pt-20 pb-48 lg:pb-72 relative z-10">
         <div className="flex flex-col lg:flex-row justify-between items-start gap-16 lg:gap-8 mb-24">
-          
+
           {/* Brand & Contact Column */}
           <div className="max-w-sm space-y-10">
             {/* Social Icons */}
@@ -91,31 +85,13 @@ export function Footer({ contactInfo, settings }: FooterProps) {
           </div>
 
           {/* Links Columns */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-16 lg:gap-28 w-full lg:w-auto">
+          <div className="grid grid-cols-2 gap-16 lg:gap-28 w-full lg:w-auto">
             <div>
               <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
                 MENU
               </h4>
               <ul className="space-y-4">
                 {footerLinks.menu.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[15px] text-gray-400 hover:text-white transition-colors"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
-                SHOP
-              </h4>
-              <ul className="space-y-4">
-                {footerLinks.shop.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
@@ -152,8 +128,8 @@ export function Footer({ contactInfo, settings }: FooterProps) {
         <div className="relative border-t border-[#e8dce7] pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
           {/* Get Started Button placed over the line */}
           <div className="absolute right-0 -top-5">
-            <Link 
-              href="/contact" 
+            <Link
+              href="/contact"
               className="bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-700 transition-colors"
             >
               Get Started

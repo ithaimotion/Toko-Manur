@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const brand = await db.brand.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: { products: true }
@@ -23,8 +24,9 @@ export async function GET(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { name, slug, description, image } = body;
 
@@ -35,7 +37,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const exists = await db.brand.findFirst({
       where: {
         slug,
-        NOT: { id: params.id }
+        NOT: { id }
       }
     });
 
@@ -44,7 +46,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     }
 
     const brand = await db.brand.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, slug, description, image },
     });
 
@@ -55,11 +57,12 @@ export async function PUT(request: Request, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     // Check if brand has products
     const brand = await db.brand.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: { select: { products: true } }
       }
@@ -74,7 +77,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     }
 
     await db.brand.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

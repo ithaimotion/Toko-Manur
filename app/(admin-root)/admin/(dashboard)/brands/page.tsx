@@ -312,10 +312,10 @@ export default function BrandsPage() {
       {/* Delete Confirmation */}
       <ConfirmDeleteModal
         isOpen={!!toDelete}
-        onClose={() => setToDelete(null)}
+        onCancel={() => setToDelete(null)}
         onConfirm={handleDelete}
         title="Hapus Brand"
-        description={`Apakah Anda yakin ingin menghapus brand "${toDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+        message={`Apakah Anda yakin ingin menghapus brand "${toDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
       />
     </div>
   );

@@ -9,9 +9,11 @@ interface ImageUploadProps {
   value: string;
   onChange: (url: string) => void;
   label?: string;
+  onRemove?: () => void;
+  aspectRatio?: string;
 }
 
-export function ImageUpload({ value, onChange, label = "Upload Gambar" }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, label = "Upload Gambar", onRemove, aspectRatio = "video" }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -67,13 +69,17 @@ export function ImageUpload({ value, onChange, label = "Upload Gambar" }: ImageU
   }, []);
 
   const removeImage = () => {
-    onChange("");
+    if (onRemove) {
+      onRemove();
+    } else {
+      onChange("");
+    }
   };
 
   if (value) {
     return (
       <div className="relative w-full rounded-xl overflow-hidden border border-slate-200 group">
-        <div className="relative aspect-video w-full bg-slate-100 flex items-center justify-center p-2">
+        <div className={`relative aspect-${aspectRatio} w-full bg-slate-100 flex items-center justify-center p-2`}>
           <img
             src={value}
             alt="Preview"

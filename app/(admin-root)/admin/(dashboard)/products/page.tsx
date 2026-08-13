@@ -225,10 +225,10 @@ export default function AdminProductsPage() {
 
       <ConfirmDeleteModal
         isOpen={!!toDelete}
-        onClose={() => setToDelete(null)}
+        onCancel={() => setToDelete(null)}
         onConfirm={handleDelete}
         title="Hapus Produk"
-        description={`Apakah Anda yakin ingin menghapus produk "${toDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
+        message={`Apakah Anda yakin ingin menghapus produk "${toDelete?.name}"? Tindakan ini tidak dapat dibatalkan.`}
       />
     </div>
   );
