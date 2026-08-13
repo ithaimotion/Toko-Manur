@@ -221,7 +221,7 @@ export default function AdminBlogsPage() {
                         <Eye className="w-4 h-4" />
                       </Link>
                       <Link
-                        href={`/blogs/${blog.id}/edit`}
+                        href={`/admin/blogs/${blog.id}/edit`}
                         className="p-1.5 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors text-muted-foreground"
                         title="Edit"
                       >

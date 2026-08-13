@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Save, X, ImagePlus, Loader2, AlertCircle, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { RichTextEditor } from "@/components/admin/ui/RichTextEditor";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
 
 interface BlogCategory {
@@ -109,7 +110,7 @@ export default function EditBlogPage() {
         throw new Error(result.error || "Gagal menyimpan perubahan");
       }
 
-      router.push("/blogs");
+      router.push("/admin/blogs");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan, coba lagi");
@@ -126,7 +127,7 @@ export default function EditBlogPage() {
         const err = await res.json();
         throw new Error(err.error || "Gagal menghapus artikel");
       }
-      router.push("/blogs");
+      router.push("/admin/blogs");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan saat menghapus");
@@ -150,7 +151,7 @@ export default function EditBlogPage() {
       <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
         <AlertCircle className="w-10 h-10 text-destructive" />
         <p className="text-muted-foreground text-sm">{error}</p>
-        <Link href="/blogs" className="btn-admin-secondary">
+        <Link href="/admin/blogs" className="btn-admin-secondary">
           <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar
         </Link>
       </div>
@@ -273,18 +274,11 @@ export default function EditBlogPage() {
                 <label className="admin-label">
                   Konten Artikel <span className="text-destructive">*</span>
                 </label>
-                <div className="border border-border rounded-xl overflow-hidden">
-                  <div className="bg-muted px-4 py-2 border-b border-border flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-semibold">Editor Konten</span>
-                    <span>· Mendukung HTML</span>
-                  </div>
-                  <textarea
-                    name="content"
+                <div className="border border-border rounded-xl overflow-hidden shadow-sm">
+                  <RichTextEditor
                     value={form.content}
-                    onChange={handleChange}
-                    rows={18}
+                    onChange={(val) => setForm(p => ({ ...p, content: val }))}
                     placeholder="Tulis konten artikel lengkap di sini..."
-                    className="w-full px-4 py-4 text-sm outline-none resize-y font-mono text-slate-700 leading-relaxed"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">

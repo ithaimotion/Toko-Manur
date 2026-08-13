@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Save, X, ImagePlus, Loader2, AlertCircle } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { RichTextEditor } from "@/components/admin/ui/RichTextEditor";
 
 interface BlogCategory {
   id: string;
@@ -90,7 +91,7 @@ export default function NewBlogPage() {
         throw new Error(result.error || "Gagal menyimpan artikel");
       }
 
-      router.push("/blogs");
+      router.push("/admin/blogs");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan, coba lagi");
@@ -207,18 +208,11 @@ export default function NewBlogPage() {
                 <label className="admin-label">
                   Konten Artikel <span className="text-destructive">*</span>
                 </label>
-                <div className="border border-border rounded-xl overflow-hidden">
-                  <div className="bg-muted px-4 py-2 border-b border-border flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-semibold">Editor Konten</span>
-                    <span>· Mendukung HTML</span>
-                  </div>
-                  <textarea
-                    name="content"
+                <div className="border border-border rounded-xl overflow-hidden shadow-sm">
+                  <RichTextEditor
                     value={form.content}
-                    onChange={handleChange}
-                    rows={18}
+                    onChange={(val) => setForm(p => ({ ...p, content: val }))}
                     placeholder="Tulis konten artikel lengkap di sini..."
-                    className="w-full px-4 py-4 text-sm outline-none resize-y font-mono text-slate-700 leading-relaxed"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">

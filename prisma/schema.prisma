@@ -26,17 +26,17 @@ enum RequestStatus {
 }
 
 model User {
-  id        String     @id @default(cuid())
-  name      String
-  email     String     @unique
-  password  String     @default("12345678")
-  role      Role       @default(EDITOR)
-  status    UserStatus @default(ACTIVE)
-  avatar    String?
-  lastLogin DateTime?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  blogs     Blog[]
+  id         String         @id @default(cuid())
+  name       String
+  email      String         @unique
+  password   String         @default("12345678")
+  role       Role           @default(EDITOR)
+  status     UserStatus     @default(ACTIVE)
+  avatar     String?
+  lastLogin  DateTime?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  blogs      Blog[]
   activities UserActivity[]
 
   @@map("users")
@@ -166,7 +166,7 @@ model Blog {
   author         User          @relation(fields: [authorId], references: [id])
   categoryId     String?
   category       BlogCategory? @relation(fields: [categoryId], references: [id])
-  tags           Json?         // Store array of strings
+  tags           Json? // Store array of strings
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -220,8 +220,8 @@ model HeroBanner {
   order            Int      @default(0)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
-  carouselItems    HeroCarouselItem[]
+
+  carouselItems HeroCarouselItem[]
 
   @@map("hero_banners")
 }
@@ -240,4 +240,42 @@ model HeroCarouselItem {
   updatedAt    DateTime   @updatedAt
 
   @@map("hero_carousel_items")
+}
+
+model Brand {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?   @db.Text
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@map("brands")
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model Product {
+  id               String        @id @default(cuid())
+  name             String
+  slug             String        @unique
+  description      String        @db.Text
+  shortDescription String?       @db.Text
+  images           Json
+  price            Float?
+  priceLabel       String?
+  isFeatured       Boolean       @default(false)
+  status           ProductStatus @default(PUBLISHED)
+  brandId          String
+  brand            Brand         @relation(fields: [brandId], references: [id])
+  specifications   Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@map("products")
 }

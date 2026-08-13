@@ -1,14 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Save, X, ImagePlus, Loader2, Star, Trash2, Plus } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 import { toast } from "sonner";
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+  
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [brands, setBrands] = useState<{id: string, name: string}[]>([]);
   
@@ -21,14 +25,41 @@ export default function NewProductPage() {
   });
 
   useEffect(() => {
-    // Fetch brands for dropdown
+    // Fetch brands
     fetch("/api/brands")
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setBrands(data);
       })
       .catch(() => toast.error("Gagal mengambil data brand"));
-  }, []);
+
+    // Fetch product details
+    fetch(`/api/products/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Gagal mengambil detail produk");
+        return res.json();
+      })
+      .then(data => {
+        setForm({
+          name: data.name,
+          slug: data.slug,
+          brandId: data.brandId,
+          shortDescription: data.shortDescription || "",
+          description: data.description || "",
+          price: data.price ? data.price.toString() : "",
+          priceLabel: data.priceLabel || "",
+          isFeatured: data.isFeatured,
+          status: data.status,
+          specs: data.specifications?.length > 0 ? data.specifications : [{ label: "", value: "" }],
+          images: data.images?.length > 0 ? data.images : [{ url: "", isPrimary: true }]
+        });
+      })
+      .catch(error => {
+        toast.error(error.message);
+        router.push("/admin/products");
+      })
+      .finally(() => setLoading(false));
+  }, [id, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -36,12 +67,6 @@ export default function NewProductPage() {
       ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
-    if (name === "name") {
-      setForm((prev) => ({ 
-        ...prev, 
-        slug: value.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") 
-      }));
-    }
   };
 
   const addSpec = () => setForm((p) => ({ ...p, specs: [...p.specs, { label: "", value: "" }] }));
@@ -84,8 +109,8 @@ export default function NewProductPage() {
         images: form.images.filter(img => img.url) // Only valid images
       };
 
-      const res = await fetch("/api/products", {
-        method: "POST",
+      const res = await fetch(`/api/products/${id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
@@ -94,7 +119,7 @@ export default function NewProductPage() {
       
       if (!res.ok) throw new Error(data.error || "Gagal menyimpan produk");
       
-      toast.success("Produk berhasil disimpan!");
+      toast.success("Produk berhasil diperbarui!");
       router.push("/admin/products");
     } catch (error: any) {
       toast.error(error.message);
@@ -103,11 +128,15 @@ export default function NewProductPage() {
     }
   };
 
+  if (loading) {
+    return <div className="p-8 text-center text-muted-foreground">Memuat data produk...</div>;
+  }
+
   return (
     <div>
       <PageHeader
-        title="Tambah Produk Baru"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Tambah Baru" }]}
+        title="Edit Produk"
+        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Edit" }]}
         action={
           <div className="flex gap-2">
             <button onClick={() => router.back()} className="btn-admin-secondary">

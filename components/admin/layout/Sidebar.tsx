@@ -28,6 +28,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
     title: "Konten",
     items: [
       { label: "Produk", href: "/admin/products", icon: Package, badge: 8 },
+      { label: "Brand", href: "/admin/brands", icon: Tag },
       { label: "Kategori Blog", href: "/admin/categories", icon: Tag },
       { label: "Blog", href: "/admin/blogs", icon: FileText, badge: 6 },
       { label: "Review Sync", href: "/admin/reviews", icon: MessageSquare },
@@ -56,9 +57,28 @@ const navSections: { title: string; items: NavItem[] }[] = [
   },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  productCount?: number;
+  blogCount?: number;
+  categoryCount?: number;
+  brandCount?: number;
+}
+
+export function Sidebar({ productCount = 0, blogCount = 0, categoryCount = 0, brandCount = 0 }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+
+  // Inject dynamic counts
+  const navSectionsWithCounts = navSections.map(section => ({
+    ...section,
+    items: section.items.map(item => {
+      if (item.label === "Produk") return { ...item, badge: productCount };
+      if (item.label === "Blog") return { ...item, badge: blogCount };
+      if (item.label === "Kategori Blog") return { ...item, badge: categoryCount };
+      if (item.label === "Brand") return { ...item, badge: brandCount };
+      return item;
+    })
+  }));
 
   const isActive = (href: string) => {
     if (href === "/admin") return pathname === "/admin";
@@ -97,7 +117,7 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-4 scrollbar-thin px-3">
-        {navSections.map((section) => (
+        {navSectionsWithCounts.map((section) => (
           <div key={section.title} className="mb-6">
             {!collapsed && (
               <p className="text-xs font-semibold text-[#8a7d8d] uppercase tracking-wider px-3 mb-2">
@@ -118,8 +138,8 @@ export function Sidebar() {
                   {!collapsed && (
                     <>
                       <span className="flex-1">{label}</span>
-                      {badge !== undefined && (
-                        <span className="ml-auto bg-[#78a4cb] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {badge !== undefined && badge > 0 && (
+                        <span className="ml-auto bg-[#78a4cb] text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center shrink-0 shadow-sm">
                           {badge}
                         </span>
                       )}
