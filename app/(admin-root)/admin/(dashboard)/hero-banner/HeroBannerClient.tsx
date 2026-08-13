@@ -329,7 +329,7 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={bIsActive} onValueChange={setBIsActive}>
+              <Select value={bIsActive} onValueChange={(val) => setBIsActive(val || "true")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="true">Aktif</SelectItem>
@@ -372,7 +372,7 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             </div>
             <div className="space-y-2">
               <Label>Status</Label>
-              <Select value={cIsActive} onValueChange={setCIsActive}>
+              <Select value={cIsActive} onValueChange={(val) => setCIsActive(val || "true")}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="true">Aktif</SelectItem>
