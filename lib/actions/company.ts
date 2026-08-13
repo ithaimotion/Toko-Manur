@@ -65,45 +65,7 @@ async function writeStoredProfile(payload: Partial<CompanyProfile>): Promise<Com
   return next;
 }
 
-async function ensureCompanyProfileTableExists(): Promise<boolean> {
-  try {
-    const tables = (await db.$queryRawUnsafe(
-      "SHOW TABLES LIKE 'company_profile'"
-    )) as Array<{ Tables_in_toko_manur?: string }>;
-
-    if (tables.length > 0) return true;
-
-    await db.$executeRawUnsafe(`
-      CREATE TABLE company_profile (
-        id VARCHAR(191) NOT NULL,
-        about TEXT NOT NULL,
-        vision VARCHAR(191) NOT NULL,
-        mission JSON NOT NULL,
-        values JSON NOT NULL,
-        brandStory TEXT NOT NULL,
-        founded VARCHAR(191) NOT NULL,
-        legalDocuments JSON NOT NULL,
-        createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-        PRIMARY KEY (id)
-      ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
-    `);
-
-    return true;
-  } catch (error) {
-    console.warn("Unable to ensure company_profile table exists:", error);
-    return false;
-  }
-}
-
 export async function getCompanyProfile() {
-  const canUseDb = await ensureCompanyProfileTableExists();
-
-  if (!canUseDb) {
-    const storage = await readStoredProfile();
-    return { success: true, data: storage };
-  }
-
   try {
     const profile = await db.companyProfile.findFirst({ orderBy: { updatedAt: "desc" } });
     if (!profile) {
@@ -131,15 +93,6 @@ export async function getCompanyProfile() {
 }
 
 export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
-  const canUseDb = await ensureCompanyProfileTableExists();
-
-  if (!canUseDb) {
-    const saved = await writeStoredProfile(payload);
-    revalidatePath("/about");
-    revalidatePath("/");
-    return { success: true, data: saved };
-  }
-
   try {
     const existing = await db.companyProfile.findFirst({ orderBy: { updatedAt: "desc" } });
 

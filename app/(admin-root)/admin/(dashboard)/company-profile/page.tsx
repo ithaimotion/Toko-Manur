@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Flame, Award, Activity } from "lucide-react";
+import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Flame, Award, Activity, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { mockCompanyProfile } from "@/lib/mock-data";
@@ -106,6 +106,13 @@ export default function AdminCompanyProfilePage() {
     }));
   };
 
+  const handleRemoveValue = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      values: prev.values.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleAddDocument = () => {
     setForm((prev) => ({
       ...prev,
@@ -126,6 +133,13 @@ export default function AdminCompanyProfilePage() {
     setForm((prev) => ({
       ...prev,
       legalDocuments: prev.legalDocuments.map((item, itemIndex) => (itemIndex === index ? { ...item, [field]: value } : item)),
+    }));
+  };
+
+  const handleRemoveDocument = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      legalDocuments: prev.legalDocuments.filter((_, i) => i !== index),
     }));
   };
 
@@ -203,9 +217,12 @@ export default function AdminCompanyProfilePage() {
             {form.values.map((val, index) => {
               const Opt = iconOptions.find((o) => o.value === val.icon)?.Icon ?? Star;
               return (
-                <div key={val.id} className="border border-border rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
+                <div key={val.id} className="border border-border rounded-lg p-4 relative group">
+                  <button type="button" onClick={() => handleRemoveValue(index)} className="absolute top-2 right-2 p-1.5 bg-red-50 text-red-500 rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <div className="flex items-center gap-3 mb-3 pr-8">
+                    <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center shrink-0">
                       <Opt className="w-5 h-5 text-primary" />
                     </div>
                     <select value={val.icon} onChange={(e) => handleValueChange(index, "icon", e.target.value)} className="admin-input w-28 text-xs py-1.5">
@@ -230,11 +247,16 @@ export default function AdminCompanyProfilePage() {
           </div>
           <div className="space-y-3">
             {form.legalDocuments.map((doc, index) => (
-              <div key={doc.id} className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 border border-border rounded-lg">
-                <input value={doc.name} onChange={(e) => handleDocumentChange(index, "name", e.target.value)} placeholder="Nama dokumen" className="admin-input text-sm" />
-                <input value={doc.number} onChange={(e) => handleDocumentChange(index, "number", e.target.value)} placeholder="Nomor dokumen" className="admin-input text-sm" />
-                <input value={doc.issuedBy} onChange={(e) => handleDocumentChange(index, "issuedBy", e.target.value)} placeholder="Diterbitkan oleh" className="admin-input text-sm" />
-                <input type="date" value={doc.issuedDate} onChange={(e) => handleDocumentChange(index, "issuedDate", e.target.value)} className="admin-input text-sm" />
+              <div key={doc.id} className="flex gap-3 p-4 border border-border rounded-lg items-center relative group">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1 pr-6">
+                  <input value={doc.name} onChange={(e) => handleDocumentChange(index, "name", e.target.value)} placeholder="Nama dokumen" className="admin-input text-sm" />
+                  <input value={doc.number} onChange={(e) => handleDocumentChange(index, "number", e.target.value)} placeholder="Nomor dokumen" className="admin-input text-sm" />
+                  <input value={doc.issuedBy} onChange={(e) => handleDocumentChange(index, "issuedBy", e.target.value)} placeholder="Diterbitkan oleh" className="admin-input text-sm" />
+                  <input type="date" value={doc.issuedDate} onChange={(e) => handleDocumentChange(index, "issuedDate", e.target.value)} className="admin-input text-sm" />
+                </div>
+                <button type="button" onClick={() => handleRemoveDocument(index)} className="absolute top-1/2 -translate-y-1/2 right-2 p-1.5 bg-red-50 text-red-500 rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             ))}
           </div>

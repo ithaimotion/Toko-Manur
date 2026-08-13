@@ -10,14 +10,13 @@ import { ProductCard } from "@/components/web/products/ProductCard";
 import { BlogCard } from "@/components/web/blog/BlogCard";
 import { SectionTitle } from "@/components/web/ui/SectionTitle";
 import {
-  mockHeroBanners,
   mockProducts,
-  mockMarketplaceLinks,
 } from "@/lib/mock-data";
 import { getContactInfo } from "@/lib/actions/contact";
 import { getPublishedBlogs } from "@/app/(web)/actions/blog";
 import { getPromos } from "@/lib/actions/promo";
 import { getMarketplaceLinks } from "@/lib/actions/marketplace-links";
+import { getHeroBanners } from "@/lib/actions/hero-banner";
 import type { MarketplaceLink } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -46,17 +45,18 @@ const jsonLd = {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const hero = mockHeroBanners.find((b) => b.isActive && b.order === 1) ?? mockHeroBanners[0];
   const featuredProducts = mockProducts.filter((p) => p.isFeatured && p.status === "published").slice(0, 4);
-  const [recentBlogs, contactResponse, promoResponse, marketplaceResponse] = await Promise.all([
+  const [recentBlogs, contactResponse, promoResponse, marketplaceResponse, heroBannersResponse] = await Promise.all([
     getPublishedBlogs({ limit: 3 }),
     getContactInfo(),
     getPromos(true),
     getMarketplaceLinks(),
+    getHeroBanners(true),
   ]);
   const contact = contactResponse.success ? contactResponse.data : undefined;
   const promos = promoResponse.success && promoResponse.data ? promoResponse.data : [];
   const marketplaceLinks = (marketplaceResponse.success && marketplaceResponse.data ? marketplaceResponse.data : []) as MarketplaceLink[];
+  const hero = heroBannersResponse.success && heroBannersResponse.data?.length ? heroBannersResponse.data[0] : null;
 
   return (
     <>
@@ -66,7 +66,7 @@ export default async function HomePage() {
       />
 
       {/* Hero */}
-      <HeroSection banner={hero} />
+      {hero && <HeroSection banner={hero as any} />}
 
       {/* Promo */}
       {promos.length > 0 && <PromoSection promos={promos} />}

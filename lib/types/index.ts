@@ -108,7 +108,7 @@ export interface HeroBanner {
   title: string;
   subtitle: string;
   description?: string;
-  image: string;
+  image?: string;
   ctaText?: string;
   ctaUrl?: string;
   ctaSecondaryText?: string;
@@ -116,6 +116,21 @@ export interface HeroBanner {
   isActive: boolean;
   order: number;
   createdAt: string;
+  updatedAt?: string;
+  carouselItems?: HeroCarouselItem[];
+}
+
+export interface HeroCarouselItem {
+  id: string;
+  heroBannerId: string;
+  marketplace: string;
+  image: string;
+  trustCount: string;
+  rating: string;
+  isActive: boolean;
+  order: number;
+  createdAt: string;
+  updatedAt?: string;
 }
 
 // ================================

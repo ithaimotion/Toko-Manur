@@ -192,3 +192,39 @@ model MarketplaceLink {
 
   @@map("marketplace_links")
 }
+
+model HeroBanner {
+  id               String   @id @default(cuid())
+  title            String
+  subtitle         String
+  description      String?  @db.Text
+  image            String?
+  ctaText          String?
+  ctaUrl           String?
+  ctaSecondaryText String?
+  ctaSecondaryUrl  String?
+  isActive         Boolean  @default(true)
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  carouselItems    HeroCarouselItem[]
+
+  @@map("hero_banners")
+}
+
+model HeroCarouselItem {
+  id           String     @id @default(cuid())
+  heroBannerId String
+  heroBanner   HeroBanner @relation(fields: [heroBannerId], references: [id], onDelete: Cascade)
+  marketplace  String
+  image        String
+  trustCount   String
+  rating       String
+  isActive     Boolean    @default(true)
+  order        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("hero_carousel_items")
+}

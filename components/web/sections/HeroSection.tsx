@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Truck, Shield, Award, Leaf, Banknote, Gift } from "lucide-react";
@@ -8,6 +11,34 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ banner }: HeroSectionProps) {
+  const marketplaces = banner.carouselItems && banner.carouselItems.length > 0 
+    ? banner.carouselItems 
+    : [
+        {
+          id: "default",
+          heroBannerId: "",
+          marketplace: "Toko Manur",
+          image: banner.image || "https://placehold.co/800x600/EE4D2D/white?text=Toko+Manur",
+          trustCount: "0",
+          rating: "0",
+          isActive: true,
+          order: 1,
+          createdAt: new Date().toISOString(),
+        }
+      ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % marketplaces.length);
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(timer);
+  }, [marketplaces.length]);
+
+  const activeMarketplace = marketplaces[currentIndex];
+
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-hero pt-20">
       {/* Background decoration */}
@@ -111,40 +142,73 @@ export function HeroSection({ banner }: HeroSectionProps) {
             </div>
           </div>
 
-          {/* Hero Image */}
+          {/* Hero Image Carousel */}
           <div className="relative animate-scale-in delay-200 hidden lg:block">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/3]">
-              <Image
-                src={banner.image}
-                alt={banner.title}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 0vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
+              {marketplaces.map((marketplace, index) => (
+                <div
+                  key={marketplace.id}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${
+                    index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                  }`}
+                >
+                  <Image
+                    src={marketplace.image}
+                    alt={marketplace.marketplace}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    sizes="(max-width: 1024px) 0vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent" />
+                </div>
+              ))}
+
+              {/* Carousel Indicators */}
+              <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
+                {marketplaces.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      index === currentIndex 
+                        ? "bg-white w-8" 
+                        : "bg-white/50 hover:bg-white/80"
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
-            {/* Floating card */}
-            <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card p-4 flex items-center gap-3 animate-fade-in-up delay-400">
+            {/* Floating card - Trust */}
+            <div 
+              key={`trust-${currentIndex}`}
+              className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card p-4 flex items-center gap-3 animate-fade-in-up z-30"
+            >
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <Award className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
                 <p className="text-xs text-slate-500">Kepercayaan</p>
-                <p className="font-bold text-slate-900 text-lg">5,000+</p>
-                <p className="text-xs text-slate-500">Bunda Puas</p>
+                <p className="font-bold text-slate-900 text-lg transition-all duration-300">{activeMarketplace.trustCount}</p>
+                <p className="text-xs text-slate-500">Bunda Puas di {activeMarketplace.marketplace}</p>
               </div>
             </div>
 
             {/* Rating card */}
-            <div className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-card p-3 animate-fade-in-up delay-300">
+            <div 
+              key={`rating-${currentIndex}`}
+              className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-card p-3 animate-fade-in-up z-30"
+            >
               <div className="flex items-center gap-1 mb-1">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="text-amber-400 text-lg">★</span>
+                  <span key={i} className={`text-lg ${i < Math.floor(parseFloat(activeMarketplace.rating)) ? "text-amber-400" : "text-slate-200"}`}>
+                    ★
+                  </span>
                 ))}
               </div>
-              <p className="text-xs text-slate-500 font-medium">Rating 4.9/5</p>
+              <p className="text-xs text-slate-500 font-medium transition-all duration-300">Rating {activeMarketplace.rating}</p>
             </div>
           </div>
         </div>
