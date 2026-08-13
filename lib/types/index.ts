@@ -13,6 +13,16 @@ export interface Category {
   updatedAt: string;
 }
 
+export interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  image?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ProductImage {
   id: string;
   url: string;
@@ -34,8 +44,8 @@ export interface Product {
   description: string;
   shortDescription: string;
   images: ProductImage[];
-  categoryId: string;
-  category?: Category;
+  brandId: string;
+  brand?: Brand;
   specifications: ProductSpecification[];
   price?: number;
   priceLabel?: string; // e.g. "Hubungi Kami"
