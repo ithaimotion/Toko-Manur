@@ -94,8 +94,8 @@ export const mockProducts: Product[] = [
       { id: "img-1", url: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&h=600&fit=crop", alt: "Merries Pants", isPrimary: true },
       { id: "img-2", url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?w=800&h=600&fit=crop", alt: "Kemasan Merries", isPrimary: false },
     ],
-    categoryId: "cat-1",
-    category: mockCategories[0],
+    brandId: "cat-1",
+    brand: mockCategories[0],
     specifications: [
       { label: "Ukuran", value: "XL (12-19 kg)" },
       { label: "Isi per pack", value: "26 pcs" },
@@ -124,8 +124,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-3", url: "https://images.unsplash.com/photo-1522771930-78848d9293e8?w=800&h=600&fit=crop", alt: "MamyPoko Newborn", isPrimary: true },
     ],
-    categoryId: "cat-2",
-    category: mockCategories[1],
+    brandId: "cat-2",
+    brand: mockCategories[1],
     specifications: [
       { label: "Ukuran", value: "Newborn (NB) / s.d 5 kg" },
       { label: "Isi per pack", value: "52 pcs" },
@@ -155,8 +155,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-4", url: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&h=600&fit=crop", alt: "Sweety Bronze", isPrimary: true },
     ],
-    categoryId: "cat-1",
-    category: mockCategories[0],
+    brandId: "cat-1",
+    brand: mockCategories[0],
     specifications: [
       { label: "Ukuran", value: "L (11-15 kg)" },
       { label: "Isi per pack", value: "30 pcs" },
@@ -179,8 +179,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-5", url: "https://images.unsplash.com/photo-1519689680058-324335c77eba?w=800&h=600&fit=crop", alt: "Pampers Premium", isPrimary: true },
     ],
-    categoryId: "cat-1",
-    category: mockCategories[0],
+    brandId: "cat-1",
+    brand: mockCategories[0],
     specifications: [
       { label: "Ukuran", value: "M (7-12 kg)" },
       { label: "Isi per pack", value: "46 pcs" },
@@ -204,8 +204,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-6", url: "https://images.unsplash.com/photo-1584984285816-c731e0f06ce8?w=800&h=600&fit=crop", alt: "Pigeon Wipes", isPrimary: true },
     ],
-    categoryId: "cat-3",
-    category: mockCategories[2],
+    brandId: "cat-3",
+    brand: mockCategories[2],
     specifications: [
       { label: "Isi Kemasan", value: "82 Lembar x 2 Pack" },
       { label: "Kandungan Utama", value: "99% Pure Water" },
@@ -228,8 +228,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-7", url: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop", alt: "Sebamed Rash Cream", isPrimary: true },
     ],
-    categoryId: "cat-4",
-    category: mockCategories[3],
+    brandId: "cat-4",
+    brand: mockCategories[3],
     specifications: [
       { label: "Volume", value: "100 ml" },
       { label: "Kandungan Aktif", value: "Panthenol, Titanium Dioxide" },
@@ -252,8 +252,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-8", url: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop", alt: "Cetaphil Baby Wash", isPrimary: true },
     ],
-    categoryId: "cat-4",
-    category: mockCategories[3],
+    brandId: "cat-4",
+    brand: mockCategories[3],
     specifications: [
       { label: "Volume", value: "400 ml" },
       { label: "Keunggulan", value: "Tear-free (Tidak perih di mata)" },
@@ -276,8 +276,8 @@ export const mockProducts: Product[] = [
     images: [
       { id: "img-9", url: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=600&fit=crop", alt: "Spectra Breastpump", isPrimary: true },
     ],
-    categoryId: "cat-5",
-    category: mockCategories[4],
+    brandId: "cat-5",
+    brand: mockCategories[4],
     specifications: [
       { label: "Tipe", value: "Elektrik (Double Pump)" },
       { label: "Daya", value: "Baterai Rechargeable / Adaptor AC" },

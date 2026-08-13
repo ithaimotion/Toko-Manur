@@ -39,7 +39,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
   const related = mockProducts
-    .filter((p) => p.categoryId === product.categoryId && p.id !== product.id && p.status === "published")
+    .filter((p) => p.brandId === product.brandId && p.id !== product.id && p.status === "published")
     .slice(0, 4);
 
   const waMessage = `Halo Toko Manur, saya tertarik dengan produk *${product.name}*. Bisa minta informasi lebih lanjut?`;
@@ -66,7 +66,7 @@ export default async function ProductDetailPage({ params }: Props) {
           <Breadcrumb
             items={[
               { label: "Produk", href: "/products" },
-              { label: product.category?.name ?? "Kategori", href: `/products?category=${product.categoryId}` },
+              { label: product.brand?.name ?? "Brand", href: `/products?brand=${product.brandId}` },
               { label: product.name },
             ]}
           />
@@ -109,12 +109,12 @@ export default async function ProductDetailPage({ params }: Props) {
 
             {/* Info */}
             <div>
-              {product.category && (
+              {product.brand && (
                 <Link
-                  href={`/products?category=${product.categoryId}`}
+                  href={`/products?brand=${product.brandId}`}
                   className="badge-primary text-xs mb-4 inline-block hover:bg-primary-200 transition-colors"
                 >
-                  {product.category.name}
+                  {product.brand.name}
                 </Link>
               )}
               <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">

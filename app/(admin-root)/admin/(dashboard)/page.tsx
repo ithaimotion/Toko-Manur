@@ -86,7 +86,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">{product.category?.name}</p>
+                      <p className="text-xs text-muted-foreground">{product.brand?.name}</p>
                     </div>
                     <div className="text-right shrink-0">
                       {product.price ? (
