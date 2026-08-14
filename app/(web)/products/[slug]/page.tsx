@@ -38,7 +38,7 @@ export default async function ProductDetailPage({ params }: Props) {
   if (!res.success || !res.data) notFound();
   
   const product = res.data;
-  const images = Array.isArray(product.images) ? product.images : [];
+  const images = Array.isArray(product.images) ? (product.images as any[]) : [];
   const primaryImage = images.find((img: any) => img.isPrimary) ?? images[0];
   
   const relatedRes = await getProducts({ brand: product.brand?.slug });
@@ -48,8 +48,8 @@ export default async function ProductDetailPage({ params }: Props) {
   const waMessage = `Halo Toko Manur, saya tertarik dengan produk *${product.name}*. Bisa minta informasi lebih lanjut?`;
   const waUrl = buildWhatsAppUrl("6281234567890", waMessage);
   
-  const specifications = Array.isArray(product.specifications) ? product.specifications : [];
-  const marketplaceLinks = Array.isArray(product.marketplaceLinks) ? product.marketplaceLinks : [];
+  const specifications = Array.isArray(product.specifications) ? (product.specifications as any[]) : [];
+  const marketplaceLinks = Array.isArray(product.marketplaceLinks) ? (product.marketplaceLinks as any[]) : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -221,7 +221,7 @@ export default async function ProductDetailPage({ params }: Props) {
             <h2 className="text-2xl font-bold text-slate-900 mb-8">Produk Serupa</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {related.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p as any} />
               ))}
             </div>
           </div>
