@@ -118,7 +118,7 @@ export default function NewProductPage() {
     <div>
       <PageHeader
         title="Tambah Produk Baru"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Tambah Baru" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Tambah Baru" }]}
         action={
           <div className="flex gap-2">
             <button onClick={() => router.back()} className="btn-admin-secondary">

@@ -83,7 +83,7 @@ export default function AdminProductsPage() {
       <PageHeader
         title="Produk Popok"
         description="Kelola semua varian produk popok Toko Manur"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Produk" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Produk" }]}
         action={
           <Link href="/admin/products/new" className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Produk

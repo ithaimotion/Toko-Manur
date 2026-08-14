@@ -9,7 +9,7 @@ import { StatsCard } from "@/components/admin/ui/StatsCard";
 import { mockDashboardStats } from "@/lib/mock-data";
 import { formatRupiah, formatDate, formatCompactNumber } from "@/lib/utils";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Dasbor" };
 
 export default function DashboardPage() {
   const stats = mockDashboardStats;

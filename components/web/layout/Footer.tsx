@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   Instagram,
-  Youtube,
+  Facebook,
   ExternalLink,
 } from "lucide-react";
 import type { ContactInfo, SiteSettings } from "@/lib/types";
@@ -14,16 +14,16 @@ interface FooterProps {
 
 const footerLinks = {
   menu: [
-    { label: "About", href: "/about" },
-    { label: "Industries", href: "/industries" },
-    { label: "Product", href: "/products" },
-    { label: "Categories", href: "/categories" },
+    { label: "Tentang Kami", href: "/about" },
+    { label: "Mitra", href: "/industries" },
+    { label: "Produk", href: "/products" },
+    { label: "Kategori", href: "/categories" },
   ],
   cart: [
     { label: "Blog", href: "/blog" },
-    { label: "Contact", href: "/contact" },
-    { label: "Terms", href: "/terms" },
-    { label: "Tutorials", href: "/tutorials" },
+    { label: "Kontak", href: "/contact" },
+    { label: "Syarat Ketentuan", href: "/terms" },
+    { label: "Panduan", href: "/tutorials" },
   ],
 };
 
@@ -43,27 +43,38 @@ export function Footer({ contactInfo, settings }: FooterProps) {
           <div className="max-w-sm space-y-10">
             {/* Social Icons */}
             <div className="flex items-center gap-4">
-              <a
-                href="#"
-                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white transition-all duration-300"
-              >
-                <Instagram className="w-5 h-5" strokeWidth={1.5} />
-              </a>
-              <a
-                href="#"
-                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white active:bg-[#78a4cb] active:text-white focus-visible:bg-[#78a4cb] focus-visible:text-white transition-all duration-300"
-              >
-                {/* Custom X Icon */}
-                <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4l16 16m0-16L4 20" />
-                </svg>
-              </a>
-              <a
-                href="#"
-                className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white active:bg-[#78a4cb] active:text-white focus-visible:bg-[#78a4cb] focus-visible:text-white transition-all duration-300"
-              >
-                <Youtube className="w-5 h-5" strokeWidth={1.5} />
-              </a>
+              {contactInfo.instagram && (
+                <a
+                  href={contactInfo.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white transition-all duration-300"
+                >
+                  <Instagram className="w-5 h-5" strokeWidth={1.5} />
+                </a>
+              )}
+              {contactInfo.facebook && (
+                <a
+                  href={contactInfo.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white transition-all duration-300"
+                >
+                  <Facebook className="w-5 h-5" strokeWidth={1.5} />
+                </a>
+              )}
+              {contactInfo.tiktok && (
+                <a
+                  href={contactInfo.tiktok}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 rounded-full border border-[#c7dce7] flex items-center justify-center text-[#78a4cb] hover:bg-[#78a4cb] hover:text-white transition-all duration-300"
+                >
+                  <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor" stroke="none">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 15.68a6.34 6.34 0 0 0 6.27 6.32 6.32 6.32 0 0 0 6.16-5.83v-7.38a8.27 8.27 0 0 0 4 1.15V6.44a4.93 4.93 0 0 1-1.84-.25z"/>
+                  </svg>
+                </a>
+              )}
             </div>
 
             {/* Contact Info */}
@@ -106,7 +117,7 @@ export function Footer({ contactInfo, settings }: FooterProps) {
 
             <div>
               <h4 className="font-medium text-[#2f2a33] mb-6 text-sm uppercase tracking-wider">
-                CART
+                KERANJANG
               </h4>
               <ul className="space-y-4">
                 {footerLinks.cart.map((link) => (
@@ -132,22 +143,20 @@ export function Footer({ contactInfo, settings }: FooterProps) {
               href="/contact"
               className="bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-700 transition-colors"
             >
-              Get Started
+              Mulai Belanja
             </Link>
           </div>
 
           <p className="text-sm text-[#6f6972] max-w-md leading-relaxed">
-            From branding to digital marketing. Our expert<br />
-            team is here to elevate your brand and connect you<br />
-            with your audience
+           Dari kebutuhan ibu dan bayi hingga pelayanan terbaik. Toko Manur hadir menyediakan produk berkualitas untuk mendukung kebutuhan Bunda dan si kecil dengan mudah, aman, dan terpercaya.
           </p>
 
           <div className="flex gap-8 text-sm text-[#6f6972] font-medium tracking-wide">
             <Link href="/terms" className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors uppercase">
-              TERMS & CONDITIONS
+              SYARAT & KETENTUAN
             </Link>
             <Link href="/privacy" className="hover:text-[#78a4cb] active:text-[#78a4cb] focus-visible:text-[#78a4cb] transition-colors uppercase">
-              PRIVACY POLICY
+              KEBIJAKAN PRIVASI
             </Link>
           </div>
         </div>

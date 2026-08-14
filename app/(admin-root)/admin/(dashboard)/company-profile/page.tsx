@@ -148,7 +148,7 @@ export default function AdminCompanyProfilePage() {
       <PageHeader
         title="Profil Perusahaan"
         description="Kelola informasi dan profil perusahaan"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Profil Perusahaan" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Profil Perusahaan" }]}
         action={
           <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

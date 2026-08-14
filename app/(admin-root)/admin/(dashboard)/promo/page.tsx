@@ -15,7 +15,7 @@ export default async function AdminPromoPage() {
       <PageHeader
         title="Promo & Diskon"
         description="Kelola banner promo dan kode diskon"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Promo" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Promo" }]}
       />
       <div className="mt-6">
         <PromoClient initialPromos={promos} />

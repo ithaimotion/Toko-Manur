@@ -100,7 +100,7 @@ export default function AdminUsersPage() {
       <PageHeader
         title="Pengguna Sistem"
         description="Kelola akun admin dan hak akses pengguna terhubung ke database XAMPP MySQL"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Pengguna" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Pengguna" }]}
         action={
           <button onClick={() => setShowModal(true)} className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Pengguna

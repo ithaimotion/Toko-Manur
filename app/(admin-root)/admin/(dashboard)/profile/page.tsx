@@ -62,7 +62,7 @@ export default function ProfilePage() {
       <PageHeader
         title="Profil Saya"
         description="Kelola informasi akun, kata sandi, dan foto profil Anda"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Profil Saya" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Profil Saya" }]}
       />
 
       <div className="max-w-4xl mx-auto mt-6">

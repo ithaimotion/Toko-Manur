@@ -26,6 +26,9 @@ type StoredContact = {
   latitude?: string | null;
   longitude?: string | null;
   businessHours?: string | null;
+  instagram?: string | null;
+  facebook?: string | null;
+  tiktok?: string | null;
   updatedAt?: string;
 };
 
@@ -50,6 +53,9 @@ function normalizeContact(contact: {
   latitude?: string | null;
   longitude?: string | null;
   businessHours?: string | null;
+  instagram?: string | null;
+  facebook?: string | null;
+  tiktok?: string | null;
   updatedAt: Date | string;
 }): ContactInfo {
   return {
@@ -62,6 +68,9 @@ function normalizeContact(contact: {
     latitude: contact.latitude ?? undefined,
     longitude: contact.longitude ?? undefined,
     businessHours: contact.businessHours ?? undefined,
+    instagram: contact.instagram ?? undefined,
+    facebook: contact.facebook ?? undefined,
+    tiktok: contact.tiktok ?? undefined,
     updatedAt: typeof contact.updatedAt === "string" ? contact.updatedAt : contact.updatedAt.toISOString(),
   };
 }
@@ -107,6 +116,9 @@ async function readStoredContact(): Promise<ContactInfo> {
       latitude: parsed.latitude ?? fallbackContact.latitude,
       longitude: parsed.longitude ?? fallbackContact.longitude,
       businessHours: parsed.businessHours ?? fallbackContact.businessHours,
+      instagram: parsed.instagram ?? fallbackContact.instagram,
+      facebook: parsed.facebook ?? fallbackContact.facebook,
+      tiktok: parsed.tiktok ?? fallbackContact.tiktok,
       updatedAt: parsed.updatedAt ?? fallbackContact.updatedAt,
     };
   } catch {
@@ -209,6 +221,9 @@ export async function getContactInfo() {
           latitude: fallbackContact.latitude,
           longitude: fallbackContact.longitude,
           businessHours: fallbackContact.businessHours,
+          instagram: fallbackContact.instagram,
+          facebook: fallbackContact.facebook,
+          tiktok: fallbackContact.tiktok,
         },
       });
 
@@ -248,6 +263,9 @@ export async function updateContactInfo(payload: Partial<ContactInfo>) {
       latitude: payload.latitude ?? null,
       longitude: payload.longitude ?? null,
       businessHours: payload.businessHours ?? null,
+      instagram: payload.instagram ?? null,
+      facebook: payload.facebook ?? null,
+      tiktok: payload.tiktok ?? null,
     };
 
     const updated = existing

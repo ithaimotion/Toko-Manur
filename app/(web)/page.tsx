@@ -131,8 +131,8 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {recentBlogs.map((blog, i) => (
-              <BlogCard key={blog.id} blog={blog} featured={i === 0} />
+            {recentBlogs.map((blog) => (
+              <BlogCard key={blog.id} blog={blog} />
             ))}
           </div>
         </div>

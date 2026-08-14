@@ -39,7 +39,7 @@ export default function AdminTestimonialsPage() {
       <PageHeader
         title="Testimoni"
         description="Kelola testimoni pelanggan"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Testimoni" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Testimoni" }]}
         action={
           <button onClick={() => setShowForm(true)} className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Testimoni

@@ -22,6 +22,9 @@ export default function AdminContactInfoPage() {
     latitude: "",
     longitude: "",
     businessHours: "",
+    instagram: "",
+    facebook: "",
+    tiktok: "",
     updatedAt: new Date().toISOString(),
   });
   const [messages, setMessages] = useState<ContactMessage[]>([]);
@@ -38,6 +41,9 @@ export default function AdminContactInfoPage() {
           latitude: contactResponse.data.latitude ?? "",
           longitude: contactResponse.data.longitude ?? "",
           businessHours: contactResponse.data.businessHours ?? "",
+          instagram: contactResponse.data.instagram ?? "",
+          facebook: contactResponse.data.facebook ?? "",
+          tiktok: contactResponse.data.tiktok ?? "",
         });
       }
 
@@ -101,7 +107,7 @@ export default function AdminContactInfoPage() {
       <PageHeader
         title="Informasi Kontak"
         description="Kelola detail kontak yang tampil di website"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Info Kontak" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Info Kontak" }]}
         action={
           <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -176,6 +182,27 @@ export default function AdminContactInfoPage() {
                   <iframe src={form.googleMapsEmbed} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" />
                 </div>
               )}
+            </div>
+
+            {/* Social Media */}
+            <div className="admin-card p-6 space-y-5">
+              <h2 className="font-bold text-base flex items-center gap-2">
+                <span className="w-4 h-4 flex items-center justify-center font-bold text-primary">@</span> Sosial Media
+              </h2>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="admin-label">URL Instagram</label>
+                  <input name="instagram" value={form.instagram || ""} onChange={handleChange} placeholder="https://instagram.com/tokomanur" className="admin-input" />
+                </div>
+                <div>
+                  <label className="admin-label">URL Facebook</label>
+                  <input name="facebook" value={form.facebook || ""} onChange={handleChange} placeholder="https://facebook.com/tokomanur" className="admin-input" />
+                </div>
+                <div>
+                  <label className="admin-label">URL TikTok</label>
+                  <input name="tiktok" value={form.tiktok || ""} onChange={handleChange} placeholder="https://tiktok.com/@tokomanur" className="admin-input" />
+                </div>
+              </div>
             </div>
           </div>
 

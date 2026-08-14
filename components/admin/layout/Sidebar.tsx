@@ -21,23 +21,23 @@ const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: "Utama",
     items: [
-      { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+      { label: "Dasbor", href: "/admin", icon: LayoutDashboard },
     ],
   },
   {
     title: "Konten",
     items: [
       { label: "Produk", href: "/admin/products", icon: Package, badge: 8 },
-      { label: "Brand", href: "/admin/brands", icon: Tag },
+      { label: "Merek", href: "/admin/brands", icon: Tag },
       { label: "Kategori Blog", href: "/admin/categories", icon: Tag },
       { label: "Blog", href: "/admin/blogs", icon: FileText, badge: 6 },
-      { label: "Review Sync", href: "/admin/reviews", icon: MessageSquare },
+      { label: "Sinkronisasi Ulasan", href: "/admin/reviews", icon: MessageSquare },
     ],
   },
   {
     title: "Tampilan",
     items: [
-      { label: "Hero Banner", href: "/admin/hero-banner", icon: ImageIcon },
+      { label: "Banner Utama", href: "/admin/hero-banner", icon: ImageIcon },
       { label: "Promo", href: "/admin/promo", icon: Megaphone },
       { label: "Marketplace", href: "/admin/marketplace", icon: ShoppingBag },
     ],
@@ -75,7 +75,7 @@ export function Sidebar({ productCount = 0, blogCount = 0, categoryCount = 0, br
       if (item.label === "Produk") return { ...item, badge: productCount };
       if (item.label === "Blog") return { ...item, badge: blogCount };
       if (item.label === "Kategori Blog") return { ...item, badge: categoryCount };
-      if (item.label === "Brand") return { ...item, badge: brandCount };
+      if (item.label === "Merek") return { ...item, badge: brandCount };
       return item;
     })
   }));

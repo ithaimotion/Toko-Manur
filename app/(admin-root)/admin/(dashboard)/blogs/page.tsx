@@ -107,7 +107,7 @@ export default function AdminBlogsPage() {
       <PageHeader
         title="Blog & Artikel"
         description="Kelola artikel dan konten blog"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Blog" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Blog" }]}
         action={
           <Link href="/admin/blogs/new" className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tulis Artikel

@@ -609,6 +609,9 @@ export const mockContactInfo: ContactInfo = {
   latitude: "-6.240000",
   longitude: "106.790000",
   businessHours: "Setiap Hari (Termasuk Tanggal Merah): 07.00 – 22.00 WIB",
+  instagram: "https://instagram.com/tokomanurbaby",
+  facebook: "https://facebook.com/tokomanurbaby",
+  tiktok: "https://tiktok.com/@tokomanurbaby",
   updatedAt: "2024-06-01T00:00:00Z",
 };
 

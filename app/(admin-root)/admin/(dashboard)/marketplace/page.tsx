@@ -128,7 +128,7 @@ export default function AdminMarketplacePage() {
       <PageHeader
         title="Link Marketplace"
         description="Kelola tautan toko di platform e-commerce"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Marketplace" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Marketplace" }]}
         action={
           <button onClick={handleAddNew} className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Link

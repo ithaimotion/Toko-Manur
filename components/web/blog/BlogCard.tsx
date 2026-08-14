@@ -13,7 +13,7 @@ interface BlogCardProps {
 export function BlogCard({ blog, featured = false }: BlogCardProps) {
   if (featured) {
     return (
-      <Link href={`/blog/${blog.slug}`} className="group block">
+      <Link href={`/blog/${blog.slug}`} className="group block md:col-span-2 lg:col-span-2">
         <article className="card-base card-hover overflow-hidden grid md:grid-cols-2 gap-0 h-full">
           {/* Image */}
           <div className="relative overflow-hidden aspect-video md:aspect-auto">

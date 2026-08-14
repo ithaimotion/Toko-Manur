@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShoppingBag, ExternalLink, Store } from "lucide-react";
+import Image from "next/image";
 import type { MarketplaceLink } from "@/lib/types";
 import { getMarketplaceColor, getMarketplaceName } from "@/lib/utils";
 
@@ -7,17 +8,14 @@ interface MarketplaceCardProps {
   link: MarketplaceLink;
 }
 
-const platformLogos: Record<string, string> = {
-  shopee: "🛍️",
-  tokopedia: "🟢",
-  tiktok: "🎵",
-  lazada: "🔵",
-  custom: "🏪",
-};
-
 export function MarketplaceCard({ link }: MarketplaceCardProps) {
   const color = getMarketplaceColor(link.platform);
-  const emoji = platformLogos[link.platform] ?? "🏪";
+  let logoPath = null;
+  const p = link.platform.toLowerCase();
+  if (p === "tokopedia" || p === "tiktok") logoPath = "/logo-marketplace/Tiktok-Tokopedia.png";
+  else if (p === "shopee") logoPath = "/logo-marketplace/Shopee.png";
+  else if (p === "lazada") logoPath = "/logo-marketplace/Lazada.png";
+  else if (p === "akulaku") logoPath = "/logo-marketplace/lama-pencairan-akulaku-tuwaga.png";
 
   return (
     <a
@@ -28,10 +26,14 @@ export function MarketplaceCard({ link }: MarketplaceCardProps) {
     >
       {/* Logo placeholder */}
       <div
-        className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm"
-        style={{ backgroundColor: `${color}15`, border: `2px solid ${color}30` }}
+        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 shadow-sm overflow-hidden bg-white"
+        style={{ border: `2px solid ${color}30` }}
       >
-        {emoji}
+        {logoPath ? (
+          <Image src={logoPath} alt={link.platform} width={48} height={48} className="w-full h-full object-contain p-2" />
+        ) : (
+          <Store className="w-8 h-8 text-slate-400" />
+        )}
       </div>
 
       <h3 className="font-bold text-slate-900 text-lg mb-1.5 group-hover:text-primary transition-colors">

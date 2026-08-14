@@ -91,7 +91,7 @@ module.exports = {
         "3xl": "2rem",
       },
       fontFamily: {
-        sans: ["var(--font-plus-jakarta)", "var(--font-inter)", "system-ui", "sans-serif"],
+        sans: ["var(--font-nunito)", "var(--font-inter)", "system-ui", "sans-serif"],
         admin: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       boxShadow: {

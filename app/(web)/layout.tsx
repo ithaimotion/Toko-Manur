@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Nunito } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/web/layout/Navbar";
 import { Footer } from "@/components/web/layout/Footer";
@@ -12,11 +12,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const nunito = Nunito({
   subsets: ["latin"],
-  variable: "--font-plus-jakarta",
+  variable: "--font-nunito",
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export const metadata: Metadata = {
@@ -56,7 +56,7 @@ export default async function WebLayout({
   const contactInfo = contactResponse.success ? contactResponse.data : undefined;
 
   return (
-    <html lang="id" className={`${inter.variable} ${plusJakarta.variable}`}>
+    <html lang="id" className={`${inter.variable} ${nunito.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         <Navbar />
         <main className="flex-1">{children}</main>

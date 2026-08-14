@@ -167,7 +167,7 @@ export default function AdminCategoriesPage() {
       <PageHeader
         title="Kategori Blog"
         description="Kelola kategori untuk artikel blog"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Kategori" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Kategori" }]}
         action={
           <button onClick={openCreateForm} className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Kategori

@@ -164,7 +164,7 @@ export default function EditBlogPage() {
         title="Edit Artikel"
         description={blogTitle}
         breadcrumb={[
-          { label: "Dashboard", href: "/admin" },
+          { label: "Dasbor", href: "/admin" },
           { label: "Blog", href: "/admin/blogs" },
           { label: "Edit" },
         ]}

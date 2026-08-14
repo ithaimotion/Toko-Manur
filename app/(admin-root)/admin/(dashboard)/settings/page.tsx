@@ -25,7 +25,7 @@ export default function AdminSettingsPage() {
       <PageHeader
         title="Pengaturan Sistem"
         description="Konfigurasi teknis dashboard dan website"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Pengaturan" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Pengaturan" }]}
         action={
           <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

@@ -172,6 +172,7 @@ export type MarketplacePlatform =
   | "tokopedia"
   | "tiktok"
   | "lazada"
+  | "akulaku"
   | "custom";
 
 export interface MarketplaceLink {
@@ -231,6 +232,9 @@ export interface ContactInfo {
   latitude?: string;
   longitude?: string;
   businessHours?: string;
+  instagram?: string;
+  facebook?: string;
+  tiktok?: string;
   updatedAt: string;
 }
 

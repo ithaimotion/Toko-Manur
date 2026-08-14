@@ -105,7 +105,7 @@ export default function NewBlogPage() {
       <PageHeader
         title="Tulis Artikel Baru"
         breadcrumb={[
-          { label: "Dashboard", href: "/admin" },
+          { label: "Dasbor", href: "/admin" },
           { label: "Blog", href: "/admin/blogs" },
           { label: "Baru" },
         ]}

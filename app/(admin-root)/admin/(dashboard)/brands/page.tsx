@@ -127,7 +127,7 @@ export default function BrandsPage() {
       <PageHeader
         title="Brand Popok"
         description="Kelola daftar brand popok untuk produk Anda"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Brand" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Merek" }]}
         action={
           <button onClick={() => handleOpenModal()} className="btn-admin-primary">
             <Plus className="w-4 h-4" /> Tambah Brand

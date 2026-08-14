@@ -51,7 +51,7 @@ export default function ResetRequestsPage() {
       <PageHeader
         title="Permintaan Reset Password"
         description="Kelola daftar permintaan reset password dari pengguna terhubung ke MySQL"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Pengguna", href: "/admin/users" }, { label: "Permintaan Reset" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Pengguna", href: "/admin/users" }, { label: "Permintaan Reset" }]}
       />
 
       <div className="admin-card overflow-hidden">

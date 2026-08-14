@@ -120,7 +120,7 @@ export default function LoginPage() {
                 disabled={submitting}
                 className="w-full flex items-center justify-center py-3 bg-white text-indigo-950 hover:bg-indigo-50 text-sm font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? "Memeriksa..." : "Masuk ke Dashboard"}
+                {submitting ? "Memeriksa..." : "Masuk ke Dasbor"}
               </button>
             </form>
           ) : submitted ? (

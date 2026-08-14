@@ -13,7 +13,7 @@ export default async function AdminHeroBannerPage() {
       <PageHeader
         title="Hero Banner"
         description="Kelola banner utama halaman beranda"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Hero Banner" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Banner Utama" }]}
       />
 
       <HeroBannerClient initialBanners={banners} />

@@ -148,7 +148,7 @@ export default function EditProductPage() {
     <div>
       <PageHeader
         title="Edit Produk"
-        breadcrumb={[{ label: "Dashboard", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Edit" }]}
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Produk", href: "/admin/products" }, { label: "Edit" }]}
         action={
           <div className="flex gap-2">
             <button onClick={() => router.back()} className="btn-admin-secondary">
