@@ -126,6 +126,7 @@ export function getMarketplaceName(platform: MarketplacePlatform): string {
     tokopedia: "Tokopedia",
     tiktok: "TikTok Shop",
     lazada: "Lazada",
+    akulaku: "Akulaku",
     custom: "Marketplace",
   };
   return names[platform];
@@ -137,6 +138,7 @@ export function getMarketplaceColor(platform: MarketplacePlatform): string {
     tokopedia: "#00AA5B",
     tiktok: "#000000",
     lazada: "#0F146D",
+    akulaku: "#E1251B",
     custom: "#6366F1",
   };
   return colors[platform];
