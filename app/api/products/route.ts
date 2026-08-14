@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, slug, description, shortDescription, images, price, priceLabel, isFeatured, status, brandId, specifications } = body;
+    const { name, slug, description, shortDescription, images, price, priceLabel, isFeatured, status, brandId, specifications, marketplaceLinks } = body;
 
     if (!name || !slug || !brandId || !images) {
       return NextResponse.json({ error: "Kolom wajib belum diisi (Nama, Slug, Brand, Gambar)" }, { status: 400 });
@@ -53,7 +53,8 @@ export async function POST(request: Request) {
         isFeatured: isFeatured || false, 
         status: status || "PUBLISHED", 
         brandId, 
-        specifications: specifications || []
+        specifications: specifications || [],
+        marketplaceLinks: marketplaceLinks || []
       },
     });
 

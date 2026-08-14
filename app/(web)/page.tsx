@@ -40,7 +40,7 @@ const jsonLd = {
   },
 };
 
-export const revalidate = 300;
+export const revalidate = 0;
 
 export default async function HomePage() {
   const [featuredProductsRes, recentBlogs, contactResponse, promoResponse, marketplaceResponse, heroBannersResponse] = await Promise.all([

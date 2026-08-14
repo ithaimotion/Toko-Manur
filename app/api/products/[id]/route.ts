@@ -28,7 +28,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params;
     const body = await request.json();
-    const { name, slug, description, shortDescription, images, price, priceLabel, isFeatured, status, brandId, specifications } = body;
+    const { name, slug, description, shortDescription, images, price, priceLabel, isFeatured, status, brandId, specifications, marketplaceLinks } = body;
 
     if (!name || !slug || !brandId || !images) {
       return NextResponse.json({ error: "Kolom wajib belum diisi" }, { status: 400 });
@@ -58,7 +58,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         isFeatured: isFeatured || false, 
         status: status || "PUBLISHED", 
         brandId, 
-        specifications: specifications || []
+        specifications: specifications || [],
+        marketplaceLinks: marketplaceLinks || []
       },
     });
 

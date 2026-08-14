@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Tag } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { getMarketplaceIcon } from "@/components/web/ui/MarketplaceIcons";
+
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ProductCardProps {
@@ -20,7 +20,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {primaryImage ? (
             <Image
               src={primaryImage.url}
-              alt={primaryImage.alt}
+              alt={primaryImage.alt || product.name || "Product image"}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -62,14 +62,20 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="flex flex-wrap gap-2 items-center">
               {product.marketplaceLinks && product.marketplaceLinks.length > 0 ? (
                 product.marketplaceLinks.map((link) => {
-                  const LogoIcon = getMarketplaceIcon(link.platform);
-                  return LogoIcon ? (
+                  const p = link.platform.toUpperCase();
+                  let logoPath = null;
+                  if (p === "TOKOPEDIA" || p === "TIKTOK") logoPath = "/logo-marketplace/Tiktok-Tokopedia.png";
+                  else if (p === "SHOPEE") logoPath = "/logo-marketplace/Shopee.png";
+                  else if (p === "LAZADA") logoPath = "/logo-marketplace/Lazada.png";
+                  else if (p === "AKULAKU") logoPath = "/logo-marketplace/lama-pencairan-akulaku-tuwaga.png";
+
+                  return logoPath ? (
                     <div
                       key={link.platform}
                       className="h-6 w-auto opacity-80 group-hover:opacity-100 transition-opacity"
                       title={link.platform}
                     >
-                      <LogoIcon className="h-6 w-auto" />
+                      <Image src={logoPath} alt={link.platform} width={60} height={24} className="h-6 w-auto object-contain" />
                     </div>
                   ) : (
                     <span key={link.platform} className="text-[10px] font-bold uppercase bg-slate-100 text-slate-600 px-2 py-0.5 rounded">

@@ -54,20 +54,22 @@ export function HeroSection({ banner }: HeroSectionProps) {
           <div className="animate-fade-in-up">
             {/* Badge */}
             <div className="badge-primary inline-flex mb-6 animate-fade-in-up">
-              Selamat Datang Para Bunda
+              SELAMAT DATANG PARA BUNDA
             </div>
 
-            <div className="relative h-28 sm:h-40 lg:h-52 w-full max-w-[800px] mb-8">
-              <Image 
-                src="/logo-manur.png"
-                alt="Toko Manur"
-                fill
-                className="object-contain object-left"
-                priority
-              />
+            <div className="w-full mb-2 lg:mb-4 -ml-2 lg:-ml-4">
+              <div className="relative w-full aspect-[3/1] max-w-2xl -ml-2 sm:-ml-4">
+                <Image 
+                  src="/Logo Manur HD.png"
+                  alt="Toko Manur"
+                  fill
+                  className="object-contain object-left"
+                  priority
+                />
+              </div>
             </div>
 
-            <p className="text-lg text-slate-600 mb-3 font-medium">{banner.subtitle}</p>
+            <p className="text-lg text-slate-600 mb-3 font-medium z-10 relative">{banner.subtitle}</p>
             <p className="text-base text-slate-500 mb-8 max-w-lg leading-relaxed">
               {banner.description}
             </p>

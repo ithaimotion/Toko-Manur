@@ -21,6 +21,7 @@ export default function EditProductPage() {
     description: "", price: "", priceLabel: "Hubungi Kami",
     isFeatured: false, status: "DRAFT" as "DRAFT" | "PUBLISHED",
     specs: [{ label: "", value: "" }],
+    marketplaceLinks: [] as { platform: string, url: string }[],
     images: [{ url: "", isPrimary: true }]
   });
 
@@ -51,6 +52,7 @@ export default function EditProductPage() {
           isFeatured: data.isFeatured,
           status: data.status,
           specs: data.specifications?.length > 0 ? data.specifications : [{ label: "", value: "" }],
+          marketplaceLinks: data.marketplaceLinks?.length > 0 ? data.marketplaceLinks : [],
           images: data.images?.length > 0 ? data.images : [{ url: "", isPrimary: true }]
         });
       })
@@ -75,6 +77,15 @@ export default function EditProductPage() {
     setForm(p => ({
       ...p,
       specs: p.specs.map((s, i) => i === idx ? { ...s, [field]: val } : s)
+    }));
+  };
+
+  const addMarketplaceLink = () => setForm((p) => ({ ...p, marketplaceLinks: [...p.marketplaceLinks, { platform: "TOKOPEDIA", url: "" }] }));
+  const removeMarketplaceLink = (idx: number) => setForm((p) => ({ ...p, marketplaceLinks: p.marketplaceLinks.filter((_, i) => i !== idx) }));
+  const updateMarketplaceLink = (idx: number, field: "platform" | "url", val: string) => {
+    setForm(p => ({
+      ...p,
+      marketplaceLinks: p.marketplaceLinks.map((m, i) => i === idx ? { ...m, [field]: val } : m)
     }));
   };
 
@@ -106,6 +117,7 @@ export default function EditProductPage() {
         ...form,
         status,
         specs: form.specs.filter(s => s.label && s.value), // Only valid specs
+        marketplaceLinks: form.marketplaceLinks.filter(m => m.platform && m.url),
         images: form.images.filter(img => img.url) // Only valid images
       };
 
@@ -308,6 +320,40 @@ export default function EditProductPage() {
               
               {form.specs.length === 0 && (
                 <p className="text-sm text-muted-foreground text-center py-4">Belum ada spesifikasi ditambahkan.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Marketplace Links */}
+          <div className="admin-card p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="font-bold text-base">Link Marketplace</h2>
+              <button type="button" onClick={addMarketplaceLink} className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+                <Plus className="w-4 h-4" /> Tambah
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {form.marketplaceLinks.map((link, idx) => (
+                <div key={idx} className="flex gap-2 items-start">
+                  <div className="flex-1 space-y-2">
+                    <select value={link.platform} onChange={(e) => updateMarketplaceLink(idx, "platform", e.target.value)} className="admin-input form-input-sm">
+                      <option value="TOKOPEDIA">Tokopedia</option>
+                      <option value="SHOPEE">Shopee</option>
+                      <option value="LAZADA">Lazada</option>
+                      <option value="TIKTOK">TikTok Shop</option>
+                      <option value="BLIBLI">Blibli</option>
+                    </select>
+                    <input type="text" value={link.url} onChange={(e) => updateMarketplaceLink(idx, "url", e.target.value)} placeholder="https://..." className="admin-input form-input-sm" />
+                  </div>
+                  <button type="button" onClick={() => removeMarketplaceLink(idx)} className="p-2 mt-1 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              
+              {form.marketplaceLinks.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">Belum ada link marketplace.</p>
               )}
             </div>
           </div>

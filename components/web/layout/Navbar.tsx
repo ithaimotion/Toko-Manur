@@ -45,8 +45,8 @@ export function Navbar() {
             href="/"
             className="flex items-center gap-2.5 font-bold text-xl text-foreground hover:text-primary transition-colors group"
           >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 relative transition-all group-hover:scale-105">
-              <Image src="/logo-manur.png" alt="Toko Manur" fill className="object-contain" />
+            <div className="w-[140px] h-[44px] sm:w-[180px] sm:h-[56px] relative transition-all group-hover:scale-105">
+              <Image src="/Logo Manur HD.png" alt="Toko Manur" fill className="object-contain object-left" />
             </div>
 
           </Link>

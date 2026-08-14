@@ -5,52 +5,58 @@ import Link from "next/link";
 import { MessageCircle, ShoppingBag, ExternalLink } from "lucide-react";
 import { Breadcrumb } from "@/components/web/ui/Breadcrumb";
 import { ProductCard } from "@/components/web/products/ProductCard";
-import { mockProducts } from "@/lib/mock-data";
 import { buildWhatsAppUrl } from "@/lib/utils";
 import { getMarketplaceIcon } from "@/components/web/ui/MarketplaceIcons";
+import { getProductBySlug, getProducts } from "@/app/(web)/actions/product";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  return mockProducts.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const product = mockProducts.find((p) => p.slug === slug);
-  if (!product) return { title: "Produk Tidak Ditemukan" };
+  const res = await getProductBySlug(slug);
+  if (!res.success || !res.data) return { title: "Produk Tidak Ditemukan" };
+  const product = res.data;
+  const images = Array.isArray(product.images) ? product.images : [];
   return {
     title: product.name,
-    description: product.shortDescription,
+    description: product.shortDescription || product.description,
     openGraph: {
       title: product.name,
-      description: product.shortDescription,
-      images: product.images.map((img) => ({ url: img.url })),
+      description: product.shortDescription || product.description,
+      images: images.map((img: any) => ({ url: img.url })),
     },
   };
 }
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
-  const product = mockProducts.find((p) => p.slug === slug);
-  if (!product) notFound();
-
-  const primaryImage = product.images.find((img) => img.isPrimary) ?? product.images[0];
-  const related = mockProducts
-    .filter((p) => p.brandId === product.brandId && p.id !== product.id && p.status === "published")
-    .slice(0, 4);
+  const res = await getProductBySlug(slug);
+  if (!res.success || !res.data) notFound();
+  
+  const product = res.data;
+  const images = Array.isArray(product.images) ? product.images : [];
+  const primaryImage = images.find((img: any) => img.isPrimary) ?? images[0];
+  
+  const relatedRes = await getProducts({ brand: product.brand?.slug });
+  let related = relatedRes.success && relatedRes.data ? relatedRes.data : [];
+  related = related.filter((p: any) => p.id !== product.id).slice(0, 4);
 
   const waMessage = `Halo Toko Manur, saya tertarik dengan produk *${product.name}*. Bisa minta informasi lebih lanjut?`;
   const waUrl = buildWhatsAppUrl("6281234567890", waMessage);
+  
+  const specifications = Array.isArray(product.specifications) ? product.specifications : [];
+  const marketplaceLinks = Array.isArray(product.marketplaceLinks) ? product.marketplaceLinks : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
     description: product.description,
-    image: product.images.map((i) => i.url),
+    image: images.map((i: any) => i.url),
     offers: product.price
       ? { "@type": "Offer", price: product.price, priceCurrency: "IDR", availability: "https://schema.org/InStock" }
       : undefined,
@@ -91,16 +97,16 @@ export default async function ProductDetailPage({ params }: Props) {
                   />
                 )}
               </div>
-              {product.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-                  {product.images.map((img) => (
+                  {images.map((img: any, idx: number) => (
                     <div
-                      key={img.id}
+                      key={idx}
                       className={`relative w-20 h-20 rounded-xl overflow-hidden shrink-0 border-2 transition-all ${
                         img.isPrimary ? "border-primary" : "border-border hover:border-primary-300"
                       }`}
                     >
-                      <Image src={img.url} alt={img.alt} fill className="object-cover" sizes="80px" />
+                      <Image src={img.url} alt={img.alt || "Product image"} fill className="object-cover" sizes="80px" />
                     </div>
                   ))}
                 </div>
@@ -127,10 +133,16 @@ export default async function ProductDetailPage({ params }: Props) {
                   <ShoppingBag className="w-4 h-4" />
                   Beli Produk Ini Di:
                 </p>
-                {product.marketplaceLinks && product.marketplaceLinks.length > 0 ? (
+                {marketplaceLinks.length > 0 ? (
                   <div className="flex flex-wrap gap-3">
-                    {product.marketplaceLinks.map((link) => {
-                      const LogoIcon = getMarketplaceIcon(link.platform);
+                    {marketplaceLinks.map((link: any) => {
+                      const p = link.platform.toUpperCase();
+                      let logoPath = null;
+                      if (p === "TOKOPEDIA" || p === "TIKTOK") logoPath = "/logo-marketplace/Tiktok-Tokopedia.png";
+                      else if (p === "SHOPEE") logoPath = "/logo-marketplace/Shopee.png";
+                      else if (p === "LAZADA") logoPath = "/logo-marketplace/Lazada.png";
+                      else if (p === "AKULAKU") logoPath = "/logo-marketplace/lama-pencairan-akulaku-tuwaga.png";
+                      
                       return (
                         <a
                           key={link.platform}
@@ -140,8 +152,8 @@ export default async function ProductDetailPage({ params }: Props) {
                           className="inline-flex items-center gap-2 px-4 py-3 rounded-xl border border-border bg-white hover:border-slate-300 hover:shadow-md transition-all hover:-translate-y-0.5"
                           title={link.platform}
                         >
-                          {LogoIcon ? (
-                            <LogoIcon className="h-7 w-auto" />
+                          {logoPath ? (
+                            <Image src={logoPath} alt={link.platform} width={100} height={40} className="h-7 w-auto object-contain" />
                           ) : (
                             <span className="font-bold uppercase text-slate-700">{link.platform}</span>
                           )}
@@ -176,12 +188,12 @@ export default async function ProductDetailPage({ params }: Props) {
 
 
               {/* Specs */}
-              {product.specifications.length > 0 && (
+              {specifications.length > 0 && (
                 <div>
                   <h3 className="font-bold text-slate-900 mb-4">Spesifikasi</h3>
                   <div className="divide-y divide-border rounded-xl border border-border overflow-hidden">
-                    {product.specifications.map((spec) => (
-                      <div key={spec.label} className="flex items-center py-3 px-4">
+                    {specifications.map((spec: any, idx: number) => (
+                      <div key={idx} className="flex items-center py-3 px-4">
                         <span className="text-slate-500 text-sm w-40 shrink-0">{spec.label}</span>
                         <span className="text-slate-900 text-sm font-medium">{spec.value}</span>
                       </div>
