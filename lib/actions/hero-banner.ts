@@ -2,6 +2,7 @@
 
 import { db as prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { mockHeroBanners } from "@/lib/mock-data";
 
 export async function getHeroBanners(activeOnly = false) {
   try {
@@ -34,8 +35,11 @@ export async function getHeroBanners(activeOnly = false) {
 
     return { success: true, data: mappedBanners };
   } catch (error: any) {
-    console.error("Error fetching hero banners:", error);
-    return { success: false, error: error.message || "Failed to fetch hero banners" };
+    console.error("Error fetching hero banners, using mock fallback:", error);
+    const fallbackBanners = activeOnly 
+      ? mockHeroBanners.filter(b => b.isActive)
+      : mockHeroBanners;
+    return { success: true, data: fallbackBanners };
   }
 }
 

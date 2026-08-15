@@ -117,7 +117,7 @@ export function Navbar() {
             ))}
             <div className="pt-2 px-4">
               <Link
-                href="https://wa.me/6281234567890"
+                href="https://api.whatsapp.com/send/?phone=628217232299&text=Halo%2Csaya+ingin+tanya+produk+Toko+Manur.Boleh+dibantu%3F&type=phone_number&app_absent=0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-whatsapp w-full text-sm justify-center"

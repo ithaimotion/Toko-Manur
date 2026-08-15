@@ -137,15 +137,7 @@ export function Footer({ contactInfo, settings }: FooterProps) {
 
         {/* Bottom Bar */}
         <div className="relative border-t border-[#e8dce7] pt-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          {/* Get Started Button placed over the line */}
-          <div className="absolute right-0 -top-5">
-            <Link
-              href="/contact"
-              className="bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium hover:bg-primary-700 transition-colors"
-            >
-              Mulai Belanja
-            </Link>
-          </div>
+
 
           <p className="text-sm text-[#6f6972] max-w-md leading-relaxed">
            Dari kebutuhan ibu dan bayi hingga pelayanan terbaik. Toko Manur hadir menyediakan produk berkualitas untuk mendukung kebutuhan Bunda dan si kecil dengan mudah, aman, dan terpercaya.
@@ -163,7 +155,7 @@ export function Footer({ contactInfo, settings }: FooterProps) {
       </div>
 
       <div className="absolute -bottom-4 left-0 w-full overflow-hidden pointer-events-none select-none text-center flex justify-center">
-        <h1 className="text-[15vw] sm:text-[13vw] md:text-[11vw] lg:text-[10vw] xl:text-[9.5vw] leading-[0.75] font-bold text-[#e8dce7] whitespace-nowrap tracking-tighter">
+        <h1 className="text-[18vw] leading-[0.75] font-bold text-[#e8dce7] whitespace-nowrap tracking-tighter">
           Toko-Manur
         </h1>
       </div>

@@ -19,7 +19,7 @@ async function main() {
       ctaText: "Belanja Popok",
       ctaUrl: "/products",
       ctaSecondaryText: "Konsultasi Bunda",
-      ctaSecondaryUrl: "https://wa.me/6281234567890",
+      ctaSecondaryUrl: "https://api.whatsapp.com/send/?phone=628217232299&text=Halo%2Csaya+ingin+tanya+produk+Toko+Manur.Boleh+dibantu%3F&type=phone_number&app_absent=0",
       isActive: true,
       order: 1,
       carouselItems: {
