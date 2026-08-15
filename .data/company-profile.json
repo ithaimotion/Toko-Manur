@@ -1,47 +1,42 @@
 {
   "id": "company-1",
-  "about": "Toko Manur Baby Care hadir sejak 2018 sebagai sahabat terpercaya para Ibu di Indonesia. Kami menyediakan berbagai kebutuhan popok bayi, perawatan kulit si kecil, dan perlengkapan menyusui dari brand-brand terkemuka dengan jaminan orisinalitas 100%.",
-  "vision": "Menjadi destinasi belanja kebutuhan ibu dan bayi nomor satu yang memberikan kemudahan, kenyamanan, dan edukasi parenting yang bermanfaat.",
+  "about": "Toko Manur adalah reseller popok terpercaya yang berdiri sejak 2021, berawal berfokus pada penjualan popok dari berbagai macam merk ternama secara online dan kini mulai meramba ke penjualan secara offline. Memiliki jutaan pembeli yang ada dari berbagai daerah yang ada Indonesia. Penyediaan produk berkualitas tinggi, pelayanan yang mengutamakan kepuasan pelanggan membuat Toko Manur memasuki 3 besar toko online terlaris dalam penjualan kategori mom and baby. Kami hadir sebagai mitra belanja yang andal, praktis, dan mengutamakan kepuasan pelanggan. ",
+  "aboutImage": "https://ownscllhukufzvzbwres.supabase.co/storage/v1/object/public/uploads/1786790296110-32872699-IMG_2343.JPG.jpeg",
+  "vision": "Menjadi toko pilihan utama yang terpercaya, menginspirasi, dan memudahkan para orangtua untuk memenuhi kebutuhan untuk sang buah hati melalui produk berkualitas, pelayanan ramah, serta kemudahan berbelanja.",
   "mission": [
-    "Menyediakan ragam pilihan popok dan kebutuhan bayi terlengkap dengan harga kompetitif",
-    "Menjamin keaslian setiap produk untuk keamanan dan kesehatan si kecil",
-    "Memberikan pelayanan pengiriman cepat (instan delivery) untuk solusi darurat Bunda",
-    "Menyajikan konten edukasi parenting yang terpercaya dari para ahli"
+    "Menyediakan ragam produk pilihan dengan mutu terbaik dan harga yang kompetitif.",
+    "Memberikan pelayanan yang ramah, cepat, dan responsif bagi setiap pelanggan.",
+    "Memanfaatkan teknologi digital untuk memudahkan proses transaksi dan akses bagi konsumen.",
+    "Membangun hubungan berbasis kepercayaan jangka panjang dengan pelanggan dan mitra."
   ],
   "values": [
     {
       "id": "val-1",
-      "title": "100% Original (Aman)",
-      "description": "Kami hanya menjual produk resmi dari distributor principal, menjamin keaslian dan masa expired yang panjang.",
-      "icon": "shield"
+      "icon": "award",
+      "title": "​Integritas & Kejujuran",
+      "description": "Menjunjung tinggi kejujuran dalam setiap transaksi, informasi produk, dan pelayanan demi menjaga kepercayaan pelanggan."
     },
     {
       "id": "val-2",
-      "title": "Penuh Kasih Ibu",
-      "description": "Layanan kami mengedepankan empati dan kelembutan, siap membantu Bunda memilihkan produk terbaik.",
-      "icon": "heart"
+      "icon": "star",
+      "title": "​Kualitas Terjamin",
+      "description": "Memastikan setiap produk yang ditawarkan memenuhi standar mutu terbaik untuk kepuasan pengguna."
     },
     {
       "id": "val-3",
-      "title": "Pengiriman Cepat",
-      "description": "Popok habis di malam hari? Layanan pengiriman cepat kami menjadi andalan di saat darurat.",
-      "icon": "zap"
+      "icon": "heart",
+      "title": "​Fokus pada Pelanggan",
+      "description": "Menempatkan kebutuhan dan kenyamanan pelanggan sebagai prioritas utama dalam setiap aktivitas bisnis."
     },
     {
       "id": "val-4",
-      "title": "Kualitas Premium",
-      "description": "Semua barang disimpan dalam suhu ruangan terkontrol untuk menjaga higienitas dan kualitas popok.",
-      "icon": "star"
-    },
-    {
-      "id": "cd4e818d-24aa-47e9-a668-411511d38575",
-      "icon": "star",
-      "title": "testing",
-      "description": "dasds"
+      "icon": "zap",
+      "title": "​Kemudahan & Inovasi",
+      "description": "Terus berkembang untuk menghadirkan pengalaman berbelanja yang makin praktis, efisien, dan modern"
     }
   ],
-  "brandStory": "Berawal dari kesulitan seorang ibu pekerja mencari stok popok langganan saat malam hari, Toko Manur lahir sebagai solusi kepraktisan. Kami memahami bahwa kehabisan popok atau anak tiba-tiba ruam adalah momen menegangkan bagi orang tua baru. Oleh karena itu, Toko Manur tidak hanya sekedar berjualan, tapi menjadi 'support system' para Bunda.",
-  "founded": "2018",
+  "brandStory": "Berawal pada tahun 2021, Toko Manur lahir dari niat sederhana untuk memberikan solusi belanja yang jujur, transparan, dan dapat diandalkan. Nama Toko Manur membawa semangat ketulusan dalam melayani para pelangan. Kami menyadari bahwa konsumen tidak hanya mencari produk, tetapi juga rasa aman dan nyaman saat bertransaksi. Sejak awal berdiri, Toko Manur terus tumbuh dengan mendengarkan kebutuhan pelanggan dan berkomitmen untuk selalu menghadirkan pelayanan terbaik.",
+  "founded": "2021",
   "legalDocuments": [
     {
       "id": "leg-1",
@@ -63,14 +58,7 @@
       "number": "12.345.678.9-123.000",
       "issuedBy": "DJP Kementerian Keuangan RI",
       "issuedDate": "2018-04-15"
-    },
-    {
-      "id": "68170834-ee58-4608-bc20-ef810fa70f1d",
-      "name": "yoi",
-      "number": "45678",
-      "issuedBy": "kok",
-      "issuedDate": "2026-08-05"
     }
   ],
-  "updatedAt": "2026-08-05T04:31:18.346Z"
+  "updatedAt": "2026-08-15T10:39:09.508Z"
 }

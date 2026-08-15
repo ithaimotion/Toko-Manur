@@ -74,7 +74,7 @@ export function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link
-              href="https://wa.me/6281234567890"
+              href="https://api.whatsapp.com/send/?phone=628217232299&text=Halo%2Csaya+ingin+tanya+produk+Toko+Manur.Boleh+dibantu%3F&type=phone_number&app_absent=0"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-whatsapp text-sm py-2.5 px-4"

@@ -208,6 +208,7 @@ export interface LegalDocument {
 export interface CompanyProfile {
   id: string;
   about: string;
+  aboutImage?: string;
   vision: string;
   mission: string[];
   values: CompanyValue[];

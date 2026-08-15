@@ -54,7 +54,7 @@ export function CTAWhatsApp({ phone, message }: CTAWhatsAppProps) {
             </div>
 
             <p className="text-primary-200 text-sm mt-6">
-              ⏰ Jam operasional: Setiap Hari, 07.00 – 22.00 WIB
+              ⏰ Jam operasional: Setiap Hari, 24 Jam
             </p>
           </div>
         </div>

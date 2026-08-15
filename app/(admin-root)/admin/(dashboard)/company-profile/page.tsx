@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Flame, Award, Activity, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 import { mockCompanyProfile } from "@/lib/mock-data";
 
 const iconOptions = [
@@ -20,6 +21,7 @@ export default function AdminCompanyProfilePage() {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(() => ({
     about: "",
+    aboutImage: "",
     vision: "",
     mission: "",
     brandStory: "",
@@ -38,6 +40,7 @@ export default function AdminCompanyProfilePage() {
           const p = json.data;
           setForm({
             about: p.about || "",
+            aboutImage: p.aboutImage || "",
             vision: p.vision || "",
             mission: Array.isArray(p.mission) ? p.mission.join('\n') : (p.mission || '').toString(),
             brandStory: p.brandStory || "",
@@ -58,6 +61,7 @@ export default function AdminCompanyProfilePage() {
     try {
       const payload = {
         about: form.about,
+        aboutImage: form.aboutImage,
         vision: form.vision,
         mission: form.mission.split("\n").filter(Boolean),
         brandStory: form.brandStory,
@@ -168,6 +172,15 @@ export default function AdminCompanyProfilePage() {
             <div>
               <label className="admin-label">Tahun Berdiri</label>
               <input type="number" value={form.founded} onChange={(e) => setForm(p => ({ ...p, founded: e.target.value }))} className="admin-input w-32" />
+            </div>
+            <div>
+              <label className="admin-label">Gambar Tentang Perusahaan</label>
+              <ImageUpload
+                value={form.aboutImage}
+                onChange={(url) => setForm(p => ({ ...p, aboutImage: url }))}
+                label="Upload Gambar"
+                aspectRatio="[4/3]"
+              />
             </div>
             <div>
               <label className="admin-label">Deskripsi Perusahaan</label>

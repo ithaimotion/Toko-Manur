@@ -19,6 +19,7 @@ function normalizeProfile(profile: any): CompanyProfile {
   return {
     id: profile.id,
     about: profile.about,
+    aboutImage: profile.aboutImage || null,
     vision: profile.vision,
     mission: Array.isArray(profile.mission) ? profile.mission : JSON.parse(profile.mission || "[]"),
     values: Array.isArray(profile.values) ? profile.values : JSON.parse(profile.values || "[]"),
@@ -38,6 +39,7 @@ async function readStoredProfile(): Promise<CompanyProfile> {
     return {
       id: parsed.id ?? "company-profile-storage",
       about: parsed.about ?? fallbackProfile.about,
+      aboutImage: parsed.aboutImage ?? fallbackProfile.aboutImage,
       vision: parsed.vision ?? fallbackProfile.vision,
       mission: parsed.mission ?? fallbackProfile.mission,
       values: parsed.values ?? fallbackProfile.values,
@@ -72,6 +74,7 @@ export async function getCompanyProfile() {
       const created = await db.companyProfile.create({
         data: {
           about: fallbackProfile.about,
+          aboutImage: fallbackProfile.aboutImage || null,
           vision: fallbackProfile.vision,
           mission: fallbackProfile.mission as any,
           values: fallbackProfile.values as any,
@@ -84,7 +87,16 @@ export async function getCompanyProfile() {
       return { success: true, data: normalizeProfile(created) };
     }
 
-    return { success: true, data: normalizeProfile(profile) };
+    // If Prisma succeeded but is missing aboutImage (e.g. schema not pushed), fallback to local storage
+    const normalized = normalizeProfile(profile);
+    if (!normalized.aboutImage) {
+      const storage = await readStoredProfile();
+      if (storage.aboutImage) {
+        normalized.aboutImage = storage.aboutImage;
+      }
+    }
+
+    return { success: true, data: normalized };
   } catch (error) {
     console.error("Failed to fetch company profile from Prisma, using fallback storage:", error);
     const storage = await readStoredProfile();
@@ -98,6 +110,7 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
 
     const data = {
       about: payload.about ?? "",
+      aboutImage: payload.aboutImage || null,
       vision: payload.vision ?? "",
       mission: (payload.mission ?? []) as any,
       values: (payload.values ?? []) as any,
