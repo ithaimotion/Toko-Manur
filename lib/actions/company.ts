@@ -74,7 +74,6 @@ export async function getCompanyProfile() {
       const created = await db.companyProfile.create({
         data: {
           about: fallbackProfile.about,
-          aboutImage: fallbackProfile.aboutImage || null,
           vision: fallbackProfile.vision,
           mission: fallbackProfile.mission as any,
           values: fallbackProfile.values as any,
@@ -106,11 +105,13 @@ export async function getCompanyProfile() {
 
 export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
   try {
+    // Save to local storage to ensure aboutImage is persisted
+    const savedStorage = await writeStoredProfile(payload);
+
     const existing = await db.companyProfile.findFirst({ orderBy: { updatedAt: "desc" } });
 
     const data = {
       about: payload.about ?? "",
-      aboutImage: payload.aboutImage || null,
       vision: payload.vision ?? "",
       mission: (payload.mission ?? []) as any,
       values: (payload.values ?? []) as any,
@@ -126,7 +127,10 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
     revalidatePath("/about");
     revalidatePath("/");
 
-    return { success: true, data: normalizeProfile(updated) };
+    const result = normalizeProfile(updated);
+    result.aboutImage = savedStorage.aboutImage;
+
+    return { success: true, data: result };
   } catch (error) {
     console.error("Failed to save company profile to Prisma, using fallback storage:", error);
     const saved = await writeStoredProfile(payload);
