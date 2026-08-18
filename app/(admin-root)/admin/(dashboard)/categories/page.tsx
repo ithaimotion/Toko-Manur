@@ -343,6 +343,7 @@ export default function AdminCategoriesPage() {
           </div>
         )}
       </div>
+    </div>
 
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}

@@ -112,105 +112,222 @@ export default function AdminContactInfoPage() {
         breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Info Kontak" }]}
         action={
           <button onClick={handleSave} disabled={saveMutation.isPending || contactLoading} className="btn-admin-primary">
+"use client";
+
+import { useState } from "react";
+import { Save, Loader2, MapPin, Mail, Phone, Clock, Map } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { getContactInfo, getContactMessages, updateContactInfo } from "@/lib/actions/contact";
+import type { ContactInfo, ContactMessage } from "@/lib/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
+
+export default function AdminContactInfoPage() {
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<ContactInfo>({
+    id: "",
+    address: "",
+    email: "",
+    whatsapp: "",
+    whatsappMessage: "",
+    googleMapsEmbed: "",
+    latitude: "",
+    longitude: "",
+    businessHours: "",
+    instagram: "",
+    facebook: "",
+    tiktok: "",
+    updatedAt: new Date().toISOString(),
+  });
+  const { isLoading: contactLoading } = useQuery({
+    queryKey: ["contactInfo"],
+    queryFn: async () => {
+      const res = await getContactInfo();
+      if (res.success && res.data) {
+        setForm({
+          ...res.data,
+          whatsappMessage: res.data.whatsappMessage ?? "",
+          googleMapsEmbed: res.data.googleMapsEmbed ?? "",
+          latitude: res.data.latitude ?? "",
+          longitude: res.data.longitude ?? "",
+          businessHours: res.data.businessHours ?? "",
+          instagram: res.data.instagram ?? "",
+          facebook: res.data.facebook ?? "",
+          tiktok: res.data.tiktok ?? "",
+        });
+        return res.data;
+      }
+      return null;
+    }
+  });
+
+  const { data: messages = [], isLoading: messagesLoading } = useQuery({
+    queryKey: ["contactMessages"],
+    queryFn: async () => {
+      const res = await getContactMessages();
+      return (res.success && res.data) ? res.data : [];
+    }
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === "googleMapsEmbed") {
+      let lat = form.latitude;
+      let lng = form.longitude;
+      
+      const srcMatch = value.match(/src=["']([^"']+)["']/);
+      const url = srcMatch ? srcMatch[1] : value;
+      
+      if (url.includes("/maps/embed")) {
+        let match = url.match(/!3d([0-9.-]+)!4d([0-9.-]+)/);
+        if (match) {
+          lat = match[1];
+          lng = match[2];
+        } else {
+          match = url.match(/!2d([0-9.-]+)!3d([0-9.-]+)/);
+          if (match) {
+            lng = match[1];
+            lat = match[2];
+          }
+        }
+      }
+      setForm((p) => ({ ...p, [name]: url, latitude: lat || "", longitude: lng || "" }));
+    } else {
+      setForm((p) => ({ ...p, [name]: value }));
+    }
+  };
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: ContactInfo) => {
+      const response = await updateContactInfo(data);
+      if (!response.success) throw new Error((response as any).error || "Gagal menyimpan informasi kontak");
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contactInfo"] });
+      toast.success("Informasi kontak berhasil disimpan.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
+    }
+  });
+
+  const handleSave = () => {
+    saveMutation.mutate(form);
+  };
+
+  return (
+    <div>
+      <PageHeader
+        title="Informasi Kontak"
+        description="Kelola detail kontak yang tampil di website"
+        breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Info Kontak" }]}
+        action={
+          <button onClick={handleSave} disabled={saveMutation.isPending || contactLoading} className="btn-admin-primary">
             {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Simpan Perubahan
           </button>
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {contactLoading ? (
-          <div className="lg:col-span-1">
-            <TableSkeleton columns={1} rows={6} showActions={false} />
-          </div>
-        ) : (
-          <div className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Address & Contact */}
-            <div className="admin-card p-6 space-y-5">
-              <h2 className="font-bold text-base flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" /> Alamat & Kontak
-              </h2>
-              <div>
-                <label className="admin-label">Alamat Lengkap</label>
-                <textarea name="address" value={form.address} onChange={handleChange} rows={3} className="admin-input resize-none" />
-              </div>
-              <div className="grid grid-cols-1 gap-4">
+      <div className="space-y-6 mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {contactLoading ? (
+            <div className="lg:col-span-2">
+              <TableSkeleton columns={1} rows={6} showActions={false} />
+            </div>
+          ) : (
+            <>
+              {/* Address & Contact */}
+              <div className="admin-card p-6 space-y-5">
+                <h2 className="font-bold text-base flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" /> Alamat & Kontak
+                </h2>
                 <div>
-                  <label className="admin-label flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> Email</label>
-                  <input type="email" name="email" value={form.email} onChange={handleChange} className="admin-input" />
+                  <label className="admin-label">Alamat Lengkap</label>
+                  <textarea name="address" value={form.address} onChange={handleChange} rows={3} className="admin-input resize-none" />
                 </div>
-                <div>
-                  <label className="admin-label flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Nomor WhatsApp</label>
-                  <div className="flex items-center">
-                    <span className="px-3 py-2.5 bg-muted border border-r-0 border-input rounded-l-lg text-sm text-muted-foreground">+</span>
-                    <input name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="6281234567890" className="admin-input rounded-l-none" />
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="admin-label flex items-center gap-1.5"><Mail className="w-3.5 h-3.5" /> Email</label>
+                    <input type="email" name="email" value={form.email} onChange={handleChange} className="admin-input" />
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">Format: kode negara + nomor (tanpa +). Cth: 62087718676718</p>
-                </div>
-                <div>
-                  <label className="admin-label">Pesan Awal WhatsApp (opsional)</label>
-                  <textarea name="whatsappMessage" value={form.whatsappMessage} onChange={handleChange} rows={2} placeholder="Halo, saya ingin bertanya..." className="admin-input resize-none" />
-                </div>
-                <div>
-                  <label className="admin-label flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Jam Operasional</label>
-                  <input name="businessHours" value={form.businessHours} onChange={handleChange} placeholder="Senin – Sabtu: 08.00 – 17.00 WIB" className="admin-input" />
+                  <div>
+                    <label className="admin-label flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" /> Nomor WhatsApp</label>
+                    <div className="flex items-center">
+                      <span className="px-3 py-2.5 bg-muted border border-r-0 border-input rounded-l-lg text-sm text-muted-foreground">+</span>
+                      <input name="whatsapp" value={form.whatsapp} onChange={handleChange} placeholder="6281234567890" className="admin-input rounded-l-none" />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">Format: kode negara + nomor (tanpa +). Cth: 62087718676718</p>
+                  </div>
+                  <div>
+                    <label className="admin-label">Pesan Awal WhatsApp (opsional)</label>
+                    <textarea name="whatsappMessage" value={form.whatsappMessage} onChange={handleChange} rows={2} placeholder="Halo, saya ingin bertanya..." className="admin-input resize-none" />
+                  </div>
+                  <div>
+                    <label className="admin-label flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> Jam Operasional</label>
+                    <input name="businessHours" value={form.businessHours} onChange={handleChange} placeholder="Senin – Sabtu: 08.00 – 17.00 WIB" className="admin-input" />
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Google Maps */}
-            <div className="admin-card p-6 space-y-5">
-              <h2 className="font-bold text-base flex items-center gap-2">
-                <Map className="w-4 h-4 text-primary" /> Google Maps
-              </h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="admin-label">Latitude</label>
-                  <input name="latitude" value={form.latitude || ""} onChange={handleChange} placeholder="-6.240000" className="admin-input" />
+              {/* Google Maps & Social Media */}
+              <div className="space-y-6">
+                <div className="admin-card p-6 space-y-5">
+                  <h2 className="font-bold text-base flex items-center gap-2">
+                    <Map className="w-4 h-4 text-primary" /> Google Maps
+                  </h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="admin-label">Latitude</label>
+                      <input name="latitude" value={form.latitude || ""} onChange={handleChange} placeholder="-6.240000" className="admin-input" />
+                    </div>
+                    <div>
+                      <label className="admin-label">Longitude</label>
+                      <input name="longitude" value={form.longitude || ""} onChange={handleChange} placeholder="106.790000" className="admin-input" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="admin-label">Google Maps Embed Code</label>
+                    <textarea name="googleMapsEmbed" value={form.googleMapsEmbed} onChange={handleChange} rows={5} placeholder='<iframe src="https://www.google.com/maps/embed?..." ...>' className="admin-input resize-none font-mono text-xs" />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Dapatkan kode embed dari Google Maps &gt; Share &gt; Embed a map
+                    </p>
+                  </div>
+                  {form.googleMapsEmbed && (
+                    <div className="rounded-xl overflow-hidden border border-border h-40">
+                      <iframe src={form.googleMapsEmbed} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" />
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <label className="admin-label">Longitude</label>
-                  <input name="longitude" value={form.longitude || ""} onChange={handleChange} placeholder="106.790000" className="admin-input" />
-                </div>
-              </div>
-              <div>
-                <label className="admin-label">Google Maps Embed Code</label>
-                <textarea name="googleMapsEmbed" value={form.googleMapsEmbed} onChange={handleChange} rows={5} placeholder='<iframe src="https://www.google.com/maps/embed?..." ...>' className="admin-input resize-none font-mono text-xs" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Dapatkan kode embed dari Google Maps &gt; Share &gt; Embed a map
-                </p>
-              </div>
-              {form.googleMapsEmbed && (
-                <div className="rounded-xl overflow-hidden border border-border h-40">
-                  <iframe src={form.googleMapsEmbed} width="100%" height="100%" style={{ border: 0 }} allowFullScreen loading="lazy" />
-                </div>
-              )}
-            </div>
 
-            {/* Social Media */}
-            <div className="admin-card p-6 space-y-5">
-              <h2 className="font-bold text-base flex items-center gap-2">
-                <span className="w-4 h-4 flex items-center justify-center font-bold text-primary">@</span> Sosial Media
-              </h2>
-              <div className="grid grid-cols-1 gap-4">
-                <div>
-                  <label className="admin-label">URL Instagram</label>
-                  <input name="instagram" value={form.instagram || ""} onChange={handleChange} placeholder="https://instagram.com/tokomanur" className="admin-input" />
-                </div>
-                <div>
-                  <label className="admin-label">URL Facebook</label>
-                  <input name="facebook" value={form.facebook || ""} onChange={handleChange} placeholder="https://facebook.com/tokomanur" className="admin-input" />
-                </div>
-                <div>
-                  <label className="admin-label">URL TikTok</label>
-                  <input name="tiktok" value={form.tiktok || ""} onChange={handleChange} placeholder="https://tiktok.com/@tokomanur" className="admin-input" />
+                <div className="admin-card p-6 space-y-5">
+                  <h2 className="font-bold text-base flex items-center gap-2">
+                    <span className="w-4 h-4 flex items-center justify-center font-bold text-primary">@</span> Sosial Media
+                  </h2>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label className="admin-label">URL Instagram</label>
+                      <input name="instagram" value={form.instagram || ""} onChange={handleChange} placeholder="https://instagram.com/tokomanur" className="admin-input" />
+                    </div>
+                    <div>
+                      <label className="admin-label">URL Facebook</label>
+                      <input name="facebook" value={form.facebook || ""} onChange={handleChange} placeholder="https://facebook.com/tokomanur" className="admin-input" />
+                    </div>
+                    <div>
+                      <label className="admin-label">URL TikTok</label>
+                      <input name="tiktok" value={form.tiktok || ""} onChange={handleChange} placeholder="https://tiktok.com/@tokomanur" className="admin-input" />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
+        </div>
 
-          <div className="admin-card p-6 space-y-4">
+        <div className="admin-card p-6 space-y-4">
             <h3 className="text-base font-semibold mb-6 flex items-center gap-2 border-b border-border pb-3">
               <Mail className="w-5 h-5 text-primary" /> Pesan dari Kontak Form
             </h3>
@@ -256,8 +373,7 @@ export default function AdminContactInfoPage() {
               </div>
             )}
           </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
