@@ -1,4 +1,4 @@
-import { NextResponse } from "next";
+import { NextResponse } from "next/server";
 import { getNotifications, markNotificationAsRead } from "@/lib/actions/notifications";
 
 export async function GET() {
