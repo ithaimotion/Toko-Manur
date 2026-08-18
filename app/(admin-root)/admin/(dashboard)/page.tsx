@@ -11,6 +11,7 @@ import { formatRupiah, formatDate, formatCompactNumber } from "@/lib/utils";
 import { getMonthlyVisitors } from "@/lib/analytics";
 
 export const metadata: Metadata = { title: "Dasbor" };
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const stats = mockDashboardStats;
