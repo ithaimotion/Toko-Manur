@@ -110,15 +110,18 @@ export function Header() {
               <div className="px-4 py-2 border-b border-border flex items-center justify-between">
                 <h3 className="font-semibold text-sm">Notifikasi</h3>
                 <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">
-                  {notifications.filter(n => !n.isRead).length} Baru
+                  {notifications.filter((n: any) => !n.isRead).length} Baru
                 </span>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="p-4 text-center text-sm text-slate-500">Tidak ada notifikasi</div>
+                  <div className="p-6 text-center">
+                    <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-sm text-slate-500">Tidak ada notifikasi</p>
+                  </div>
                 ) : (
-                  notifications.map((notif: any) => (
-                    <div 
+                  notifications.slice(0, 5).map((notif: any) => (
+                    <div
                       key={notif.id}
                       onClick={() => handleNotificationClick(notif.id, notif.link)}
                       className={`p-4 border-b border-border last:border-0 hover:bg-slate-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
@@ -136,6 +139,17 @@ export function Header() {
                     </div>
                   ))
                 )}
+              </div>
+              <div className="border-t border-border px-4 py-2.5">
+                <Link
+                  href="/admin/notifications"
+                  onClick={() => setNotificationsOpen(false)}
+                  className="block text-center text-xs font-semibold text-primary hover:text-primary/80 transition-colors py-0.5"
+                >
+                  {notifications.length > 5
+                    ? `Lihat ${notifications.length - 5} notifikasi lainnya →`
+                    : "Lihat Semua Notifikasi →"}
+                </Link>
               </div>
             </div>
           )}

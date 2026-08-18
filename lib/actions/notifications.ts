@@ -98,6 +98,16 @@ export async function getNotifications() {
     }
   }
 
+  // Read persisted read state for sys- notifications
+  const sysReadFile = path.join(storageDir, "sys-notifications-read.json");
+  let sysReadIds: string[] = [];
+  try {
+    const raw = await fs.readFile(sysReadFile, "utf8");
+    sysReadIds = JSON.parse(raw);
+  } catch {
+    sysReadIds = [];
+  }
+
   // Inject a generic reminder for catalog update
   const hasCatalogReminder = notifications.some(n => n.id === "sys-reminder-catalog");
   if (!hasCatalogReminder) {
@@ -106,12 +116,19 @@ export async function getNotifications() {
       type: "SYSTEM_ALERT",
       title: "Pengingat Rutin",
       message: "Jangan lupa untuk memperbarui katalog produk Anda bulan ini dan cek sinkronisasi harga dengan Marketplace.",
-      isRead: false,
+      isRead: sysReadIds.includes("sys-reminder-catalog"),
       link: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
   }
+
+  // Apply persisted read state for all sys- notifications
+  notifications = notifications.map(n =>
+    n.id.startsWith("sys-") && sysReadIds.includes(n.id)
+      ? { ...n, isRead: true }
+      : n
+  );
 
   // sort again after injections
   notifications.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -159,6 +176,24 @@ export async function createNotification(payload: {
 
 export async function markNotificationAsRead(id: string) {
   if (id.startsWith("sys-")) {
+    // Persist sys- read state to file so it survives refetches
+    const sysReadFile = path.join(storageDir, "sys-notifications-read.json");
+    try {
+      await fs.mkdir(storageDir, { recursive: true });
+      let existing: string[] = [];
+      try {
+        const raw = await fs.readFile(sysReadFile, "utf8");
+        existing = JSON.parse(raw);
+      } catch {
+        existing = [];
+      }
+      if (!existing.includes(id)) {
+        existing.push(id);
+        await fs.writeFile(sysReadFile, JSON.stringify(existing), "utf8");
+      }
+    } catch {
+      // ignore write errors
+    }
     return { success: true };
   }
 

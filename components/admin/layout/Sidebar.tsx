@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, Tag, FileText, Star, Image as ImageIcon, Megaphone,
   ShoppingBag, Building2, Phone, Users, Settings, Baby, ChevronLeft,
-  ChevronRight, ExternalLink, Key, MessageSquare, Shield
+  ChevronRight, ExternalLink, Key, MessageSquare, Shield, Bell
 } from "lucide-react";
 
 interface NavItem {
@@ -54,6 +54,7 @@ const navSections: { title: string; items: NavItem[] }[] = [
   {
     title: "Sistem",
     items: [
+      { label: "Notifikasi", href: "/admin/notifications", icon: Bell },
       { label: "Pengguna", href: "/admin/users", icon: Users },
     ],
   },
