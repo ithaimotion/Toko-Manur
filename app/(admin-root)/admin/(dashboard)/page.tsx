@@ -8,11 +8,13 @@ import {
 import { StatsCard } from "@/components/admin/ui/StatsCard";
 import { mockDashboardStats } from "@/lib/mock-data";
 import { formatRupiah, formatDate, formatCompactNumber } from "@/lib/utils";
+import { getMonthlyVisitors } from "@/lib/analytics";
 
 export const metadata: Metadata = { title: "Dasbor" };
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
   const stats = mockDashboardStats;
+  const visitorsData = await getMonthlyVisitors();
 
   return (
     <div>
@@ -55,8 +57,8 @@ export default function DashboardPage() {
         />
         <StatsCard
           label="Pengunjung Bulan Ini"
-          value={formatCompactNumber(stats.monthlyVisitors)}
-          change={23}
+          value={formatCompactNumber(visitorsData.current)}
+          change={visitorsData.change}
           changeLabel="vs. bulan lalu"
           icon={Eye}
           color="purple"
