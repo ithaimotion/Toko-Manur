@@ -218,7 +218,6 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
-    </div>
 
       <ConfirmDeleteModal
         isOpen={!!toDelete}

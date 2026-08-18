@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Plus, Pencil, Trash2, Search, Tag, X, Image as ImageIcon } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
@@ -107,7 +108,7 @@ export default function BrandsPage() {
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       name,
       slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')

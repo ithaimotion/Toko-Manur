@@ -117,7 +117,7 @@ export function Header() {
                 {notifications.length === 0 ? (
                   <div className="p-4 text-center text-sm text-slate-500">Tidak ada notifikasi</div>
                 ) : (
-                  notifications.map((notif) => (
+                  notifications.map((notif: any) => (
                     <div 
                       key={notif.id}
                       onClick={() => handleNotificationClick(notif.id, notif.link)}

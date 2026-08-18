@@ -315,7 +315,7 @@ export default function AdminUsersPage() {
         itemName={deleteTarget?.name}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
-        loading={deleting}
+        loading={deleteMutation.isPending}
       />
     </div>
   );

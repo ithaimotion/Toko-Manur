@@ -78,7 +78,7 @@ export default function ProfilePage() {
         <div className="admin-card overflow-hidden">
           {isLoading ? (
             <div className="p-6 md:p-8">
-              <CardSkeleton lines={5} />
+              <CardSkeleton count={5} />
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-6 md:p-8">
