@@ -103,7 +103,7 @@ export default function NotificationsPage() {
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
       // Include ALL unread notifications — the API now handles sys- ones by saving to file
-      const unread = notifications.filter((n) => !n.isRead);
+      const unread = notifications.filter((n: any) => !n.isRead);
       await Promise.all(
         unread.map((n) =>
           fetch("/api/notifications", {
@@ -169,7 +169,7 @@ export default function NotificationsPage() {
         action={
           unreadCount > 0 ? (
             <button
-              onClick={() => markAllReadMutation.mutate()}
+              onClick={() => markAllReadMutation.mutate(undefined as any)}
               disabled={markAllReadMutation.isPending}
               className="btn-admin-secondary flex items-center gap-2"
             >
