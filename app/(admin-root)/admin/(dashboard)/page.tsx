@@ -33,6 +33,7 @@ export default function DashboardPage() {
           changeLabel="vs. bulan lalu"
           icon={Package}
           color="blue"
+          href="/admin/products"
         />
         <StatsCard
           label="Total Artikel"
@@ -41,6 +42,7 @@ export default function DashboardPage() {
           changeLabel="vs. bulan lalu"
           icon={FileText}
           color="green"
+          href="/admin/blogs"
         />
         <StatsCard
           label="Review Terkumpul"
@@ -49,6 +51,7 @@ export default function DashboardPage() {
           changeLabel="baru bulan ini"
           icon={Star}
           color="amber"
+          href="/admin/reviews"
         />
         <StatsCard
           label="Pengunjung Bulan Ini"
@@ -95,9 +98,8 @@ export default function DashboardPage() {
                         <p className="text-xs text-muted-foreground">Hubungi Kami</p>
                       )}
                       <span
-                        className={`badge-admin mt-1 ${
-                          product.status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
-                        }`}
+                        className={`badge-admin mt-1 ${product.status === "published" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+                          }`}
                       >
                         {product.status === "published" ? "Aktif" : "Draft"}
                       </span>
@@ -136,29 +138,6 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="admin-card p-5">
-            <h2 className="font-bold text-base text-foreground mb-4">Aksi Cepat</h2>
-            <div className="space-y-2">
-              {[
-                { label: "Tambah Produk", href: "/products/new", icon: Package },
-                { label: "Tulis Artikel", href: "/blogs/new", icon: FileText },
-                { label: "Edit Hero Banner", href: "/hero-banner", icon: Activity },
-              ].map(({ label, href, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors text-sm font-medium text-foreground"
-                >
-                  <div className="w-7 h-7 bg-primary-50 rounded-lg flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-primary" />
-                  </div>
-                  {label}
-                </Link>
               ))}
             </div>
           </div>

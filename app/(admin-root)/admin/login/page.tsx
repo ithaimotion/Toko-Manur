@@ -2,20 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Package, Lock, Mail, ArrowLeft, Send } from "lucide-react";
-import { toast } from "sonner";
+import { Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { loginAction } from "@/lib/actions/auth";
-import { createResetRequest } from "@/lib/actions/users";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
-  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,169 +27,191 @@ export default function LoginPage() {
     }
   };
 
-  const handleResetSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const res = await createResetRequest(email);
-    setSubmitting(false);
-    if (res.success) {
-      setSubmitted(true);
-    } else {
-      toast.error(res.error || "Gagal mengirim permintaan.");
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-4 relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-600/20 blur-[120px]" />
-        <div className="absolute top-[60%] -right-[10%] w-[40%] h-[60%] rounded-full bg-blue-600/20 blur-[120px]" />
+    <div
+      className="min-h-screen flex items-center justify-center relative overflow-hidden p-4"
+      style={{
+        background: "linear-gradient(145deg, #1a0505 0%, #3d0c0c 35%, #7f1d1d 70%, #991b1b 100%)",
+      }}
+    >
+      {/* Background blobs — merah tua elegan sesuai branding */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div
+          className="absolute -top-[20%] -left-[15%] w-[60%] h-[60%] rounded-full blur-[120px] opacity-40"
+          style={{ background: "radial-gradient(circle, #cf2525, #7f1d1d)" }}
+        />
+        <div
+          className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[55%] rounded-full blur-[100px] opacity-30"
+          style={{ background: "radial-gradient(circle, #ff4f4f, #991b1b)" }}
+        />
+        <div
+          className="absolute top-[40%] left-[50%] w-[35%] h-[35%] rounded-full blur-[90px] opacity-20"
+          style={{ background: "radial-gradient(circle, #fca55d, #cf2525)" }}
+        />
+        {/* Decorative subtle grid */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `radial-gradient(circle, #ffffff 1px, transparent 1px)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* Floating dots */}
+        <div className="absolute top-[12%] right-[18%] w-2 h-2 rounded-full bg-red-300/30 animate-pulse" />
+        <div className="absolute top-[68%] left-[12%] w-1.5 h-1.5 rounded-full bg-orange-300/40 animate-pulse" style={{ animationDelay: "1.2s" }} />
+        <div className="absolute top-[40%] right-[6%] w-1 h-1 rounded-full bg-red-200/50 animate-pulse" style={{ animationDelay: "2.4s" }} />
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Logo or Brand */}
+        {/* Logo & Branding */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-white/10 backdrop-blur-md border border-white/20 text-white rounded-2xl flex items-center justify-center mb-5 shadow-xl">
-            <Package className="w-7 h-7" />
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Toko Manur Admin</h1>
-          <p className="text-slate-300 text-sm mt-2">
-            {isForgotPassword ? "Permintaan reset password" : "Masuk ke panel dashboard"}
-          </p>
-        </div>
-
-        {/* Glassmorphism Login/Reset Card */}
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-6 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden transition-all duration-300">
-          {!isForgotPassword ? (
-            <form key="login-form" onSubmit={handleLoginSubmit} className="space-y-6">
-              {loginError && (
-                <div className="bg-red-500/20 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-200">
-                  {loginError}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200 block ml-1">Email</label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-white transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type="email" 
-                    placeholder="admin@tokomanur.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white text-sm focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all placeholder:text-slate-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between ml-1">
-                  <label className="text-sm font-medium text-slate-200 block">Password</label>
-                  <button 
-                    type="button"
-                    onClick={() => { setIsForgotPassword(true); setSubmitted(false); }}
-                    className="text-xs text-indigo-300 hover:text-white transition-colors"
-                  >
-                    Lupa password?
-                  </button>
-                </div>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-white transition-colors">
-                    <Lock className="w-4 h-4" />
-                  </div>
-                  <input 
-                    type="password" 
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white text-sm focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all placeholder:text-slate-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="submit"
-                disabled={submitting}
-                className="w-full flex items-center justify-center py-3 bg-white text-indigo-950 hover:bg-indigo-50 text-sm font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {submitting ? "Memeriksa..." : "Masuk ke Dasbor"}
-              </button>
-            </form>
-          ) : submitted ? (
-            <div key="success-message" className="text-center space-y-4 py-4">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center mx-auto border border-emerald-500/30">
-                <Send className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Permintaan Terkirim!</h3>
-              <p className="text-sm text-slate-300">
-                Permintaan reset password untuk <span className="font-semibold text-white">{email}</span> telah disimpan ke database dan diteruskan ke Super Admin.
-              </p>
-              <button 
-                type="button" 
-                onClick={() => { setIsForgotPassword(false); setSubmitted(false); setEmail(""); }}
-                className="mt-4 text-sm text-indigo-300 hover:text-white transition-colors flex items-center justify-center gap-1.5 mx-auto font-medium"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Kembali ke Form Login
-              </button>
+          <div className="relative mb-5">
+            <div
+              className="w-20 h-20 rounded-2xl overflow-hidden shadow-2xl"
+              style={{ boxShadow: "0 0 40px rgba(207, 37, 37, 0.5)" }}
+            >
+              <Image
+                src="/Logo Manur HD.png"
+                alt="Toko Manur Logo"
+                width={80}
+                height={80}
+                className="w-full h-full object-contain bg-white p-1"
+              />
             </div>
-          ) : (
-            <form key="reset-form" className="space-y-6" onSubmit={handleResetSubmit}>
-              <div className="text-center mb-6">
-                <p className="text-sm text-slate-300">
-                  Masukkan email Anda. Permintaan reset password akan dikirim ke Super Admin untuk disetujui.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-200 block ml-1">Email Terdaftar</label>
-                <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-white transition-colors">
-                    <Mail className="w-4 h-4" />
-                  </div>
-                  <input 
-                    key="reset-email-input"
-                    type="email" 
-                    placeholder="nama@tokomanur.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border border-white/10 rounded-xl bg-white/5 text-white text-sm focus:outline-none focus:bg-white/10 focus:border-white/30 focus:ring-1 focus:ring-white/30 transition-all placeholder:text-slate-500"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="pt-2">
-                <button 
-                  type="submit" 
-                  disabled={submitting}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-500 text-white hover:bg-indigo-400 text-sm font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 duration-200"
-                >
-                  <Send className="w-4 h-4" />
-                  {submitting ? "Mengirim..." : "Kirim Permintaan"}
-                </button>
-              </div>
-
-              <div className="text-center mt-6">
-                <button 
-                  type="button" 
-                  onClick={() => setIsForgotPassword(false)}
-                  className="text-sm text-slate-400 hover:text-white transition-colors flex items-center justify-center gap-1.5 mx-auto"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Kembali ke form Login
-                </button>
-              </div>
-            </form>
-          )}
+            {/* Glow ring */}
+            <div
+              className="absolute inset-0 rounded-2xl"
+              style={{
+                boxShadow: "0 0 0 2px rgba(255,79,79,0.3), 0 0 0 4px rgba(207,37,37,0.15)",
+              }}
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-white tracking-tight">Toko Manur</h1>
+          <p className="text-red-200/70 text-sm mt-1.5 font-medium tracking-wide">Panel Admin Dashboard</p>
         </div>
 
-        <p className="text-center text-xs text-slate-400 mt-8 font-medium">
+        {/* Glass Card */}
+        <div
+          className="p-6 sm:p-8 rounded-3xl shadow-2xl"
+          style={{
+            background: "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(28px)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            boxShadow: "0 25px 50px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+          }}
+        >
+          <form onSubmit={handleLoginSubmit} className="space-y-5">
+            {loginError && (
+              <div
+                className="rounded-xl px-4 py-3 text-sm text-red-200"
+                style={{
+                  background: "rgba(239,68,68,0.15)",
+                  border: "1px solid rgba(239,68,68,0.3)",
+                }}
+              >
+                {loginError}
+              </div>
+            )}
+
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-red-100/90 block ml-0.5">Email</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-red-300/50 pointer-events-none">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  placeholder="admin@tokomanur.com"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl text-white text-sm outline-none transition-all placeholder:text-white/25"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.background = "rgba(255,255,255,0.10)";
+                    e.target.style.border = "1px solid rgba(255,79,79,0.5)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(207,37,37,0.15)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.background = "rgba(255,255,255,0.06)";
+                    e.target.style.border = "1px solid rgba(255,255,255,0.10)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-red-100/90 block ml-0.5">Password</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-red-300/50 pointer-events-none">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="w-full pl-11 pr-12 py-3 rounded-xl text-white text-sm outline-none transition-all placeholder:text-white/25"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.background = "rgba(255,255,255,0.10)";
+                    e.target.style.border = "1px solid rgba(255,79,79,0.5)";
+                    e.target.style.boxShadow = "0 0 0 3px rgba(207,37,37,0.15)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.background = "rgba(255,255,255,0.06)";
+                    e.target.style.border = "1px solid rgba(255,255,255,0.10)";
+                    e.target.style.boxShadow = "none";
+                  }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-red-300/50 hover:text-red-200 transition-colors"
+                  aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full flex items-center justify-center py-3.5 text-sm font-bold rounded-xl transition-all duration-200 mt-2"
+              style={{
+                background: submitting
+                  ? "rgba(207,37,37,0.4)"
+                  : "linear-gradient(135deg, #cf2525 0%, #ff4f4f 50%, #cf2525 100%)",
+                color: "white",
+                boxShadow: submitting ? "none" : "0 4px 20px rgba(207,37,37,0.4)",
+                letterSpacing: "0.03em",
+              }}
+            >
+              {submitting ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Memeriksa...
+                </span>
+              ) : (
+                "Masuk ke Dasbor"
+              )}
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center text-xs text-red-200/30 mt-8 font-medium">
           &copy; {new Date().getFullYear()} Toko Manur. All rights reserved.
         </p>
       </div>

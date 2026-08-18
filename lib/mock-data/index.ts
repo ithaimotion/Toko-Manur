@@ -550,7 +550,7 @@ export const mockMarketplaceLinks: MarketplaceLink[] = [
 export const mockCompanyProfile: CompanyProfile = {
   id: "company-1",
   about:
-    "Toko Manur Baby Care hadir sejak 2018 sebagai sahabat terpercaya para Ibu di Indonesia. Kami menyediakan berbagai kebutuhan popok bayi, perawatan kulit si kecil, dan perlengkapan menyusui dari brand-brand terkemuka dengan jaminan orisinalitas 100%.",
+    "Toko Manur hadir sejak 2018 sebagai sahabat terpercaya para Ibu di Indonesia. Kami menyediakan berbagai kebutuhan popok bayi, perawatan kulit si kecil, dan perlengkapan menyusui dari brand-brand terkemuka dengan jaminan orisinalitas 100%.",
   vision:
     "Menjadi destinasi belanja kebutuhan ibu dan bayi nomor satu yang memberikan kemudahan, kenyamanan, dan edukasi parenting yang bermanfaat.",
   mission: [
@@ -604,7 +604,7 @@ export const mockContactInfo: ContactInfo = {
   address: "Jl. Kasih Bunda No. 88, Kecamatan Kebayoran Baru, Jakarta Selatan 12160",
   email: "halo@tokomanurbaby.id",
   whatsapp: "6281234567890",
-  whatsappMessage: "Halo Toko Manur Baby Care, saya mau tanya stok popok ukuran...",
+  whatsappMessage: "Halo Toko Manur, saya mau tanya stok popok ukuran...",
   googleMapsEmbed: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.27!2d106.79!3d-6.24!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTQnMjQuMCJTIDEwNsKwNDcnMjQuMCJF!5e0!3m2!1sen!2sid!4v1",
   latitude: "-6.240000",
   longitude: "106.790000",
@@ -646,14 +646,14 @@ export const mockUsers: User[] = [
 // ================================
 export const mockSettings: SiteSettings = {
   id: "settings-1",
-  siteName: "Toko Manur Baby Care",
+  siteName: "Toko Manur",
   siteTagline: "Sahabat Belanja Bunda & Si Kecil",
   socialMedia: [
     { platform: "Instagram", url: "https://instagram.com/tokomanurbaby" },
     { platform: "Facebook", url: "https://facebook.com/tokomanurbaby" },
     { platform: "TikTok", url: "https://tiktok.com/@tokomanurbaby" },
   ],
-  footerText: "© 2024 Toko Manur Baby Care. Pusat perlengkapan ibu dan bayi terpercaya.",
+  footerText: "© 2024 Toko Manur. Pusat perlengkapan ibu dan bayi terpercaya.",
   seoTitle: "Toko Manur — Distributor Popok & Perlengkapan Bayi Termurah",
   seoDescription: "Pusat belanja kebutuhan ibu dan anak. Menyediakan popok MamyPoko, Merries, Pampers, Sweety termurah dan perlengkapan mandi bayi 100% original.",
   seoKeywords: "popok bayi, pampers murah, merries pants, mamypoko pants, perlengkapan bayi, toko bayi terdekat, tisu basah",

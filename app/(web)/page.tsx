@@ -18,7 +18,7 @@ import { getHeroBanners } from "@/lib/actions/hero-banner";
 import type { MarketplaceLink } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Toko Manur Baby Care — Pusat Popok & Perlengkapan Bayi Termurah",
+  title: "Toko Manur — Pusat Popok & Perlengkapan Bayi Termurah",
   description:
     "Toko Manur menyediakan popok MamyPoko, Merries, Pampers, Sweety, tisu basah, dan perlengkapan mandi bayi 100% original dengan pengiriman instan.",
 };
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  name: "Toko Manur Baby Care",
+  name: "Toko Manur",
   description: "Toko perlengkapan bayi dan popok termurah di Indonesia",
   url: "https://tokomanurbaby.id",
   telephone: "+6281234567890",

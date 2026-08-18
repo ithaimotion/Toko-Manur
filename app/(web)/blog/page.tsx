@@ -8,7 +8,7 @@ import { getPublishedBlogs, getBlogCategories } from "@/app/(web)/actions/blog";
 export const metadata: Metadata = {
   title: "Blog & Artikel — Tips Parenting | Toko Manur",
   description:
-    "Baca artikel parenting, tips merawat bayi, panduan memilih popok, dan informasi terpercaya dari Toko Manur Baby Care.",
+    "Baca artikel parenting, tips merawat bayi, panduan memilih popok, dan informasi terpercaya dari Toko Manur.",
 };
 
 // Revalidate setiap 5 menit agar artikel baru segera muncul

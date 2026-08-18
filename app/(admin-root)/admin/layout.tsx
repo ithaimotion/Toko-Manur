@@ -11,8 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Admin — Toko Manur Baby Care", template: "%s | Admin Toko Manur Baby Care" },
-  description: "Admin Dashboard Toko Manur Baby Care CMS",
+  title: { default: "Admin — Toko Manur", template: "%s | Admin Toko Manur" },
+  description: "Admin Dashboard Toko Manur CMS",
   robots: { index: false, follow: false },
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { Bell, Search, User, LogOut, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -8,12 +8,31 @@ import { logoutAction } from "@/lib/actions/auth";
 import { getMyProfile } from "@/lib/actions/users";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { CommandPalette } from "@/components/admin/ui/CommandPalette";
 
 export function Header() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [isMac, setIsMac] = useState(false);
+
+  useEffect(() => {
+    setIsMac(navigator.platform.toUpperCase().includes("MAC"));
+  }, []);
+
+  // Global Ctrl+K / Cmd+K shortcut
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCommandOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const { data: profile } = useQuery({
     queryKey: ["myProfile"],
@@ -32,7 +51,7 @@ export function Header() {
       if (!json.success) throw new Error("Gagal mengambil notifikasi");
       return json.data;
     },
-    refetchInterval: 30000 // Poll every 30 seconds
+    refetchInterval: 30000,
   });
 
   const markReadMutation = useMutation({
@@ -51,7 +70,7 @@ export function Header() {
       );
       return { previousNotifications };
     },
-    onError: (err, id, context) => {
+    onError: (_err: any, _id: any, context: any) => {
       queryClient.setQueryData(["notifications"], context?.previousNotifications);
     },
     onSettled: () => {
@@ -62,9 +81,7 @@ export function Header() {
   const handleNotificationClick = (id: string, link: string | null) => {
     markReadMutation.mutate(id);
     setNotificationsOpen(false);
-    if (link) {
-      router.push(link);
-    }
+    if (link) router.push(link);
   };
 
   const handleLogout = async () => {
@@ -75,132 +92,139 @@ export function Header() {
   };
 
   return (
-    <header className="h-16 bg-[#fcfbff] border-b border-[#e8dce7] flex items-center justify-between px-6 shrink-0 z-10">
-      {/* Search */}
-      <div className="flex items-center gap-2 bg-[#f7f1f8] rounded-lg px-3 py-2 w-64">
-        <Search className="w-4 h-4 text-[#8a7d8d]" />
-        <input
-          type="search"
-          placeholder="Cari..."
-          className="bg-transparent text-sm outline-none flex-1 placeholder:text-[#8a7d8d] text-[#4b3f49]"
-        />
-      </div>
+    <>
+      <CommandPalette open={commandOpen} onClose={() => setCommandOpen(false)} />
 
-      {/* Right */}
-      <div className="flex items-center gap-3">
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            id="notifications-btn"
-            onClick={() => {
-              setNotificationsOpen(!notificationsOpen);
-              setUserMenuOpen(false);
-            }}
-            className="relative p-2 rounded-lg hover:bg-[#f8ebf6] transition-colors text-[#8a7d8d] hover:text-[#78a4cb]"
-            aria-label="Notifications"
-          >
-            <Bell className="w-5 h-5" />
-            {notifications.some((n: any) => !n.isRead) && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
-            )}
-          </button>
+      <header className="h-16 bg-[#fcfbff] border-b border-[#e8dce7] flex items-center justify-between px-6 shrink-0 z-10">
+        {/* Command Palette Trigger */}
+        <button
+          onClick={() => setCommandOpen(true)}
+          className="flex items-center gap-2.5 bg-[#f7f1f8] hover:bg-[#f0e6f4] rounded-lg px-3 py-2 w-64 text-left transition-colors group"
+        >
+          <Search className="w-4 h-4 text-[#8a7d8d] group-hover:text-primary transition-colors shrink-0" />
+          <span className="text-sm text-[#8a7d8d] flex-1">Cari halaman...</span>
+          <kbd className="hidden sm:flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono text-[#8a7d8d] border border-[#d8ccd8] rounded bg-white/70">
+            {isMac ? <span>⌘</span> : <span>Ctrl</span>}
+            <span className="ml-0.5">K</span>
+          </kbd>
+        </button>
 
-          {notificationsOpen && (
-            <div className="absolute right-0 top-12 w-80 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-2 z-50 overflow-hidden">
-              <div className="px-4 py-2 border-b border-border flex items-center justify-between">
-                <h3 className="font-semibold text-sm">Notifikasi</h3>
-                <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">
-                  {notifications.filter((n: any) => !n.isRead).length} Baru
-                </span>
-              </div>
-              <div className="max-h-80 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="p-6 text-center">
-                    <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-                    <p className="text-sm text-slate-500">Tidak ada notifikasi</p>
-                  </div>
-                ) : (
-                  notifications.slice(0, 5).map((notif: any) => (
-                    <div
-                      key={notif.id}
-                      onClick={() => handleNotificationClick(notif.id, notif.link)}
-                      className={`p-4 border-b border-border last:border-0 hover:bg-slate-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
-                    >
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className={`text-sm ${!notif.isRead ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>
-                          {notif.title}
-                        </h4>
-                        {!notif.isRead && <span className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
-                      </div>
-                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{notif.message}</p>
-                      <p className="text-[10px] text-slate-400 mt-2">
-                        {new Date(notif.createdAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+        {/* Right */}
+        <div className="flex items-center gap-3">
+          {/* Notifications */}
+          <div className="relative">
+            <button
+              id="notifications-btn"
+              onClick={() => {
+                setNotificationsOpen(!notificationsOpen);
+                setUserMenuOpen(false);
+              }}
+              className="relative p-2 rounded-lg hover:bg-[#f8ebf6] transition-colors text-[#8a7d8d] hover:text-[#78a4cb]"
+              aria-label="Notifications"
+            >
+              <Bell className="w-5 h-5" />
+              {notifications.some((n: any) => !n.isRead) && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+              )}
+            </button>
+
+            {notificationsOpen && (
+              <div className="absolute right-0 top-12 w-80 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-2 z-50 overflow-hidden">
+                <div className="px-4 py-2 border-b border-border flex items-center justify-between">
+                  <h3 className="font-semibold text-sm">Notifikasi</h3>
+                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">
+                    {notifications.filter((n: any) => !n.isRead).length} Baru
+                  </span>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="p-6 text-center">
+                      <Bell className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                      <p className="text-sm text-slate-500">Tidak ada notifikasi</p>
                     </div>
-                  ))
+                  ) : (
+                    notifications.slice(0, 5).map((notif: any) => (
+                      <div
+                        key={notif.id}
+                        onClick={() => handleNotificationClick(notif.id, notif.link)}
+                        className={`p-4 border-b border-border last:border-0 hover:bg-slate-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <h4 className={`text-sm ${!notif.isRead ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>
+                            {notif.title}
+                          </h4>
+                          {!notif.isRead && <span className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
+                        </div>
+                        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{notif.message}</p>
+                        <p className="text-[10px] text-slate-400 mt-2">
+                          {new Date(notif.createdAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="border-t border-border px-4 py-2.5">
+                  <Link
+                    href="/admin/notifications"
+                    onClick={() => setNotificationsOpen(false)}
+                    className="block text-center text-xs font-semibold text-primary hover:text-primary/80 transition-colors py-0.5"
+                  >
+                    {notifications.length > 5
+                      ? `Lihat ${notifications.length - 5} notifikasi lainnya →`
+                      : "Lihat Semua Notifikasi →"}
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* User Menu */}
+          <div className="relative">
+            <button
+              id="user-menu-btn"
+              onClick={() => {
+                setUserMenuOpen(!userMenuOpen);
+                setNotificationsOpen(false);
+              }}
+              className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#f8ebf6] transition-colors"
+            >
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden border border-primary-200">
+                {profile?.avatar ? (
+                  <Image src={profile.avatar} alt="Avatar" width={32} height={32} className="object-cover w-full h-full" />
+                ) : (
+                  <User className="w-4 h-4 text-white" />
                 )}
               </div>
-              <div className="border-t border-border px-4 py-2.5">
-                <Link
-                  href="/admin/notifications"
-                  onClick={() => setNotificationsOpen(false)}
-                  className="block text-center text-xs font-semibold text-primary hover:text-primary/80 transition-colors py-0.5"
-                >
-                  {notifications.length > 5
-                    ? `Lihat ${notifications.length - 5} notifikasi lainnya →`
-                    : "Lihat Semua Notifikasi →"}
-                </Link>
+              <div className="hidden sm:block text-left">
+                <p className="text-sm font-semibold text-[#4b3f49] leading-none">{profile?.name || "Memuat..."}</p>
+                <p className="text-[10px] uppercase font-bold text-primary mt-0.5">{profile?.role?.replace("_", " ") || "ADMIN"}</p>
               </div>
-            </div>
-          )}
-        </div>
+              <ChevronDown className="w-4 h-4 text-[#8a7d8d] hidden sm:block" />
+            </button>
 
-        {/* User Menu */}
-        <div className="relative">
-          <button
-            id="user-menu-btn"
-            onClick={() => {
-              setUserMenuOpen(!userMenuOpen);
-              setNotificationsOpen(false);
-            }}
-            className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#f8ebf6] transition-colors"
-          >
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden border border-primary-200">
-              {profile?.avatar ? (
-                <Image src={profile.avatar} alt="Avatar" width={32} height={32} className="object-cover w-full h-full" />
-              ) : (
-                <User className="w-4 h-4 text-white" />
-              )}
-            </div>
-            <div className="hidden sm:block text-left">
-              <p className="text-sm font-semibold text-[#4b3f49] leading-none">{profile?.name || "Memuat..."}</p>
-              <p className="text-[10px] uppercase font-bold text-primary mt-0.5">{profile?.role?.replace("_", " ") || "ADMIN"}</p>
-            </div>
-            <ChevronDown className="w-4 h-4 text-[#8a7d8d] hidden sm:block" />
-          </button>
-
-          {userMenuOpen && (
-            <div className="absolute right-0 top-12 w-48 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-1 z-50">
-              <Link
-                href="/admin/profile"
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
-                onClick={() => setUserMenuOpen(false)}
-              >
-                <User className="w-4 h-4 text-muted-foreground" />
-                Profil Saya
-              </Link>
-              <hr className="my-1 border-border" />
-              <button 
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-destructive hover:bg-red-50 transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Keluar
-              </button>
-            </div>
-          )}
+            {userMenuOpen && (
+              <div className="absolute right-0 top-12 w-48 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-1 z-50">
+                <Link
+                  href="/admin/profile"
+                  className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-secondary transition-colors"
+                  onClick={() => setUserMenuOpen(false)}
+                >
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  Profil Saya
+                </Link>
+                <hr className="my-1 border-border" />
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-destructive hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Keluar
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

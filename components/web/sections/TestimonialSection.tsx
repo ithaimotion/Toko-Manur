@@ -78,7 +78,7 @@ export function TestimonialSection({ testimonials }: { testimonials: Testimonial
             <span className="gradient-text">Bunda</span>
           </h2>
           <p className="text-slate-500 max-w-xl mx-auto">
-            Ribuan Bunda telah membuktikan kualitas produk dan layanan Toko Manur Baby Care
+            Ribuan Bunda telah membuktikan kualitas produk dan layanan Toko Manur
           </p>
         </div>
 

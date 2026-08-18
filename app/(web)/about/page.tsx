@@ -10,7 +10,7 @@ import { getContactInfo } from "@/lib/actions/contact";
 export const metadata: Metadata = {
   title: "Tentang Kami",
   description:
-    "Kenali lebih dekat Toko Manur Baby Care — sahabat belanja Bunda. Pelajari sejarah, visi, misi, dan nilai-nilai kami.",
+    "Kenali lebih dekat Toko Manur — sahabat belanja Bunda. Pelajari sejarah, visi, misi, dan nilai-nilai kami.",
 };
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {

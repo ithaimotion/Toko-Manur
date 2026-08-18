@@ -112,7 +112,7 @@ export function Sidebar({ productCount = 0, blogCount = 0, categoryCount = 0, br
         </div>
         {!collapsed && (
           <div>
-            <p className="text-[#2f2a33] font-bold text-sm">Toko Manur Baby</p>
+            <p className="text-[#2f2a33] font-bold text-sm">Toko Manur</p>
             <p className="text-[#7c6d7e] text-xs">Admin Panel</p>
           </div>
         )}

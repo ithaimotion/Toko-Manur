@@ -3,6 +3,7 @@ import { Inter, Nunito } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/web/layout/Navbar";
 import { Footer } from "@/components/web/layout/Footer";
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { mockSettings } from "@/lib/mock-data";
 import { getContactInfo } from "@/lib/actions/contact";
 
@@ -22,8 +23,8 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   metadataBase: new URL("https://tokomanur.id"),
   title: {
-    default: mockSettings.seoTitle ?? "Toko Manur Baby Care — Pusat Perlengkapan Bayi Terlengkap",
-    template: `%s | Toko Manur Baby Care`,
+    default: mockSettings.seoTitle ?? "Toko Manur — Pusat Perlengkapan Bayi Terlengkap",
+    template: `%s | Toko Manur`,
   },
   description: mockSettings.seoDescription,
   keywords: mockSettings.seoKeywords,
@@ -61,6 +62,9 @@ export default async function WebLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer contactInfo={contactInfo ?? { id: "", address: "", email: "", whatsapp: "", updatedAt: new Date().toISOString() }} settings={mockSettings} />
+        
+        {/* Google Analytics GA4 */}
+        <GoogleAnalytics gaId="G-FLELNWNL1H" />
       </body>
     </html>
   );
