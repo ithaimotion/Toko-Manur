@@ -7,10 +7,11 @@ import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 import { getMyProfile, updateMyProfile } from "@/lib/actions/users";
 import Image from "next/image";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CardSkeleton } from "@/components/admin/ui/CardSkeleton";
 
 export default function ProfilePage() {
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
   const [role, setRole] = useState("EDITOR");
   const [formData, setFormData] = useState({
     name: "",
@@ -19,42 +20,50 @@ export default function ProfilePage() {
     avatar: "",
   });
 
-  useEffect(() => {
-    async function fetchProfile() {
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["myProfile"],
+    queryFn: async () => {
       const res = await getMyProfile();
-      if (res.success && res.data) {
-        setFormData({
-          name: res.data.name,
-          email: res.data.email,
-          password: "",
-          avatar: res.data.avatar || "",
-        });
-        setRole(res.data.role);
-      }
-      setLoading(false);
+      return (res.success && res.data) ? res.data : null;
     }
-    fetchProfile();
-  }, []);
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        name: profile.name,
+        email: profile.email,
+        password: "",
+        avatar: profile.avatar || "",
+      });
+      setRole(profile.role);
+    }
+  }, [profile]);
+
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const res = await updateMyProfile(data);
+      if (!res.success) throw new Error(res.error || "Gagal memperbarui profil");
+      return res;
+    },
+    onSuccess: () => {
+      toast.success("Profil berhasil diperbarui.");
+      setFormData(prev => ({ ...prev, password: "" }));
+      queryClient.invalidateQueries({ queryKey: ["myProfile"] });
+      // Reload to update header (because it might be needed for the avatar on header)
+      setTimeout(() => window.location.reload(), 1000);
+    },
+    onError: (error: any) => toast.error(error.message)
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    const res = await updateMyProfile({
+    saveMutation.mutate({
       name: formData.name,
       email: formData.email,
       password: formData.password,
       avatar: formData.avatar,
     });
-    setSubmitting(false);
-
-    if (res.success) {
-      toast.success("Profil berhasil diperbarui.");
-      setFormData(prev => ({ ...prev, password: "" }));
-      // Reload to update header
-      setTimeout(() => window.location.reload(), 1000);
-    } else {
-      toast.error(res.error || "Gagal memperbarui profil.");
-    }
   };
 
   return (
@@ -67,8 +76,10 @@ export default function ProfilePage() {
 
       <div className="max-w-4xl mx-auto mt-6">
         <div className="admin-card overflow-hidden">
-          {loading ? (
-            <div className="p-12 text-center text-muted-foreground animate-pulse">Memuat data...</div>
+          {isLoading ? (
+            <div className="p-6 md:p-8">
+              <CardSkeleton lines={5} />
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-6 md:p-8">
               <div className="flex flex-col md:flex-row gap-10">
@@ -149,9 +160,9 @@ export default function ProfilePage() {
                   </div>
 
                   <div className="pt-6 flex justify-end">
-                    <button type="submit" disabled={submitting} className="btn-admin-primary px-8 py-2.5 shadow-md shadow-primary/20">
+                    <button type="submit" disabled={saveMutation.isPending} className="btn-admin-primary px-8 py-2.5 shadow-md shadow-primary/20">
                       <Save className="w-4 h-4 mr-2" />
-                      {submitting ? "Menyimpan..." : "Simpan Perubahan"}
+                      {saveMutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
                     </button>
                   </div>
                 </div>

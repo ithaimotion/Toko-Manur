@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Plus, Trash2, Shield, User, RefreshCw, ToggleLeft, ToggleRight, Eye, Clock } from "lucide-react";
+import { useState } from "react";
+import { Plus, MoreVertical, X, Eye, Activity, ShieldAlert, Key, Loader2, ShieldCheck, UserX, Trash2, Shield, User, RefreshCw, ToggleLeft, ToggleRight, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
 import { getUsers, createUser, deleteUser, toggleUserStatus, getUserActivity } from "@/lib/actions/users";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Role, UserStatus } from "@/lib/db";
 
 interface UserItem {
@@ -19,80 +21,91 @@ interface UserItem {
 }
 
 export default function AdminUsersPage() {
-  const [users, setUsers] = useState<UserItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [detailTarget, setDetailTarget] = useState<UserItem | null>(null);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [loadingActivities, setLoadingActivities] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     role: "EDITOR" as Role,
   });
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    const res = await getUsers();
-    if (res.success && res.data) {
-      setUsers(res.data as UserItem[]);
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ["adminUsers"],
+    queryFn: async () => {
+      const res = await getUsers();
+      if (!res.success) throw new Error(res.error || "Gagal mengambil data pengguna");
+      return res.data as UserItem[];
     }
-    setLoading(false);
-  };
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    const res = await createUser(formData);
-    setSubmitting(false);
-    if (res.success) {
+  const createMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const res = await createUser(data);
+      if (!res.success) throw new Error(res.error || "Gagal membuat pengguna.");
+      return res;
+    },
+    onSuccess: () => {
       setShowModal(false);
       setFormData({ name: "", email: "", role: "EDITOR" });
-      fetchUsers();
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       toast.success("Pengguna berhasil dibuat.");
-    } else {
-      toast.error(res.error || "Gagal membuat pengguna.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
     }
-  };
+  });
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    const res = await deleteUser(deleteTarget.id);
-    setDeleting(false);
-    setDeleteTarget(null);
-    if (res.success) {
-      fetchUsers();
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await deleteUser(id);
+      if (!res.success) throw new Error(res.error || "Gagal menghapus pengguna.");
+      return res;
+    },
+    onSuccess: () => {
+      setDeleteTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
       toast.success("Pengguna berhasil dihapus.");
-    } else {
-      toast.error(res.error || "Gagal menghapus pengguna.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
     }
+  });
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, currentStatus }: { id: string, currentStatus: UserStatus }) => {
+      const res = await toggleUserStatus(id, currentStatus);
+      if (!res.success) throw new Error(res.error);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adminUsers"] });
+    }
+  });
+
+  const { data: userActivities = [], isLoading: loadingActivities } = useQuery({
+    queryKey: ["userActivity", detailTarget?.id],
+    queryFn: async () => {
+      if (!detailTarget) return [];
+      const res = await getUserActivity(detailTarget.id);
+      if (!res.success) throw new Error(res.error);
+      return res.data;
+    },
+    enabled: !!detailTarget
+  });
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMutation.mutate(formData);
   };
 
-  const handleToggle = async (id: string, currentStatus: UserStatus) => {
-    const res = await toggleUserStatus(id, currentStatus);
-    if (res.success) {
-      fetchUsers();
-    }
+  const handleDelete = () => {
+    if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
   };
 
-  const handleViewDetail = async (user: UserItem) => {
-    setDetailTarget(user);
-    setLoadingActivities(true);
-    const res = await getUserActivity(user.id);
-    if (res.success && res.data) {
-      setActivities(res.data);
-    } else {
-      setActivities([]);
-    }
-    setLoadingActivities(false);
+  const handleToggle = (id: string, currentStatus: UserStatus) => {
+    toggleMutation.mutate({ id, currentStatus });
   };
 
   return (
@@ -108,96 +121,93 @@ export default function AdminUsersPage() {
         }
       />
 
-      {/* Table Container */}
-      <div className="admin-card overflow-hidden">
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Total: <span className="font-bold text-foreground">{users.length}</span> Pengguna</p>
-          <button onClick={fetchUsers} className="p-1.5 hover:bg-muted rounded-md transition-colors text-muted-foreground" title="Refresh data">
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-          </button>
+      {isLoading ? (
+        <TableSkeleton columns={5} rows={3} showActions={false} />
+      ) : users.length === 0 ? (
+        <div className="admin-card p-12 flex flex-col items-center justify-center text-center">
+          <UserX className="w-12 h-12 text-slate-300 mb-4" />
+          <h3 className="text-lg font-semibold">Belum ada pengguna</h3>
+          <p className="text-muted-foreground text-sm">Tambahkan pengguna baru untuk memulai.</p>
         </div>
-
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-border bg-muted/50">
-              <th className="text-left px-5 py-3 font-semibold text-muted-foreground text-xs uppercase">Pengguna</th>
-              <th className="text-left px-5 py-3 font-semibold text-muted-foreground text-xs uppercase">Peran (Role)</th>
-              <th className="text-left px-5 py-3 font-semibold text-muted-foreground text-xs uppercase hidden md:table-cell">Login Terakhir</th>
-              <th className="text-left px-5 py-3 font-semibold text-muted-foreground text-xs uppercase">Status</th>
-              <th className="text-right px-5 py-3 font-semibold text-muted-foreground text-xs uppercase">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {users.map((u) => (
-              <tr key={u.id} className={`hover:bg-muted/30 transition-colors ${u.status === "INACTIVE" ? "opacity-60" : ""}`}>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-                      <User className="w-5 h-5 text-primary-600" />
-                    </div>
-                    <div>
-                      <p className="font-semibold text-foreground">{u.name}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-1.5 text-xs font-medium">
-                    {u.role === "SUPER_ADMIN" ? (
-                      <span className="flex items-center gap-1 text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full"><Shield className="w-3 h-3" /> Super Admin</span>
-                    ) : u.role === "EDITOR" ? (
-                      <span className="text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full">Editor</span>
-                    ) : (
-                      <span className="text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">Viewer</span>
-                    )}
-                  </div>
-                </td>
-                <td className="px-5 py-4 text-muted-foreground text-xs hidden md:table-cell">
-                  {u.lastLogin ? new Date(u.lastLogin).toLocaleString("id-ID") : "Belum pernah"}
-                </td>
-                <td className="px-5 py-4">
-                  <button
-                    onClick={() => handleToggle(u.id, u.status)}
-                    className={`badge-admin flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${u.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
-                  >
-                    {u.status === "ACTIVE" ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
-                    {u.status === "ACTIVE" ? "Aktif" : "Nonaktif"}
-                  </button>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-2 justify-end">
-                    <button
-                      onClick={() => handleViewDetail(u)}
-                      className="p-1.5 hover:bg-primary-50 hover:text-primary-600 rounded-md transition-colors text-muted-foreground"
-                      title="Detail Pengguna"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    {u.role !== "SUPER_ADMIN" && (
+      ) : (
+        <div className="admin-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="text-left px-5 py-3.5 font-semibold text-muted-foreground text-xs uppercase">Nama & Email</th>
+                  <th className="text-left px-5 py-3.5 font-semibold text-muted-foreground text-xs uppercase">Peran</th>
+                  <th className="text-left px-5 py-3.5 font-semibold text-muted-foreground text-xs uppercase">Login Terakhir</th>
+                  <th className="text-left px-5 py-3.5 font-semibold text-muted-foreground text-xs uppercase">Status</th>
+                  <th className="text-right px-5 py-3.5 font-semibold text-muted-foreground text-xs uppercase">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {users.map((u) => (
+                  <tr key={u.id} className={`hover:bg-muted/30 transition-colors ${u.status === "INACTIVE" ? "opacity-60" : ""}`}>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
+                          <User className="w-5 h-5 text-primary-600" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{u.name}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{u.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-1.5 text-xs font-medium">
+                        {u.role === "SUPER_ADMIN" ? (
+                          <span className="flex items-center gap-1 text-purple-700 bg-purple-100 px-2.5 py-1 rounded-full"><Shield className="w-3 h-3" /> Super Admin</span>
+                        ) : u.role === "EDITOR" ? (
+                          <span className="text-blue-700 bg-blue-100 px-2.5 py-1 rounded-full">Editor</span>
+                        ) : (
+                          <span className="text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">Viewer</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-5 py-4 text-muted-foreground text-xs hidden md:table-cell">
+                      {u.lastLogin ? new Date(u.lastLogin).toLocaleString("id-ID") : "Belum pernah"}
+                    </td>
+                    <td className="px-5 py-4">
                       <button
-                        onClick={() => setDeleteTarget({ id: u.id, name: u.name })}
-                        className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
-                        title="Hapus Pengguna"
+                        onClick={() => handleToggle(u.id, u.status)}
+                        disabled={toggleMutation.isPending}
+                        className={`badge-admin flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${u.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {u.status === "ACTIVE" ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
+                        {u.status === "ACTIVE" ? "Aktif" : "Nonaktif"}
                       </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {!loading && users.length === 0 && (
-              <tr>
-                <td colSpan={5} className="px-5 py-8 text-center text-muted-foreground text-sm">
-                  Belum ada pengguna terdaftar di database MySQL.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          onClick={() => setDetailTarget(u)}
+                          className="p-1.5 hover:bg-primary-50 hover:text-primary-600 rounded-md transition-colors text-muted-foreground"
+                          title="Detail Pengguna"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        {u.role !== "SUPER_ADMIN" && (
+                          <button
+                            onClick={() => setDeleteTarget({ id: u.id, name: u.name })}
+                            className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
+                            title="Hapus Pengguna"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-      {/* Modal Add User */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-background border border-border rounded-2xl w-full max-w-md p-6 shadow-2xl space-y-4">
@@ -237,33 +247,43 @@ export default function AdminUsersPage() {
                   <option value="SUPER_ADMIN">Super Admin</option>
                 </select>
               </div>
-              <div className="flex gap-3 pt-2">
-                <button type="submit" disabled={submitting} className="btn-admin-primary flex-1 justify-center">
-                  {submitting ? "Menyimpan..." : "Simpan Pengguna"}
-                </button>
-                <button type="button" onClick={() => setShowModal(false)} className="btn-admin-secondary">
-                  Batal
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="btn-admin-secondary">Batal</button>
+                <button type="submit" disabled={createMutation.isPending} className="btn-admin-primary flex-1 justify-center">
+                  {createMutation.isPending ? "Menyimpan..." : "Simpan"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-      {/* Modal Detail User */}
+
       {detailTarget && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-background border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl flex flex-col max-h-[85vh]">
             <h2 className="text-lg font-bold text-foreground mb-1">Detail Pengguna</h2>
             <p className="text-sm text-muted-foreground mb-4">Melihat log aktivitas {detailTarget.name}</p>
-
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin">
               {loadingActivities ? (
-                <div className="flex items-center justify-center py-10">
-                  <RefreshCw className="w-5 h-5 animate-spin text-muted-foreground" />
+                <div className="flex flex-col gap-4 py-4">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex gap-4 animate-pulse">
+                      <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0"></div>
+                      <div className="flex-1 space-y-2 py-1">
+                        <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+                        <div className="h-3 bg-slate-100 rounded w-1/2"></div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ) : activities.length > 0 ? (
-                <div className="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-                  {activities.map((log: any) => (
+              ) : userActivities?.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center text-muted-foreground">
+                  <ShieldAlert className="w-10 h-10 mb-2 opacity-20" />
+                  <p>Belum ada aktivitas tercatat.</p>
+                </div>
+              ) : (
+                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                  {userActivities?.map((log: any) => (
                     <div key={log.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                       <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 group-[.is-active]:bg-primary-100 text-slate-500 group-[.is-active]:text-primary-600 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2">
                         <Clock className="w-4 h-4" />
@@ -277,10 +297,6 @@ export default function AdminUsersPage() {
                       </div>
                     </div>
                   ))}
-                </div>
-              ) : (
-                <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-border">
-                  <p className="text-sm text-muted-foreground">Belum ada aktivitas tercatat untuk pengguna ini.</p>
                 </div>
               )}
             </div>

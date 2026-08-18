@@ -5,8 +5,10 @@ import Link from "next/link";
 import { Plus, Pencil, Trash2, Search, Package, Image as ImageIcon } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ProductImage {
   url: string;
@@ -31,44 +33,40 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "PUBLISHED" | "DRAFT">("all");
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
 
-  const fetchProducts = async () => {
-    try {
+  const { data: products = [], isLoading } = useQuery<Product[]>({
+    queryKey: ["adminProducts"],
+    queryFn: async () => {
       const res = await fetch("/api/products");
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setProducts(data);
-    } catch (error: any) {
-      toast.error(error.message || "Gagal mengambil data produk");
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error(data.error || "Gagal mengambil data produk");
+      return data;
     }
-  };
+  });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const handleDelete = async () => {
-    if (!toDelete) return;
-    
-    try {
-      const res = await fetch(`/api/products/${toDelete.id}`, { method: "DELETE" });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
       const data = await res.json();
-      
       if (!res.ok) throw new Error(data.error);
-      
+      return data;
+    },
+    onSuccess: () => {
       toast.success("Produk berhasil dihapus");
       setToDelete(null);
-      fetchProducts();
-    } catch (error: any) {
-      toast.error(error.message);
+      queryClient.invalidateQueries({ queryKey: ["adminProducts"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Gagal menghapus produk");
     }
+  });
+
+  const handleDelete = () => {
+    if (toDelete) deleteMutation.mutate(toDelete.id);
   };
 
   const filtered = products.filter((p) => {
@@ -120,24 +118,22 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="admin-card overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground">Memuat data...</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Package className="w-8 h-8 text-muted-foreground/50" />
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Belum Ada Produk</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Anda belum menambahkan produk popok. Tambahkan produk pertama Anda untuk mulai menampilkannya.
-            </p>
-            <Link href="/admin/products/new" className="btn-admin-primary inline-flex">
-              <Plus className="w-4 h-4" /> Tambah Produk
-            </Link>
-          </div>
-        ) : (
+      {/* Content */}
+      {isLoading ? (
+        <TableSkeleton columns={6} rows={5} showActions={false} />
+      ) : filtered.length === 0 ? (
+        <div className="admin-card p-12 flex flex-col items-center justify-center text-center">
+          <Package className="w-12 h-12 text-slate-300 mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Belum Ada Produk</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Anda belum menambahkan produk popok. Tambahkan produk pertama Anda untuk mulai menampilkannya.
+          </p>
+          <Link href="/admin/products/new" className="btn-admin-primary inline-flex">
+            <Plus className="w-4 h-4" /> Tambah Produk
+          </Link>
+        </div>
+      ) : (
+        <div className="admin-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

@@ -5,9 +5,11 @@ import { Save, Loader2, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { RichTextEditor } from "@/components/admin/ui/RichTextEditor";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 
 export default function AdminTermsPage() {
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
   const [form, setForm] = useState(() => ({
     about: "",
     aboutImage: "",
@@ -21,23 +23,26 @@ export default function AdminTermsPage() {
     legalDocuments: [] as any[],
   }));
 
+  const { data: company, isLoading } = useQuery({
+    queryKey: ["companyProfile"],
+    queryFn: async () => {
+      const res = await fetch('/api/company');
+      const json = await res.json();
+      return json.success ? json.data : null;
+    }
+  });
+
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch('/api/company');
-        const json = await res.json();
-        if (json.success && json.data && mounted) {
-          const p = json.data;
-          setForm({
-            about: p.about || "",
-            aboutImage: p.aboutImage || "",
-            vision: p.vision || "",
-            mission: Array.isArray(p.mission) ? p.mission.join('\n') : (p.mission || '').toString(),
-            brandStory: p.brandStory || "",
-            founded: p.founded || "",
-            privacyPolicy: p.privacyPolicy || "",
-            termsOfService: p.termsOfService || `<p>
+    if (company) {
+      setForm({
+        about: company.about || "",
+        aboutImage: company.aboutImage || "",
+        vision: company.vision || "",
+        mission: Array.isArray(company.mission) ? company.mission.join('\n') : (company.mission || '').toString(),
+        brandStory: company.brandStory || "",
+        founded: company.founded || "",
+        privacyPolicy: company.privacyPolicy || "",
+        termsOfService: company.termsOfService || `<p>
   Selamat datang di Toko Manur. Syarat dan Ketentuan berikut mengatur penggunaan Anda atas website Toko Manur serta layanan yang kami sediakan. Dengan mengakses atau menggunakan website ini, Anda setuju untuk terikat oleh Syarat dan Ketentuan ini.
 </p>
 
@@ -74,49 +79,44 @@ export default function AdminTermsPage() {
 <p>
   Jika Anda memiliki pertanyaan tentang Syarat dan Ketentuan ini, silakan hubungi kami melalui email yang tertera di halaman kontak atau langsung menghubungi WhatsApp resmi kami.
 </p>`,
-            values: (p.values || []).map((v: any) => ({ ...v })),
-            legalDocuments: (p.legalDocuments || []).map((d: any) => ({ ...d })),
-          });
-        }
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false };
-  }, []);
+        values: (company.values || []).map((v: any) => ({ ...v })),
+        legalDocuments: (company.legalDocuments || []).map((d: any) => ({ ...d })),
+      });
+    }
+  }, [company]);
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const payload = {
-        about: form.about,
-        aboutImage: form.aboutImage,
-        vision: form.vision,
-        mission: form.mission.split("\n").filter(Boolean),
-        brandStory: form.brandStory,
-        founded: form.founded,
-        privacyPolicy: form.privacyPolicy,
-        termsOfService: form.termsOfService,
-        values: form.values,
-        legalDocuments: form.legalDocuments,
-      };
-
+  const saveMutation = useMutation({
+    mutationFn: async (payload: any) => {
       const res = await fetch("/api/company", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!json.success) {
-        toast.error(json.error || "Gagal menyimpan.");
-      } else {
-        toast.success("Syarat dan Ketentuan berhasil disimpan.");
-      }
-    } catch (error) {
-      toast.error("Gagal menyimpan.");
-    } finally {
-      setSaving(false);
-    }
+      if (!json.success) throw new Error(json.error || "Gagal menyimpan.");
+      return json;
+    },
+    onSuccess: () => {
+      toast.success("Syarat & Ketentuan berhasil disimpan.");
+      queryClient.invalidateQueries({ queryKey: ["companyProfile"] });
+    },
+    onError: (error: any) => toast.error(error.message || "Gagal menyimpan.")
+  });
+
+  const handleSave = () => {
+    const payload = {
+      about: form.about,
+      aboutImage: form.aboutImage,
+      vision: form.vision,
+      mission: form.mission.split("\n").filter(Boolean),
+      brandStory: form.brandStory,
+      founded: form.founded,
+      privacyPolicy: form.privacyPolicy,
+      termsOfService: form.termsOfService,
+      values: form.values,
+      legalDocuments: form.legalDocuments,
+    };
+    saveMutation.mutate(payload);
   };
 
   return (
@@ -126,14 +126,19 @@ export default function AdminTermsPage() {
         description="Kelola teks Syarat & Ketentuan (Terms and Conditions) yang tampil di halaman frontend."
         breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Syarat & Ketentuan" }]}
         action={
-          <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          <button onClick={handleSave} disabled={saveMutation.isPending || isLoading} className="btn-admin-primary">
+            {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Simpan Perubahan
           </button>
         }
       />
 
-      <div className="grid grid-cols-1 gap-6">
+      {isLoading ? (
+        <div className="mt-6">
+          <TableSkeleton columns={1} rows={10} showActions={false} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 mt-6">
         <div className="admin-card p-6">
           <div className="flex items-center gap-2 mb-5">
             <FileText className="w-5 h-5 text-primary" />
@@ -151,6 +156,7 @@ export default function AdminTermsPage() {
           </p>
         </div>
       </div>
+      )}
     </div>
   );
 }

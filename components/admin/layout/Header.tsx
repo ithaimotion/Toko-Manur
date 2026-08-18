@@ -5,55 +5,62 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logoutAction } from "@/lib/actions/auth";
-
 import { getMyProfile } from "@/lib/actions/users";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 
 export function Header() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [profile, setProfile] = useState<{name: string, role: string, avatar?: string | null} | null>(null);
-  const [notifications, setNotifications] = useState<any[]>([]);
-  
-  useEffect(() => {
-    async function fetchUser() {
-      const res = await getMyProfile();
-      if (res.success && res.data) {
-        setProfile(res.data);
-      }
-    }
-    async function fetchNotifications() {
-      try {
-        const res = await fetch("/api/notifications");
-        const json = await res.json();
-        if (json.success) {
-          setNotifications(json.data);
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-    fetchUser();
-    fetchNotifications();
-    
-    // Poll for notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, []);
 
-  const handleNotificationClick = async (id: string, link: string | null) => {
-    try {
+  const { data: profile } = useQuery({
+    queryKey: ["myProfile"],
+    queryFn: async () => {
+      const res = await getMyProfile();
+      if (!res.success) throw new Error(res.error);
+      return res.data;
+    }
+  });
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: async () => {
+      const res = await fetch("/api/notifications");
+      const json = await res.json();
+      if (!json.success) throw new Error("Gagal mengambil notifikasi");
+      return json.data;
+    },
+    refetchInterval: 30000 // Poll every 30 seconds
+  });
+
+  const markReadMutation = useMutation({
+    mutationFn: async (id: string) => {
       await fetch("/api/notifications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
-      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
-    } catch (e) {
-      // ignore
+    },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      const previousNotifications = queryClient.getQueryData(["notifications"]);
+      queryClient.setQueryData(["notifications"], (old: any) =>
+        old?.map((n: any) => n.id === id ? { ...n, isRead: true } : n)
+      );
+      return { previousNotifications };
+    },
+    onError: (err, id, context) => {
+      queryClient.setQueryData(["notifications"], context?.previousNotifications);
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
     }
+  });
 
+  const handleNotificationClick = (id: string, link: string | null) => {
+    markReadMutation.mutate(id);
     setNotificationsOpen(false);
     if (link) {
       router.push(link);

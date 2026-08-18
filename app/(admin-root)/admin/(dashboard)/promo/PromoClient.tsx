@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Plus, Pencil, Trash2, Megaphone } from "lucide-react";
 import type { Promo } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
-import { createPromo, updatePromo, deletePromo } from "@/lib/actions/promo";
+import { createPromo, updatePromo, deletePromo, getPromos } from "@/lib/actions/promo";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { CardSkeleton } from "@/components/admin/ui/CardSkeleton";
 import {
   Dialog,
   DialogContent,
@@ -40,7 +42,15 @@ interface PromoClientProps {
 }
 
 export default function PromoClient({ initialPromos }: PromoClientProps) {
-  const [promos, setPromos] = useState<Promo[]>(initialPromos);
+  const queryClient = useQueryClient();
+  const { data: promos = initialPromos, isLoading: isFetching } = useQuery({
+    queryKey: ["promos"],
+    queryFn: async () => {
+      const res = await getPromos();
+      return (res.success && res.data) ? (res.data as Promo[]) : [];
+    },
+    initialData: initialPromos,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -82,67 +92,58 @@ export default function PromoClient({ initialPromos }: PromoClientProps) {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleSave = async () => {
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingId) {
+        const res = await updatePromo(editingId, data);
+        if (!res.success) throw new Error(res.error || "Gagal memperbarui promo");
+        return res;
+      } else {
+        const res = await createPromo(data);
+        if (!res.success) throw new Error(res.error || "Gagal menambahkan promo");
+        return res;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promos"] });
+      toast.success(editingId ? "Promo berhasil diperbarui" : "Promo berhasil ditambahkan");
+      setIsModalOpen(false);
+    },
+    onError: (error: any) => toast.error(error.message || "Terjadi kesalahan sistem")
+  });
+
+  const handleSave = () => {
     if (!title) {
       toast.error("Judul promo wajib diisi");
       return;
     }
-
-    setIsLoading(true);
-    const data = {
+    saveMutation.mutate({
       title,
       subtitle: code,
       badgeText: discount,
       validUntil: validUntil || undefined,
       description,
       isActive: isActive === "true",
-    };
-
-    try {
-      if (editingId) {
-        const res = await updatePromo(editingId, data);
-        if (res.success && res.data) {
-          setPromos((prev) =>
-            prev.map((p) => (p.id === editingId ? (res.data as Promo) : p))
-          );
-          toast.success("Promo berhasil diperbarui");
-        } else {
-          toast.error(res.error);
-        }
-      } else {
-        const res = await createPromo(data);
-        if (res.success && res.data) {
-          setPromos((prev) => [...prev, res.data as Promo]);
-          toast.success("Promo berhasil ditambahkan");
-        } else {
-          toast.error(res.error);
-        }
-      }
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Terjadi kesalahan sistem");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
-  const handleDelete = async () => {
-    if (!deletingId) return;
-    
-    try {
-      const res = await deletePromo(deletingId);
-      if (res.success) {
-        setPromos((prev) => prev.filter((p) => p.id !== deletingId));
-        toast.success("Promo berhasil dihapus");
-      } else {
-        toast.error(res.error);
-      }
-    } catch (error) {
-      toast.error("Terjadi kesalahan sistem");
-    } finally {
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await deletePromo(id);
+      if (!res.success) throw new Error(res.error || "Gagal menghapus promo");
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["promos"] });
+      toast.success("Promo berhasil dihapus");
       setIsDeleteDialogOpen(false);
       setDeletingId(null);
-    }
+    },
+    onError: (error: any) => toast.error(error.message || "Terjadi kesalahan sistem")
+  });
+
+  const handleDelete = () => {
+    if (deletingId) deleteMutation.mutate(deletingId);
   };
 
   return (
@@ -154,7 +155,13 @@ export default function PromoClient({ initialPromos }: PromoClientProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {promos.length === 0 ? (
+        {isFetching && promos.length === 0 ? (
+          <>
+            <CardSkeleton lines={3} />
+            <CardSkeleton lines={3} />
+            <CardSkeleton lines={3} />
+          </>
+        ) : promos.length === 0 ? (
           <div className="col-span-full p-10 text-center border rounded-xl border-dashed">
             <Megaphone className="w-10 h-10 mx-auto text-slate-300 mb-3" />
             <p className="text-slate-500 font-medium">Belum ada promo aktif</p>
@@ -279,12 +286,12 @@ export default function PromoClient({ initialPromos }: PromoClientProps) {
               </Select>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-4 border-t pt-4">
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Batal
             </Button>
-            <Button onClick={handleSave} disabled={isLoading}>
-              {isLoading ? "Menyimpan..." : "Simpan"}
+            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+              {saveMutation.isPending ? "Menyimpan..." : "Simpan Promo"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -300,9 +307,13 @@ export default function PromoClient({ initialPromos }: PromoClientProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-              Hapus
+            <AlertDialogCancel disabled={deleteMutation.isPending}>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Menghapus..." : "Ya, Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

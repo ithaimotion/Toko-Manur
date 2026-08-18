@@ -5,7 +5,8 @@ import { Save, Loader2, Globe, Target, Heart, Zap, Star, Shield, Flame, Award, A
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
-import { mockCompanyProfile } from "@/lib/mock-data";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 
 const iconOptions = [
   { value: "shield", label: "Shield", Icon: Shield },
@@ -18,7 +19,7 @@ const iconOptions = [
 ];
 
 export default function AdminCompanyProfilePage() {
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
   const [form, setForm] = useState(() => ({
     about: "",
     aboutImage: "",
@@ -31,64 +32,64 @@ export default function AdminCompanyProfilePage() {
     legalDocuments: [] as any[],
   }));
 
+  const { data: company, isLoading } = useQuery({
+    queryKey: ["companyProfile"],
+    queryFn: async () => {
+      const res = await fetch('/api/company');
+      const json = await res.json();
+      return json.success ? json.data : null;
+    }
+  });
+
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch('/api/company');
-        const json = await res.json();
-        if (json.success && json.data && mounted) {
-          const p = json.data;
-          setForm({
-            about: p.about || "",
-            aboutImage: p.aboutImage || "",
-            vision: p.vision || "",
-            mission: Array.isArray(p.mission) ? p.mission.join('\n') : (p.mission || '').toString(),
-            brandStory: p.brandStory || "",
-            founded: p.founded || "",
-            privacyPolicy: p.privacyPolicy || "",
-            values: (p.values || []).map((v: any) => ({ ...v })),
-            legalDocuments: (p.legalDocuments || []).map((d: any) => ({ ...d })),
-          });
-        }
-      } catch (e) {
-        // ignore
-      }
-    })();
-    return () => { mounted = false };
-  }, []);
+    if (company) {
+      setForm({
+        about: company.about || "",
+        aboutImage: company.aboutImage || "",
+        vision: company.vision || "",
+        mission: Array.isArray(company.mission) ? company.mission.join('\n') : (company.mission || '').toString(),
+        brandStory: company.brandStory || "",
+        founded: company.founded || "",
+        privacyPolicy: company.privacyPolicy || "",
+        values: (company.values || []).map((v: any) => ({ ...v })),
+        legalDocuments: (company.legalDocuments || []).map((d: any) => ({ ...d })),
+      });
+    }
+  }, [company]);
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const payload = {
-        about: form.about,
-        aboutImage: form.aboutImage,
-        vision: form.vision,
-        mission: form.mission.split("\n").filter(Boolean),
-        brandStory: form.brandStory,
-        founded: form.founded,
-        privacyPolicy: form.privacyPolicy,
-        values: form.values,
-        legalDocuments: form.legalDocuments,
-      };
-
+  const saveMutation = useMutation({
+    mutationFn: async (payload: any) => {
       const res = await fetch("/api/company", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       const json = await res.json();
-      if (!json.success) {
-        toast.error(json.error || "Gagal menyimpan.");
-      } else {
-        toast.success("Profil perusahaan berhasil disimpan.");
-      }
-    } catch (error) {
-      toast.error("Gagal menyimpan.");
-    } finally {
-      setSaving(false);
+      if (!json.success) throw new Error(json.error || "Gagal menyimpan.");
+      return json;
+    },
+    onSuccess: () => {
+      toast.success("Profil perusahaan berhasil disimpan.");
+      queryClient.invalidateQueries({ queryKey: ["companyProfile"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Gagal menyimpan.");
     }
+  });
+
+  const handleSave = () => {
+    const payload = {
+      about: form.about,
+      aboutImage: form.aboutImage,
+      vision: form.vision,
+      mission: form.mission.split("\n").filter(Boolean),
+      brandStory: form.brandStory,
+      founded: form.founded,
+      privacyPolicy: form.privacyPolicy,
+      values: form.values,
+      legalDocuments: form.legalDocuments,
+    };
+    saveMutation.mutate(payload);
   };
 
   const handleAddValue = () => {
@@ -157,14 +158,19 @@ export default function AdminCompanyProfilePage() {
         description="Kelola informasi dan profil perusahaan"
         breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Profil Perusahaan" }]}
         action={
-          <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          <button onClick={handleSave} disabled={saveMutation.isPending || isLoading} className="btn-admin-primary">
+            {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Simpan Perubahan
           </button>
         }
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {isLoading ? (
+        <div className="mt-6">
+          <TableSkeleton columns={2} rows={5} showActions={false} />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* About */}
         <div className="admin-card p-6">
           <div className="flex items-center gap-2 mb-5">
@@ -280,6 +286,7 @@ export default function AdminCompanyProfilePage() {
           </div>
         </div>
       </div>
-    </div>
-  );
+    )}
+  </div>
+);
 }

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Search, Tag, X, Image as ImageIcon } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface Brand {
   id: string;
@@ -17,35 +18,26 @@ interface Brand {
 }
 
 export default function BrandsPage() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   
   // Modal states
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", slug: "", description: "", image: "" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Delete state
   const [toDelete, setToDelete] = useState<{ id: string; name: string } | null>(null);
 
-  useEffect(() => {
-    fetchBrands();
-  }, []);
-
-  const fetchBrands = async () => {
-    try {
+  const { data: brands = [], isLoading } = useQuery<Brand[]>({
+    queryKey: ["adminBrands"],
+    queryFn: async () => {
       const res = await fetch("/api/brands");
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setBrands(data);
-    } catch (error: any) {
-      toast.error(error.message || "Gagal mengambil data brand");
-    } finally {
-      setLoading(false);
+      if (!res.ok) throw new Error(data.error || "Gagal mengambil data brand");
+      return data;
     }
-  };
+  });
 
   const handleOpenModal = (brand?: Brand) => {
     if (brand) {
@@ -63,48 +55,53 @@ export default function BrandsPage() {
     setShowModal(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
       const url = editingId ? `/api/brands/${editingId}` : "/api/brands";
       const method = editingId ? "PUT" : "POST";
-      
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
-      
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error);
+      return resData;
+    },
+    onSuccess: () => {
       toast.success(`Brand berhasil di${editingId ? "perbarui" : "tambahkan"}`);
       setShowModal(false);
-      fetchBrands();
-    } catch (error: any) {
+      queryClient.invalidateQueries({ queryKey: ["adminBrands"] });
+    },
+    onError: (error: any) => {
       toast.error(error.message);
-    } finally {
-      setIsSubmitting(false);
     }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    saveMutation.mutate(formData);
   };
 
-  const handleDelete = async () => {
-    if (!toDelete) return;
-    
-    try {
-      const res = await fetch(`/api/brands/${toDelete.id}`, { method: "DELETE" });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/brands/${id}`, { method: "DELETE" });
       const data = await res.json();
-      
       if (!res.ok) throw new Error(data.error);
-      
+      return data;
+    },
+    onSuccess: () => {
       toast.success("Brand berhasil dihapus");
       setToDelete(null);
-      fetchBrands();
-    } catch (error: any) {
+      queryClient.invalidateQueries({ queryKey: ["adminBrands"] });
+    },
+    onError: (error: any) => {
       toast.error(error.message);
     }
+  });
+
+  const handleDelete = () => {
+    if (toDelete) deleteMutation.mutate(toDelete.id);
   };
 
   // Auto-generate slug from name
@@ -148,23 +145,21 @@ export default function BrandsPage() {
         </div>
       </div>
 
-      <div className="admin-card overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground">Memuat data...</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-12 text-center">
-            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Tag className="w-8 h-8 text-muted-foreground/50" />
-            </div>
-            <h3 className="text-lg font-medium text-foreground mb-2">Belum Ada Brand</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Anda belum menambahkan brand popok apa pun. Tambahkan brand pertama Anda untuk mulai mengelola produk.
-            </p>
-            <button onClick={() => handleOpenModal()} className="btn-admin-primary inline-flex">
-              <Plus className="w-4 h-4" /> Tambah Brand
-            </button>
-          </div>
-        ) : (
+      {isLoading ? (
+        <TableSkeleton columns={5} rows={4} showActions={false} />
+      ) : filtered.length === 0 ? (
+        <div className="admin-card p-12 flex flex-col items-center justify-center text-center">
+          <Tag className="w-12 h-12 text-slate-300 mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">Belum Ada Brand</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Anda belum menambahkan brand. Tambahkan brand pertama Anda.
+          </p>
+          <button onClick={() => handleOpenModal()} className="btn-admin-primary inline-flex">
+            <Plus className="w-4 h-4" /> Tambah Brand
+          </button>
+        </div>
+      ) : (
+        <div className="admin-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -223,10 +218,10 @@ export default function BrandsPage() {
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Brand Modal */}
+      {/* Modal Add/Edit */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setShowModal(false)} />
@@ -288,22 +283,14 @@ export default function BrandsPage() {
                 </div>
               </div>
               
-              <div className="flex items-center justify-end gap-3 mt-8">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-foreground bg-secondary hover:bg-secondary/80 rounded-lg transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-50"
-                >
-                  {isSubmitting ? "Menyimpan..." : "Simpan Brand"}
-                </button>
-              </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button type="button" onClick={() => setShowModal(false)} className="btn-admin-secondary">
+                    Batal
+                  </button>
+                  <button type="submit" disabled={saveMutation.isPending} className="btn-admin-primary">
+                    {saveMutation.isPending ? "Menyimpan..." : "Simpan Brand"}
+                  </button>
+                </div>
             </form>
           </div>
         </div>

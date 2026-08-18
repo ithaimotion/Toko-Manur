@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Plus, Pencil, Trash2, Tag, Loader2, X, Save, AlertCircle, Check } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface BlogCategory {
   id: string;
@@ -17,11 +19,7 @@ interface BlogCategory {
 const emptyForm = { name: "", slug: "", description: "" };
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<BlogCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState<BlogCategory | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -35,23 +33,15 @@ export default function AdminCategoriesPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchCategories = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: categories = [], isLoading } = useQuery<BlogCategory[]>({
+    queryKey: ["adminCategories"],
+    queryFn: async () => {
       const res = await fetch("/api/blog-categories");
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error("Gagal memuat kategori");
       const data = await res.json();
-      setCategories(data);
-    } catch {
-      showToast("Gagal memuat kategori", "error");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+      return data;
+    },
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -90,7 +80,30 @@ export default function AdminCategoriesPage() {
     setFormError(null);
   };
 
-  const handleSave = async () => {
+  const saveMutation = useMutation({
+    mutationFn: async (data: typeof form) => {
+      const url = editTarget ? `/api/blog-categories/${editTarget.id}` : "/api/blog-categories";
+      const method = editTarget ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || "Gagal menyimpan kategori");
+      return resData;
+    },
+    onSuccess: () => {
+      showToast(`Kategori berhasil di${editTarget ? "perbarui" : "tambahkan"}`, "success");
+      closeForm();
+      queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
+    },
+    onError: (error: any) => {
+      setFormError(error.message);
+    }
+  });
+
+  const handleSave = () => {
     if (!form.name.trim()) {
       setFormError("Nama kategori wajib diisi");
       return;
@@ -99,55 +112,28 @@ export default function AdminCategoriesPage() {
       setFormError("Slug wajib diisi");
       return;
     }
-
-    setFormError(null);
-    setSaving(true);
-
-    try {
-      const isEdit = !!editTarget;
-      const url = isEdit ? `/api/blog-categories/${editTarget!.id}` : "/api/blog-categories";
-      const method = isEdit ? "PUT" : "POST";
-
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        throw new Error(result.error || "Gagal menyimpan");
-      }
-
-      showToast(
-        isEdit ? `Kategori "${form.name}" berhasil diperbarui` : `Kategori "${form.name}" berhasil dibuat`,
-        "success"
-      );
-      closeForm();
-      fetchCategories();
-    } catch (err: any) {
-      setFormError(err.message || "Terjadi kesalahan");
-    } finally {
-      setSaving(false);
-    }
+    saveMutation.mutate(form);
   };
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/blog-categories/${deleteTarget.id}`, { method: "DELETE" });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Gagal menghapus");
-      showToast(`Kategori "${deleteTarget.name}" berhasil dihapus`, "success");
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/blog-categories/${id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: () => {
+      showToast("Kategori berhasil dihapus", "success");
       setDeleteTarget(null);
-      fetchCategories();
-    } catch (err: any) {
-      showToast(err.message || "Terjadi kesalahan saat menghapus", "error");
-    } finally {
-      setDeleting(false);
+      queryClient.invalidateQueries({ queryKey: ["adminCategories"] });
+    },
+    onError: (error: any) => {
+      showToast(error.message || "Gagal menghapus kategori", "error");
     }
+  });
+
+  const handleDelete = () => {
+    if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
   };
 
   return (
@@ -239,48 +225,42 @@ export default function AdminCategoriesPage() {
                   className="admin-input resize-none"
                 />
               </div>
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="btn-admin-primary flex-1 justify-center"
-                >
-                  {saving ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4" />
-                  )}
-                  {editTarget ? "Perbarui" : "Simpan"}
-                </button>
-                <button onClick={closeForm} disabled={saving} className="btn-admin-secondary">
-                  Batal
-                </button>
-              </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button type="button" onClick={closeForm} className="btn-admin-secondary">
+                    Batal
+                  </button>
+                  <button type="submit" onClick={handleSave} disabled={saveMutation.isPending} className="btn-admin-primary min-w-[120px] justify-center">
+                    {saveMutation.isPending ? (
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Menyimpan</>
+                    ) : (
+                      <><Save className="w-4 h-4 mr-2" /> Simpan</>
+                    )}
+                  </button>
+                </div>
             </div>
           </div>
         )}
 
         {/* List */}
         <div className={showForm ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="admin-card overflow-hidden">
-            {loading ? (
-              <div className="py-20 flex flex-col items-center gap-3 text-muted-foreground">
-                <Loader2 className="w-7 h-7 animate-spin" />
-                <p className="text-sm">Memuat kategori...</p>
-              </div>
-            ) : categories.length === 0 ? (
-              <div className="py-20 flex flex-col items-center gap-3 text-muted-foreground">
-                <Tag className="w-10 h-10" />
-                <p className="text-sm font-medium">Belum ada kategori</p>
-                <p className="text-xs text-center max-w-xs">
-                  Buat kategori untuk mengelompokkan artikel blog kamu
-                </p>
-                <button onClick={openCreateForm} className="btn-admin-primary mt-1 text-xs">
-                  <Plus className="w-3.5 h-3.5" /> Buat Kategori Pertama
-                </button>
-              </div>
-            ) : (
-              <>
+        {isLoading ? (
+          <div className="mt-6">
+            <TableSkeleton columns={5} rows={3} showActions={false} />
+          </div>
+        ) : categories.length === 0 ? (
+          <div className="admin-card mt-6 p-12 flex flex-col items-center text-center">
+            <Tag className="w-12 h-12 text-slate-300 mb-4" />
+            <h3 className="font-semibold text-lg mb-1">Belum ada Kategori</h3>
+            <p className="text-muted-foreground text-sm max-w-sm mb-6">
+              Buat kategori pertama Anda untuk mulai mengelompokkan artikel.
+            </p>
+            <button onClick={openCreateForm} className="btn-admin-primary">
+              <Plus className="w-4 h-4 mr-2" /> Buat Kategori Baru
+            </button>
+          </div>
+        ) : (
+          <div className="admin-card overflow-hidden mt-6">
+            <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-muted/50">
@@ -359,18 +339,17 @@ export default function AdminCategoriesPage() {
                     Total {categories.length} kategori
                   </p>
                 </div>
-              </>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         itemName={deleteTarget?.name}
-        loading={deleting}
+        loading={deleteMutation.isPending}
         onConfirm={handleDelete}
-        onCancel={() => !deleting && setDeleteTarget(null)}
+        onCancel={() => !deleteMutation.isPending && setDeleteTarget(null)}
       />
     </div>
   );

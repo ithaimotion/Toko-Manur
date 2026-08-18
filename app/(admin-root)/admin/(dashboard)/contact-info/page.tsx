@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Save, Loader2, MapPin, Mail, Phone, Clock, Map } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { getContactInfo, getContactMessages, updateContactInfo } from "@/lib/actions/contact";
 import type { ContactInfo, ContactMessage } from "@/lib/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 
 export default function AdminContactInfoPage() {
-  const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [messagesLoading, setMessagesLoading] = useState(true);
-  // status moved to toast notifications
+  const queryClient = useQueryClient();
   const [form, setForm] = useState<ContactInfo>({
     id: "",
     address: "",
@@ -27,36 +26,35 @@ export default function AdminContactInfoPage() {
     tiktok: "",
     updatedAt: new Date().toISOString(),
   });
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-
-  useEffect(() => {
-    async function loadContact() {
-      const [contactResponse, messagesResponse] = await Promise.all([getContactInfo(), getContactMessages()]);
-
-      if (contactResponse.success) {
+  const { isLoading: contactLoading } = useQuery({
+    queryKey: ["contactInfo"],
+    queryFn: async () => {
+      const res = await getContactInfo();
+      if (res.success && res.data) {
         setForm({
-          ...contactResponse.data,
-          whatsappMessage: contactResponse.data.whatsappMessage ?? "",
-          googleMapsEmbed: contactResponse.data.googleMapsEmbed ?? "",
-          latitude: contactResponse.data.latitude ?? "",
-          longitude: contactResponse.data.longitude ?? "",
-          businessHours: contactResponse.data.businessHours ?? "",
-          instagram: contactResponse.data.instagram ?? "",
-          facebook: contactResponse.data.facebook ?? "",
-          tiktok: contactResponse.data.tiktok ?? "",
+          ...res.data,
+          whatsappMessage: res.data.whatsappMessage ?? "",
+          googleMapsEmbed: res.data.googleMapsEmbed ?? "",
+          latitude: res.data.latitude ?? "",
+          longitude: res.data.longitude ?? "",
+          businessHours: res.data.businessHours ?? "",
+          instagram: res.data.instagram ?? "",
+          facebook: res.data.facebook ?? "",
+          tiktok: res.data.tiktok ?? "",
         });
+        return res.data;
       }
-
-      if (messagesResponse.success) {
-        setMessages(messagesResponse.data);
-      }
-
-      setLoading(false);
-      setMessagesLoading(false);
+      return null;
     }
+  });
 
-    loadContact();
-  }, []);
+  const { data: messages = [], isLoading: messagesLoading } = useQuery({
+    queryKey: ["contactMessages"],
+    queryFn: async () => {
+      const res = await getContactMessages();
+      return (res.success && res.data) ? res.data : [];
+    }
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -87,19 +85,23 @@ export default function AdminContactInfoPage() {
     }
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    try {
-      const response = await updateContactInfo(form);
-      if (response.success) {
-        toast.success("Informasi kontak berhasil disimpan.");
-      } else {
-        toast.error((response as any).error || "Gagal menyimpan informasi kontak.");
-      }
-    } catch (err) {
-      toast.error("Gagal menyimpan informasi kontak.");
+  const saveMutation = useMutation({
+    mutationFn: async (data: ContactInfo) => {
+      const response = await updateContactInfo(data);
+      if (!response.success) throw new Error((response as any).error || "Gagal menyimpan informasi kontak");
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contactInfo"] });
+      toast.success("Informasi kontak berhasil disimpan.");
+    },
+    onError: (error: any) => {
+      toast.error(error.message);
     }
-    setSaving(false);
+  });
+
+  const handleSave = () => {
+    saveMutation.mutate(form);
   };
 
   return (
@@ -109,18 +111,20 @@ export default function AdminContactInfoPage() {
         description="Kelola detail kontak yang tampil di website"
         breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Info Kontak" }]}
         action={
-          <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Simpan
+          <button onClick={handleSave} disabled={saveMutation.isPending || contactLoading} className="btn-admin-primary">
+            {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Simpan Perubahan
           </button>
         }
       />
 
-      {loading ? (
-        <div className="admin-card p-6 text-sm text-muted-foreground">Memuat data kontak...</div>
-      ) : (
-        <div className="space-y-4">
-          {/* notifications are shown via toast */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {contactLoading ? (
+          <div className="lg:col-span-1">
+            <TableSkeleton columns={1} rows={6} showActions={false} />
+          </div>
+        ) : (
+          <div className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Address & Contact */}
             <div className="admin-card p-6 space-y-5">
@@ -207,18 +211,12 @@ export default function AdminContactInfoPage() {
           </div>
 
           <div className="admin-card p-6 space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h2 className="font-bold text-base">Pesan dari Landing Page</h2>
-                <p className="text-sm text-muted-foreground">Daftar setiap pesan yang dikirim melalui form kontak</p>
-              </div>
-              <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
-                {messages.length} pesan
-              </span>
-            </div>
+            <h3 className="text-base font-semibold mb-6 flex items-center gap-2 border-b border-border pb-3">
+              <Mail className="w-5 h-5 text-primary" /> Pesan dari Kontak Form
+            </h3>
 
             {messagesLoading ? (
-              <div className="text-sm text-muted-foreground">Memuat pesan...</div>
+              <TableSkeleton columns={3} rows={4} showActions={false} />
             ) : messages.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
                 Belum ada pesan yang dikirim dari landing page.

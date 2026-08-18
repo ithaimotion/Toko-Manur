@@ -6,6 +6,7 @@ import { Marketplace } from '@/lib/db';
 import { Star, Trash2, CheckCircle, XCircle, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConfirmDeleteModal } from '@/components/admin/ui/ConfirmDeleteModal';
+import { TableSkeleton } from '@/components/admin/ui/TableSkeleton';
 
 interface Review {
   id: string;
@@ -155,8 +156,8 @@ export default function ReviewsPage() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-10 text-center text-gray-500">
-                    Loading reviews...
+                  <td colSpan={6} className="p-0">
+                    <TableSkeleton columns={6} rows={5} showActions={false} />
                   </td>
                 </tr>
               ) : reviews.length === 0 ? (

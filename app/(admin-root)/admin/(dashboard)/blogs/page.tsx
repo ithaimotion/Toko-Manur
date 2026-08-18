@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
 import { Plus, Pencil, Trash2, Eye, Search, FileText, Loader2 } from "lucide-react";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 import { formatDate } from "@/lib/utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface BlogAuthor {
   id: string;
@@ -34,12 +34,10 @@ interface Blog {
 }
 
 export default function AdminBlogsPage() {
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "DRAFT" | "PUBLISHED">("all");
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
-  const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   const showToast = (message: string, type: "success" | "error") => {
@@ -47,9 +45,9 @@ export default function AdminBlogsPage() {
     setTimeout(() => setToast(null), 3500);
   };
 
-  const fetchBlogs = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: blogs = [], isLoading } = useQuery<Blog[]>({
+    queryKey: ["adminBlogs", search, statusFilter],
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (statusFilter !== "all") params.set("status", statusFilter);
@@ -57,36 +55,31 @@ export default function AdminBlogsPage() {
       const res = await fetch(`/api/blogs?${params.toString()}`);
       if (!res.ok) throw new Error("Gagal mengambil data");
       const data = await res.json();
-      setBlogs(data);
-    } catch {
-      showToast("Gagal memuat daftar blog", "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [search, statusFilter]);
+      return data;
+    },
+  });
 
-  useEffect(() => {
-    const timer = setTimeout(fetchBlogs, 300);
-    return () => clearTimeout(timer);
-  }, [fetchBlogs]);
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/blogs/${deleteTarget.id}`, { method: "DELETE" });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/blogs/${id}`, { method: "DELETE" });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Gagal menghapus");
       }
-      showToast(`Artikel "${deleteTarget.title}" berhasil dihapus`, "success");
+      return await res.json();
+    },
+    onSuccess: () => {
+      showToast(`Artikel berhasil dihapus`, "success");
       setDeleteTarget(null);
-      fetchBlogs();
-    } catch (err: any) {
-      showToast(err.message || "Terjadi kesalahan", "error");
-    } finally {
-      setDeleting(false);
+      queryClient.invalidateQueries({ queryKey: ["adminBlogs"] });
+    },
+    onError: (error: any) => {
+      showToast(error.message || "Terjadi kesalahan", "error");
     }
+  });
+
+  const handleDelete = () => {
+    if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
   };
 
   return (
@@ -146,11 +139,8 @@ export default function AdminBlogsPage() {
 
       {/* Table */}
       <div className="admin-card overflow-hidden">
-        {loading ? (
-          <div className="py-20 flex flex-col items-center gap-3 text-muted-foreground">
-            <Loader2 className="w-7 h-7 animate-spin" />
-            <p className="text-sm">Memuat artikel...</p>
-          </div>
+        {isLoading ? (
+          <TableSkeleton columns={6} rows={5} showActions={false} />
         ) : blogs.length === 0 ? (
           <div className="py-20 flex flex-col items-center gap-3 text-muted-foreground">
             <FileText className="w-10 h-10" />
@@ -242,7 +232,7 @@ export default function AdminBlogsPage() {
           </table>
         )}
 
-        {!loading && blogs.length > 0 && (
+        {!isLoading && blogs.length > 0 && (
           <div className="px-5 py-3 border-t border-border bg-muted/30">
             <p className="text-xs text-muted-foreground">
               Menampilkan {blogs.length} artikel
@@ -254,9 +244,9 @@ export default function AdminBlogsPage() {
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         itemName={deleteTarget?.title}
-        loading={deleting}
+        loading={deleteMutation.isPending}
         onConfirm={handleDelete}
-        onCancel={() => !deleting && setDeleteTarget(null)}
+        onCancel={() => !deleteMutation.isPending && setDeleteTarget(null)}
       />
     </div>
   );

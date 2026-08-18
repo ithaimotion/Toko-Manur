@@ -5,6 +5,7 @@ import { Plus, Pencil, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PageHeader } from "@/components/admin/ui/PageHeader";
 import { ConfirmDeleteModal } from "@/components/admin/ui/ConfirmDeleteModal";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 import type { MarketplacePlatform } from "@/lib/types";
 import { 
   getMarketplaceLinks, 
@@ -12,6 +13,7 @@ import {
   updateMarketplaceLink, 
   deleteMarketplaceLink 
 } from "@/lib/actions/marketplace-links";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type MarketplaceLink = {
   id: string;
@@ -24,9 +26,7 @@ type MarketplaceLink = {
 };
 
 export default function AdminMarketplacePage() {
-  const [links, setLinks] = useState<MarketplaceLink[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   
   const [form, setForm] = useState<Omit<MarketplaceLink, "id">>({ 
@@ -43,20 +43,13 @@ export default function AdminMarketplacePage() {
     { value: "custom", label: "Lainnya" },
   ];
 
-  useEffect(() => {
-    loadLinks();
-  }, []);
-
-  const loadLinks = async () => {
-    setLoading(true);
-    const res = await getMarketplaceLinks();
-    if (res.success && res.data) {
-      setLinks(res.data);
-    } else {
-      toast.error(res.error || "Gagal memuat link");
+  const { data: links = [], isLoading } = useQuery({
+    queryKey: ["marketplaceLinks"],
+    queryFn: async () => {
+      const res = await getMarketplaceLinks();
+      return res.success && res.data ? res.data : [];
     }
-    setLoading(false);
-  };
+  });
 
   const handleEdit = (link: MarketplaceLink) => {
     setForm({
@@ -77,50 +70,60 @@ export default function AdminMarketplacePage() {
     setShowForm(true);
   };
 
-  const handleSave = async () => {
-    setSaving(true);
-    if (editId) {
-      const res = await updateMarketplaceLink(editId, form);
-      if (res.success) {
-        toast.success("Link berhasil diupdate!");
-        setShowForm(false);
-        loadLinks();
+  const saveMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editId) {
+        const res = await updateMarketplaceLink(editId, data);
+        if (!res.success) throw new Error(res.error || "Gagal update link");
+        return res;
       } else {
-        toast.error(res.error || "Gagal update link");
+        const res = await createMarketplaceLink(data);
+        if (!res.success) throw new Error(res.error || "Gagal menambah link");
+        return res;
       }
-    } else {
-      const res = await createMarketplaceLink(form);
-      if (res.success) {
-        toast.success("Link berhasil ditambahkan!");
-        setShowForm(false);
-        loadLinks();
-      } else {
-        toast.error(res.error || "Gagal menambah link");
-      }
-    }
-    setSaving(false);
+    },
+    onSuccess: () => {
+      toast.success(editId ? "Link berhasil diupdate!" : "Link berhasil ditambahkan!");
+      setShowForm(false);
+      queryClient.invalidateQueries({ queryKey: ["marketplaceLinks"] });
+    },
+    onError: (error: any) => toast.error(error.message || "Gagal menyimpan link")
+  });
+
+  const handleSave = () => saveMutation.mutate(form);
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await deleteMarketplaceLink(id);
+      if (!res.success) throw new Error(res.error || "Gagal menghapus link");
+      return res;
+    },
+    onSuccess: () => {
+      toast.success("Link dihapus!");
+      setDeleteTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["marketplaceLinks"] });
+    },
+    onError: (error: any) => toast.error(error.message || "Gagal menghapus link")
+  });
+
+  const handleDelete = () => {
+    if (deleteTarget) deleteMutation.mutate(deleteTarget.id);
   };
 
-  const toggleActive = async (link: MarketplaceLink) => {
-    const res = await updateMarketplaceLink(link.id, { isActive: !link.isActive });
-    if (res.success) {
-      toast.success(`Status ${link.name} diubah!`);
-      loadLinks();
-    } else {
-      toast.error(res.error || "Gagal mengubah status");
-    }
-  };
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ id, isActive }: { id: string, isActive: boolean }) => {
+      const res = await updateMarketplaceLink(id, { isActive });
+      if (!res.success) throw new Error(res.error || "Gagal mengubah status");
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["marketplaceLinks"] });
+    },
+    onError: (error: any) => toast.error(error.message)
+  });
 
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    const res = await deleteMarketplaceLink(deleteTarget.id);
-    if (res.success) {
-      toast.success("Link berhasil dihapus!");
-      loadLinks();
-    } else {
-      toast.error(res.error || "Gagal menghapus link");
-    }
-    setDeleteTarget(null);
+  const toggleActive = (link: MarketplaceLink) => {
+    toggleActiveMutation.mutate({ id: link.id, isActive: !link.isActive });
   };
 
   return (
@@ -171,17 +174,20 @@ export default function AdminMarketplacePage() {
             </div>
           </div>
           <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving} className="btn-admin-primary">
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Simpan"}
+            <button onClick={() => setShowForm(false)} className="px-4 py-2 text-sm font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+              Batal
             </button>
-            <button onClick={() => setShowForm(false)} disabled={saving} className="btn-admin-secondary">Batal</button>
+            <button onClick={handleSave} disabled={saveMutation.isPending} className="btn-admin-primary">
+              {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
+              {editId ? "Update Link" : "Simpan Link"}
+            </button>
           </div>
         </div>
       )}
 
       <div className="admin-card overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground"><Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" /> Memuat data...</div>
+        {isLoading ? (
+          <TableSkeleton columns={5} rows={3} showActions={true} />
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -233,8 +239,9 @@ export default function AdminMarketplacePage() {
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         itemName={deleteTarget?.name}
+        loading={deleteMutation.isPending}
         onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => !deleteMutation.isPending && setDeleteTarget(null)}
       />
     </div>
   );

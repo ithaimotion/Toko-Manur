@@ -38,11 +38,23 @@ import {
   deleteHeroBanner,
   createCarouselItem,
   updateCarouselItem,
-  deleteCarouselItem
+  deleteCarouselItem,
+  getHeroBanners
 } from "@/lib/actions/hero-banner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { TableSkeleton } from "@/components/admin/ui/TableSkeleton";
 
 export default function HeroBannerClient({ initialBanners }: { initialBanners: any[] }) {
-  const [banners, setBanners] = useState<any[]>(initialBanners);
+  const queryClient = useQueryClient();
+  
+  const { data: banners = initialBanners, isLoading: isFetching } = useQuery({
+    queryKey: ["heroBanners"],
+    queryFn: async () => {
+      const res = await getHeroBanners();
+      return res.data || [];
+    },
+    initialData: initialBanners,
+  });
 
   // Modals state
   const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
@@ -90,39 +102,76 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
     setIsBannerModalOpen(true);
   };
 
-  const handleSaveBanner = async () => {
+  // --- MUTATIONS ---
+  const saveBannerMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingBannerId) {
+        return updateHeroBanner(editingBannerId, data);
+      }
+      return createHeroBanner(data);
+    },
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["heroBanners"] });
+        toast.success(editingBannerId ? "Banner diperbarui" : "Banner ditambahkan");
+        setIsBannerModalOpen(false);
+      } else {
+        toast.error(res.error || "Gagal menyimpan banner");
+      }
+    },
+    onError: () => toast.error("Terjadi kesalahan sistem")
+  });
+
+  const deleteBannerMutation = useMutation({
+    mutationFn: async (id: string) => deleteHeroBanner(id),
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["heroBanners"] });
+        toast.success("Banner dihapus");
+        setIsDeleteDialogOpen(false);
+      } else toast.error(res.error);
+    }
+  });
+
+  const saveCarouselMutation = useMutation({
+    mutationFn: async (data: any) => {
+      if (editingCarouselId) {
+        return updateCarouselItem(editingCarouselId, data);
+      }
+      return createCarouselItem(data);
+    },
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["heroBanners"] });
+        toast.success(editingCarouselId ? "Foto diperbarui" : "Foto ditambahkan");
+        setIsCarouselModalOpen(false);
+      } else toast.error(res.error || "Gagal menyimpan foto");
+    }
+  });
+
+  const deleteCarouselMutation = useMutation({
+    mutationFn: async (id: string) => deleteCarouselItem(id),
+    onSuccess: (res) => {
+      if (res.success) {
+        queryClient.invalidateQueries({ queryKey: ["heroBanners"] });
+        toast.success("Foto dihapus");
+        setIsDeleteDialogOpen(false);
+      } else toast.error(res.error);
+    }
+  });
+
+  // --- ACTIONS HANDLERS ---
+  const handleSaveBanner = () => {
     if (!bTitle || !bSubtitle) {
       toast.error("Judul dan Subjudul wajib diisi");
       return;
     }
-    setIsLoading(true);
-    const data = {
+    saveBannerMutation.mutate({
       title: bTitle, subtitle: bSubtitle, description: bDescription,
       image: bImage, ctaText: bCtaText, ctaUrl: bCtaUrl,
       ctaSecondaryText: bCtaSecondaryText, ctaSecondaryUrl: bCtaSecondaryUrl,
       isActive: bIsActive === "true"
-    };
-
-    try {
-      if (editingBannerId) {
-        const res = await updateHeroBanner(editingBannerId, data);
-        if (res.success) {
-          setBanners(prev => prev.map(b => b.id === editingBannerId ? { ...res.data, carouselItems: b.carouselItems } : b));
-          toast.success("Banner diperbarui");
-        } else toast.error(res.error);
-      } else {
-        const res = await createHeroBanner(data);
-        if (res.success) {
-          setBanners(prev => [...prev, { ...res.data, carouselItems: [] }]);
-          toast.success("Banner ditambahkan");
-        } else toast.error(res.error);
-      }
-      setIsBannerModalOpen(false);
-    } catch (e) {
-      toast.error("Terjadi kesalahan");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   // --- CAROUSEL ACTIONS ---
@@ -141,69 +190,26 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
     setIsCarouselModalOpen(true);
   };
 
-  const handleSaveCarousel = async () => {
+  const handleSaveCarousel = () => {
+    if (!activeBannerIdForCarousel) return;
     if (!cImage) {
-      toast.error("Foto wajib diisi");
+      toast.error("Gambar wajib diisi");
       return;
     }
-    setIsLoading(true);
-    const data = {
-      marketplace: cMarketplace || "Foto", image: cImage, trustCount: "",
-      rating: "", isActive: cIsActive === "true"
-    };
-
-    try {
-      if (editingCarouselId) {
-        const res = await updateCarouselItem(editingCarouselId, data);
-        if (res.success) {
-          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel
-            ? { ...b, carouselItems: b.carouselItems.map((ci: any) => ci.id === editingCarouselId ? res.data : ci) }
-            : b));
-          toast.success("Item diperbarui");
-        } else toast.error(res.error);
-      } else {
-        if (!activeBannerIdForCarousel) return;
-        const res = await createCarouselItem({ ...data, heroBannerId: activeBannerIdForCarousel });
-        if (res.success) {
-          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel
-            ? { ...b, carouselItems: [...b.carouselItems, res.data] }
-            : b));
-          toast.success("Item ditambahkan");
-        } else toast.error(res.error);
-      }
-      setIsCarouselModalOpen(false);
-    } catch (e) {
-      toast.error("Terjadi kesalahan");
-    } finally {
-      setIsLoading(false);
-    }
+    saveCarouselMutation.mutate({
+      heroBannerId: activeBannerIdForCarousel,
+      marketplace: cMarketplace || "Foto",
+      image: cImage,
+      isActive: cIsActive === "true"
+    });
   };
 
-  // --- DELETE ACTIONS ---
-  const handleDelete = async () => {
+  const confirmDelete = () => {
     if (!deleteData) return;
-    try {
-      if (deleteData.type === 'banner') {
-        const res = await deleteHeroBanner(deleteData.id);
-        if (res.success) {
-          setBanners(prev => prev.filter(b => b.id !== deleteData.id));
-          toast.success("Banner dihapus");
-        } else toast.error(res.error);
-      } else {
-        const res = await deleteCarouselItem(deleteData.id);
-        if (res.success) {
-          setBanners(prev => prev.map(b => ({
-            ...b,
-            carouselItems: b.carouselItems.filter((ci: any) => ci.id !== deleteData.id)
-          })));
-          toast.success("Item dihapus");
-        } else toast.error(res.error);
-      }
-    } catch (e) {
-      toast.error("Terjadi kesalahan");
-    } finally {
-      setIsDeleteDialogOpen(false);
-      setDeleteData(null);
+    if (deleteData.type === 'banner') {
+      deleteBannerMutation.mutate(deleteData.id);
+    } else {
+      deleteCarouselMutation.mutate(deleteData.id);
     }
   };
 
@@ -222,7 +228,7 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
       </div>
 
       <div className="space-y-4">
-        {banners.map((banner) => (
+        {banners.map((banner: any) => (
           <div key={banner.id} className="admin-card p-5 flex flex-col gap-4 border border-slate-200 shadow-sm rounded-xl bg-white">
             <div className="flex items-center gap-5">
               <button className="text-muted-foreground cursor-grab">
@@ -280,11 +286,13 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             </div>
           </div>
         ))}
-        {banners.length === 0 && (
+        {isFetching && banners.length === 0 ? (
+          <TableSkeleton columns={1} rows={3} showActions={false} />
+        ) : banners.length === 0 ? (
           <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
             <p className="text-slate-500 font-medium">Belum ada data Hero Banner.</p>
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Banner Modal */}
@@ -338,8 +346,12 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsBannerModalOpen(false)}>Batal</Button>
-            <Button onClick={handleSaveBanner} disabled={isLoading}>{isLoading ? "Menyimpan..." : "Simpan Banner"}</Button>
+              <Button type="button" variant="outline" onClick={() => setIsBannerModalOpen(false)}>
+                Batal
+              </Button>
+              <Button type="button" onClick={handleSaveBanner} disabled={saveBannerMutation.isPending}>
+                {saveBannerMutation.isPending ? "Menyimpan..." : "Simpan"}
+              </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -371,8 +383,12 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCarouselModalOpen(false)}>Batal</Button>
-            <Button onClick={handleSaveCarousel} disabled={isLoading}>{isLoading ? "Menyimpan..." : "Simpan Foto"}</Button>
+              <Button type="button" variant="outline" onClick={() => setIsCarouselModalOpen(false)}>
+                Batal
+              </Button>
+              <Button type="button" onClick={handleSaveCarousel} disabled={saveCarouselMutation.isPending}>
+                {saveCarouselMutation.isPending ? "Menyimpan..." : "Simpan"}
+              </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -385,8 +401,10 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
             <AlertDialogDescription>Data yang dihapus tidak dapat dikembalikan lagi.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">Hapus</AlertDialogAction>
+            <AlertDialogCancel disabled={deleteBannerMutation.isPending || deleteCarouselMutation.isPending}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700" disabled={deleteBannerMutation.isPending || deleteCarouselMutation.isPending}>
+              {deleteBannerMutation.isPending || deleteCarouselMutation.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
