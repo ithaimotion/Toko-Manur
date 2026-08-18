@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Package, Tag, FileText, Star, Image as ImageIcon, Megaphone,
   ShoppingBag, Building2, Phone, Users, Settings, Baby, ChevronLeft,
-  ChevronRight, ExternalLink, Key, MessageSquare
+  ChevronRight, ExternalLink, Key, MessageSquare, Shield
 } from "lucide-react";
 
 interface NavItem {
@@ -47,6 +47,8 @@ const navSections: { title: string; items: NavItem[] }[] = [
     items: [
       { label: "Profil Perusahaan", href: "/admin/company-profile", icon: Building2 },
       { label: "Info Kontak", href: "/admin/contact-info", icon: Phone },
+      { label: "Kebijakan Privasi", href: "/admin/privacy-policy", icon: Shield },
+      { label: "Syarat & Ketentuan", href: "/admin/terms", icon: FileText },
     ],
   },
   {

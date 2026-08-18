@@ -12,8 +12,10 @@ import Image from "next/image";
 export function Header() {
   const router = useRouter();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profile, setProfile] = useState<{name: string, role: string, avatar?: string | null} | null>(null);
-
+  const [notifications, setNotifications] = useState<any[]>([]);
+  
   useEffect(() => {
     async function fetchUser() {
       const res = await getMyProfile();
@@ -21,11 +23,46 @@ export function Header() {
         setProfile(res.data);
       }
     }
+    async function fetchNotifications() {
+      try {
+        const res = await fetch("/api/notifications");
+        const json = await res.json();
+        if (json.success) {
+          setNotifications(json.data);
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
     fetchUser();
+    fetchNotifications();
+    
+    // Poll for notifications every 30 seconds
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const handleNotificationClick = async (id: string, link: string | null) => {
+    try {
+      await fetch("/api/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    } catch (e) {
+      // ignore
+    }
+
+    setNotificationsOpen(false);
+    if (link) {
+      router.push(link);
+    }
+  };
 
   const handleLogout = async () => {
     setUserMenuOpen(false);
+    setNotificationsOpen(false);
     await logoutAction();
     router.push("/admin/login");
   };
@@ -45,20 +82,66 @@ export function Header() {
       {/* Right */}
       <div className="flex items-center gap-3">
         {/* Notifications */}
-        <button
-          id="notifications-btn"
-          className="relative p-2 rounded-lg hover:bg-[#f8ebf6] transition-colors text-[#8a7d8d] hover:text-[#78a4cb]"
-          aria-label="Notifications"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
-        </button>
+        <div className="relative">
+          <button
+            id="notifications-btn"
+            onClick={() => {
+              setNotificationsOpen(!notificationsOpen);
+              setUserMenuOpen(false);
+            }}
+            className="relative p-2 rounded-lg hover:bg-[#f8ebf6] transition-colors text-[#8a7d8d] hover:text-[#78a4cb]"
+            aria-label="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+            {notifications.some(n => !n.isRead) && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+            )}
+          </button>
+
+          {notificationsOpen && (
+            <div className="absolute right-0 top-12 w-80 bg-[#fffdfd] rounded-xl border border-[#e8dce7] shadow-lg py-2 z-50 overflow-hidden">
+              <div className="px-4 py-2 border-b border-border flex items-center justify-between">
+                <h3 className="font-semibold text-sm">Notifikasi</h3>
+                <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full font-medium">
+                  {notifications.filter(n => !n.isRead).length} Baru
+                </span>
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-slate-500">Tidak ada notifikasi</div>
+                ) : (
+                  notifications.map((notif) => (
+                    <div 
+                      key={notif.id}
+                      onClick={() => handleNotificationClick(notif.id, notif.link)}
+                      className={`p-4 border-b border-border last:border-0 hover:bg-slate-50 cursor-pointer transition-colors ${!notif.isRead ? 'bg-primary/5' : ''}`}
+                    >
+                      <div className="flex justify-between items-start mb-1">
+                        <h4 className={`text-sm ${!notif.isRead ? 'font-semibold text-slate-900' : 'font-medium text-slate-700'}`}>
+                          {notif.title}
+                        </h4>
+                        {!notif.isRead && <span className="w-2 h-2 bg-primary rounded-full mt-1.5 shrink-0" />}
+                      </div>
+                      <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{notif.message}</p>
+                      <p className="text-[10px] text-slate-400 mt-2">
+                        {new Date(notif.createdAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* User Menu */}
         <div className="relative">
           <button
             id="user-menu-btn"
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            onClick={() => {
+              setUserMenuOpen(!userMenuOpen);
+              setNotificationsOpen(false);
+            }}
             className="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-[#f8ebf6] transition-colors"
           >
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center overflow-hidden border border-primary-200">

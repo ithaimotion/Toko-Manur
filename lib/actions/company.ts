@@ -26,6 +26,8 @@ function normalizeProfile(profile: any): CompanyProfile {
     brandStory: profile.brandStory,
     founded: profile.founded,
     legalDocuments: Array.isArray(profile.legalDocuments) ? profile.legalDocuments : JSON.parse(profile.legalDocuments || "[]"),
+    privacyPolicy: profile.privacyPolicy,
+    termsOfService: profile.termsOfService,
     updatedAt: typeof profile.updatedAt === "string" ? profile.updatedAt : profile.updatedAt.toISOString(),
   };
 }
@@ -46,6 +48,8 @@ async function readStoredProfile(): Promise<CompanyProfile> {
       brandStory: parsed.brandStory ?? fallbackProfile.brandStory,
       founded: parsed.founded ?? fallbackProfile.founded,
       legalDocuments: parsed.legalDocuments ?? fallbackProfile.legalDocuments,
+      privacyPolicy: parsed.privacyPolicy ?? fallbackProfile.privacyPolicy,
+      termsOfService: parsed.termsOfService ?? fallbackProfile.termsOfService,
       updatedAt: parsed.updatedAt ?? fallbackProfile.updatedAt,
     };
   } catch (err) {
@@ -80,6 +84,8 @@ export async function getCompanyProfile() {
           brandStory: fallbackProfile.brandStory,
           founded: fallbackProfile.founded,
           legalDocuments: fallbackProfile.legalDocuments as any,
+          privacyPolicy: fallbackProfile.privacyPolicy,
+          termsOfService: fallbackProfile.termsOfService,
         },
       });
 
@@ -88,10 +94,16 @@ export async function getCompanyProfile() {
 
     // If Prisma succeeded but is missing aboutImage (e.g. schema not pushed), fallback to local storage
     const normalized = normalizeProfile(profile);
-    if (!normalized.aboutImage) {
+    if (!normalized.aboutImage || !normalized.privacyPolicy || !normalized.termsOfService) {
       const storage = await readStoredProfile();
-      if (storage.aboutImage) {
+      if (!normalized.aboutImage && storage.aboutImage) {
         normalized.aboutImage = storage.aboutImage;
+      }
+      if (!normalized.privacyPolicy && storage.privacyPolicy) {
+        normalized.privacyPolicy = storage.privacyPolicy;
+      }
+      if (!normalized.termsOfService && storage.termsOfService) {
+        normalized.termsOfService = storage.termsOfService;
       }
     }
 
@@ -118,6 +130,8 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
       brandStory: payload.brandStory ?? "",
       founded: payload.founded ?? "",
       legalDocuments: (payload.legalDocuments ?? []) as any,
+      privacyPolicy: payload.privacyPolicy ?? null,
+      termsOfService: payload.termsOfService ?? null,
     };
 
     const updated = existing
@@ -126,6 +140,8 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
 
     revalidatePath("/about");
     revalidatePath("/");
+    revalidatePath("/privacy");
+    revalidatePath("/terms");
 
     const result = normalizeProfile(updated);
     result.aboutImage = savedStorage.aboutImage;
@@ -137,6 +153,8 @@ export async function updateCompanyProfile(payload: Partial<CompanyProfile>) {
 
     revalidatePath("/about");
     revalidatePath("/");
+    revalidatePath("/privacy");
+    revalidatePath("/terms");
 
     return { success: true, data: saved };
   }

@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import type { ContactInfo, ContactMessage } from "@/lib/types";
 import { mockContactInfo } from "@/lib/mock-data";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "./notifications";
 
 const fallbackContact: ContactInfo = {
   ...mockContactInfo,
@@ -333,6 +334,14 @@ export async function submitContactMessage(payload: {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
+    
+    await createNotification({
+      type: "CONTACT_MESSAGE",
+      title: "Pesan Baru",
+      message: `Pesan baru dari ${payload.name} (${payload.email})`,
+      link: "/admin/contact-info",
+    });
+
     revalidatePath("/contact-info");
     return { success: true, data: saved };
   }
@@ -348,6 +357,13 @@ export async function submitContactMessage(payload: {
       },
     });
 
+    await createNotification({
+      type: "CONTACT_MESSAGE",
+      title: "Pesan Baru",
+      message: `Pesan baru dari ${payload.name} (${payload.email})`,
+      link: "/admin/contact-info",
+    });
+
     revalidatePath("/contact-info");
     return { success: true, data: normalizeContactMessage(created) };
   } catch (error) {
@@ -356,6 +372,13 @@ export async function submitContactMessage(payload: {
       ...payload,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    });
+
+    await createNotification({
+      type: "CONTACT_MESSAGE",
+      title: "Pesan Baru",
+      message: `Pesan baru dari ${payload.name} (${payload.email})`,
+      link: "/admin/contact-info",
     });
 
     revalidatePath("/contact-info");

@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
     <div>
       <PageHeader
         title="Pengguna Sistem"
-        description="Kelola akun admin dan hak akses pengguna terhubung ke database XAMPP MySQL"
+        description="Kelola akun admin dan hak akses pengguna"
         breadcrumb={[{ label: "Dasbor", href: "/admin" }, { label: "Pengguna" }]}
         action={
           <button onClick={() => setShowModal(true)} className="btn-admin-primary">
@@ -156,7 +156,7 @@ export default function AdminUsersPage() {
                   {u.lastLogin ? new Date(u.lastLogin).toLocaleString("id-ID") : "Belum pernah"}
                 </td>
                 <td className="px-5 py-4">
-                  <button 
+                  <button
                     onClick={() => handleToggle(u.id, u.status)}
                     className={`badge-admin flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity ${u.status === "ACTIVE" ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
                   >
@@ -166,16 +166,16 @@ export default function AdminUsersPage() {
                 </td>
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-2 justify-end">
-                    <button 
-                      onClick={() => handleViewDetail(u)} 
+                    <button
+                      onClick={() => handleViewDetail(u)}
                       className="p-1.5 hover:bg-primary-50 hover:text-primary-600 rounded-md transition-colors text-muted-foreground"
                       title="Detail Pengguna"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     {u.role !== "SUPER_ADMIN" && (
-                      <button 
-                        onClick={() => setDeleteTarget({ id: u.id, name: u.name })} 
+                      <button
+                        onClick={() => setDeleteTarget({ id: u.id, name: u.name })}
                         className="p-1.5 hover:bg-red-50 hover:text-destructive rounded-md transition-colors text-muted-foreground"
                         title="Hapus Pengguna"
                       >
@@ -205,31 +205,31 @@ export default function AdminUsersPage() {
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
                 <label className="admin-label">Nama Lengkap</label>
-                <input 
-                  type="text" 
-                  value={formData.name} 
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
-                  placeholder="Masukkan nama" 
-                  className="admin-input" 
-                  required 
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Masukkan nama"
+                  className="admin-input"
+                  required
                 />
               </div>
               <div>
                 <label className="admin-label">Email</label>
-                <input 
-                  type="email" 
-                  value={formData.email} 
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                  placeholder="email@tokomanur.id" 
-                  className="admin-input" 
-                  required 
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="email@tokomanur.id"
+                  className="admin-input"
+                  required
                 />
               </div>
               <div>
                 <label className="admin-label">Peran (Role)</label>
-                <select 
-                  value={formData.role} 
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as Role })} 
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value as Role })}
                   className="admin-input"
                 >
                   <option value="EDITOR">Editor</option>
@@ -255,7 +255,7 @@ export default function AdminUsersPage() {
           <div className="bg-background border border-border rounded-2xl w-full max-w-lg p-6 shadow-2xl flex flex-col max-h-[85vh]">
             <h2 className="text-lg font-bold text-foreground mb-1">Detail Pengguna</h2>
             <p className="text-sm text-muted-foreground mb-4">Melihat log aktivitas {detailTarget.name}</p>
-            
+
             <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin">
               {loadingActivities ? (
                 <div className="flex items-center justify-center py-10">

@@ -32,9 +32,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { ImageUpload } from "@/components/admin/ui/ImageUpload";
-import { 
-  createHeroBanner, 
-  updateHeroBanner, 
+import {
+  createHeroBanner,
+  updateHeroBanner,
   deleteHeroBanner,
   createCarouselItem,
   updateCarouselItem,
@@ -43,12 +43,12 @@ import {
 
 export default function HeroBannerClient({ initialBanners }: { initialBanners: any[] }) {
   const [banners, setBanners] = useState<any[]>(initialBanners);
-  
+
   // Modals state
   const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
   const [isCarouselModalOpen, setIsCarouselModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  
+
   // IDs state
   const [editingBannerId, setEditingBannerId] = useState<string | null>(null);
   const [editingCarouselId, setEditingCarouselId] = useState<string | null>(null);
@@ -70,8 +70,6 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
   // Carousel Form State
   const [cMarketplace, setCMarketplace] = useState("");
   const [cImage, setCImage] = useState("");
-  const [cTrustCount, setCTrustCount] = useState("");
-  const [cRating, setCRating] = useState("");
   const [cIsActive, setCIsActive] = useState("true");
 
   // --- BANNER ACTIONS ---
@@ -131,35 +129,35 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
   const openAddCarousel = (bannerId: string) => {
     setActiveBannerIdForCarousel(bannerId);
     setEditingCarouselId(null);
-    setCMarketplace(""); setCImage(""); setCTrustCount(""); setCRating(""); setCIsActive("true");
+    setCMarketplace(""); setCImage(""); setCIsActive("true");
     setIsCarouselModalOpen(true);
   };
 
   const openEditCarousel = (bannerId: string, c: any) => {
     setActiveBannerIdForCarousel(bannerId);
     setEditingCarouselId(c.id);
-    setCMarketplace(c.marketplace); setCImage(c.image); setCTrustCount(c.trustCount);
-    setCRating(c.rating); setCIsActive(c.isActive ? "true" : "false");
+    setCMarketplace(c.marketplace || ""); setCImage(c.image);
+    setCIsActive(c.isActive ? "true" : "false");
     setIsCarouselModalOpen(true);
   };
 
   const handleSaveCarousel = async () => {
-    if (!cMarketplace || !cImage) {
-      toast.error("Marketplace dan Gambar wajib diisi");
+    if (!cImage) {
+      toast.error("Foto wajib diisi");
       return;
     }
     setIsLoading(true);
     const data = {
-      marketplace: cMarketplace, image: cImage, trustCount: cTrustCount,
-      rating: cRating, isActive: cIsActive === "true"
+      marketplace: cMarketplace || "Foto", image: cImage, trustCount: "",
+      rating: "", isActive: cIsActive === "true"
     };
 
     try {
       if (editingCarouselId) {
         const res = await updateCarouselItem(editingCarouselId, data);
         if (res.success) {
-          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel 
-            ? { ...b, carouselItems: b.carouselItems.map((ci: any) => ci.id === editingCarouselId ? res.data : ci) } 
+          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel
+            ? { ...b, carouselItems: b.carouselItems.map((ci: any) => ci.id === editingCarouselId ? res.data : ci) }
             : b));
           toast.success("Item diperbarui");
         } else toast.error(res.error);
@@ -167,8 +165,8 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
         if (!activeBannerIdForCarousel) return;
         const res = await createCarouselItem({ ...data, heroBannerId: activeBannerIdForCarousel });
         if (res.success) {
-          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel 
-            ? { ...b, carouselItems: [...b.carouselItems, res.data] } 
+          setBanners(prev => prev.map(b => b.id === activeBannerIdForCarousel
+            ? { ...b, carouselItems: [...b.carouselItems, res.data] }
             : b));
           toast.success("Item ditambahkan");
         } else toast.error(res.error);
@@ -213,8 +211,8 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
     <div>
       <div className="mb-4 flex justify-end">
         <div title={banners.length > 0 ? "Bisa digunakan jika belum memiliki banner" : ""}>
-          <Button 
-            onClick={openAddBanner} 
+          <Button
+            onClick={openAddBanner}
             className="gap-2 bg-primary hover:bg-primary-600 text-white rounded-full px-6"
             disabled={banners.length > 0}
           >
@@ -250,11 +248,11 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
                 </Button>
               </div>
             </div>
-            
+
             <div className="pl-10 mt-2 pt-4 border-t border-slate-100 bg-slate-50/50 rounded-b-xl -mx-5 -mb-5 px-5 pb-5">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" /> Carousel Marketplaces
+                  <ImageIcon className="w-4 h-4" /> Foto Carousel (Slideshow)
                 </h4>
                 <Button variant="outline" size="sm" onClick={() => openAddCarousel(banner.id)} className="h-8 rounded-full px-4 text-xs border-primary/20 text-primary hover:bg-primary hover:text-white">
                   <Plus className="w-3.5 h-3.5 mr-1" /> Tambah Foto
@@ -264,10 +262,11 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
                 {banner.carouselItems?.map((item: any) => (
                   <div key={item.id} className="border border-slate-200 rounded-lg overflow-hidden group relative bg-white shadow-sm hover:shadow-md transition-shadow">
                     <img src={item.image} alt={item.marketplace} className="w-full h-28 object-cover" />
-                    <div className="p-2.5 border-t border-slate-100">
-                      <p className="text-xs font-semibold text-slate-800">{item.marketplace}</p>
-                      <p className="text-[10px] text-slate-500 mt-1">⭐ {item.rating} • {item.trustCount}</p>
-                    </div>
+                    {item.marketplace && item.marketplace !== "Foto" && (
+                      <div className="p-2.5 border-t border-slate-100">
+                        <p className="text-xs font-semibold text-slate-800 line-clamp-1">{item.marketplace}</p>
+                      </div>
+                    )}
                     <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => openEditCarousel(banner.id, item)} className="p-1.5 bg-white/90 backdrop-blur-sm text-blue-600 rounded-md hover:bg-blue-50 shadow-sm"><Pencil className="w-3 h-3" /></button>
                       <button onClick={() => { setDeleteData({ type: 'carousel', id: item.id }); setIsDeleteDialogOpen(true); }} className="p-1.5 bg-white/90 backdrop-blur-sm text-red-600 rounded-md hover:bg-red-50 shadow-sm"><Trash2 className="w-3 h-3" /></button>
@@ -283,7 +282,7 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
         ))}
         {banners.length === 0 && (
           <div className="text-center py-12 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
-             <p className="text-slate-500 font-medium">Belum ada data Hero Banner.</p>
+            <p className="text-slate-500 font-medium">Belum ada data Hero Banner.</p>
           </div>
         )}
       </div>
@@ -353,22 +352,12 @@ export default function HeroBannerClient({ initialBanners }: { initialBanners: a
           </DialogHeader>
           <div className="grid grid-cols-1 gap-4 py-4">
             <div className="space-y-2">
-              <Label>Nama Marketplace *</Label>
-              <Input value={cMarketplace} onChange={e => setCMarketplace(e.target.value)} placeholder="Cth: Shopee" />
+              <Label>Judul Foto (Opsional)</Label>
+              <Input value={cMarketplace} onChange={e => setCMarketplace(e.target.value)} placeholder="Cth: Suasana Toko" />
             </div>
             <div className="space-y-2">
-              <Label>Foto / Logo Marketplace *</Label>
-              <ImageUpload value={cImage} onChange={setCImage} label="Upload Logo" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Rating (Cth: 4.9/5)</Label>
-                <Input value={cRating} onChange={e => setCRating(e.target.value)} />
-              </div>
-              <div className="space-y-2">
-                <Label>Angka Kepercayaan</Label>
-                <Input value={cTrustCount} onChange={e => setCTrustCount(e.target.value)} placeholder="Cth: 15,000+" />
-              </div>
+              <Label>Foto *</Label>
+              <ImageUpload value={cImage} onChange={setCImage} label="Upload Foto" />
             </div>
             <div className="space-y-2">
               <Label>Status</Label>

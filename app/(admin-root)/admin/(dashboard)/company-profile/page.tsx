@@ -26,6 +26,7 @@ export default function AdminCompanyProfilePage() {
     mission: "",
     brandStory: "",
     founded: "",
+    privacyPolicy: "",
     values: [] as any[],
     legalDocuments: [] as any[],
   }));
@@ -45,6 +46,7 @@ export default function AdminCompanyProfilePage() {
             mission: Array.isArray(p.mission) ? p.mission.join('\n') : (p.mission || '').toString(),
             brandStory: p.brandStory || "",
             founded: p.founded || "",
+            privacyPolicy: p.privacyPolicy || "",
             values: (p.values || []).map((v: any) => ({ ...v })),
             legalDocuments: (p.legalDocuments || []).map((d: any) => ({ ...d })),
           });
@@ -66,6 +68,7 @@ export default function AdminCompanyProfilePage() {
         mission: form.mission.split("\n").filter(Boolean),
         brandStory: form.brandStory,
         founded: form.founded,
+        privacyPolicy: form.privacyPolicy,
         values: form.values,
         legalDocuments: form.legalDocuments,
       };
@@ -216,6 +219,8 @@ export default function AdminCompanyProfilePage() {
           </div>
           <textarea value={form.brandStory} onChange={(e) => setForm(p => ({ ...p, brandStory: e.target.value }))} rows={5} className="admin-input resize-y" />
         </div>
+
+
 
         {/* Values */}
         <div className="admin-card p-6 lg:col-span-2">

@@ -25,6 +25,12 @@ enum RequestStatus {
   REJECTED
 }
 
+enum NotificationType {
+  CONTACT_MESSAGE
+  SYSTEM_ALERT
+  GENERAL
+}
+
 model User {
   id         String         @id @default(cuid())
   name       String
@@ -76,6 +82,19 @@ model ContactMessage {
   @@map("contact_messages")
 }
 
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType @default(GENERAL)
+  title     String
+  message   String           @db.Text
+  isRead    Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@map("notifications")
+}
+
 model CompanyProfile {
   id             String   @id @default(cuid())
   about          String   @db.Text
@@ -84,7 +103,9 @@ model CompanyProfile {
   values         Json
   brandStory     String   @db.Text
   founded        String
-  legalDocuments Json
+  legalDocuments Json?    @default("[]") // Array of { id, name, number, issuedBy, issuedDate }
+  privacyPolicy  String?  @db.Text
+  termsOfService String?  @db.Text
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

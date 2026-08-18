@@ -11,21 +11,21 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ banner }: HeroSectionProps) {
-  const marketplaces = banner.carouselItems && banner.carouselItems.length > 0 
-    ? banner.carouselItems 
+  const marketplaces = banner.carouselItems && banner.carouselItems.length > 0
+    ? banner.carouselItems
     : [
-        {
-          id: "default",
-          heroBannerId: "",
-          marketplace: "Toko Manur",
-          image: banner.image || "https://placehold.co/800x600/EE4D2D/white?text=Toko+Manur",
-          trustCount: "0",
-          rating: "0",
-          isActive: true,
-          order: 1,
-          createdAt: new Date().toISOString(),
-        }
-      ];
+      {
+        id: "default",
+        heroBannerId: "",
+        marketplace: "Toko Manur",
+        image: banner.image || "https://placehold.co/800x600/EE4D2D/white?text=Toko+Manur",
+        trustCount: "0",
+        rating: "0",
+        isActive: true,
+        order: 1,
+        createdAt: new Date().toISOString(),
+      }
+    ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -59,7 +59,7 @@ export function HeroSection({ banner }: HeroSectionProps) {
 
             <div className="w-full mb-2 lg:mb-4 -ml-2 lg:-ml-4">
               <div className="relative w-full aspect-[3/1] max-w-2xl -ml-2 sm:-ml-4">
-                <Image 
+                <Image
                   src="/Logo Manur HD.png"
                   alt="Toko Manur"
                   fill
@@ -150,9 +150,8 @@ export function HeroSection({ banner }: HeroSectionProps) {
               {marketplaces.map((marketplace, index) => (
                 <div
                   key={marketplace.id}
-                  className={`absolute inset-0 transition-opacity duration-1000 ${
-                    index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-                  }`}
+                  className={`absolute inset-0 transition-opacity duration-1000 ${index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+                    }`}
                 >
                   <Image
                     src={marketplace.image}
@@ -172,34 +171,20 @@ export function HeroSection({ banner }: HeroSectionProps) {
                   <button
                     key={index}
                     onClick={() => setCurrentIndex(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                      index === currentIndex 
-                        ? "bg-white w-8" 
-                        : "bg-white/50 hover:bg-white/80"
-                    }`}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${index === currentIndex
+                      ? "bg-white w-8"
+                      : "bg-white/50 hover:bg-white/80"
+                      }`}
                     aria-label={`Go to slide ${index + 1}`}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Floating card - Trust */}
-            <div 
-              key={`trust-${currentIndex}`}
-              className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card p-4 flex items-center gap-3 animate-fade-in-up z-30"
-            >
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Kepercayaan</p>
-                <p className="font-bold text-slate-900 text-lg transition-all duration-300">{activeMarketplace.trustCount}</p>
-                <p className="text-xs text-slate-500">Bunda Puas di {activeMarketplace.marketplace}</p>
-              </div>
-            </div>
+
 
             {/* Rating card */}
-            <div 
+            {/* <div
               key={`rating-${currentIndex}`}
               className="absolute -top-4 -right-4 bg-white rounded-2xl shadow-card p-3 animate-fade-in-up z-30"
             >
@@ -211,7 +196,7 @@ export function HeroSection({ banner }: HeroSectionProps) {
                 ))}
               </div>
               <p className="text-xs text-slate-500 font-medium transition-all duration-300">Rating {activeMarketplace.rating}</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

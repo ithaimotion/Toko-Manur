@@ -215,6 +215,8 @@ export interface CompanyProfile {
   brandStory: string;
   founded: string;
   legalDocuments: LegalDocument[];
+  privacyPolicy?: string;
+  termsOfService?: string;
   updatedAt: string;
 }
 
@@ -246,6 +248,19 @@ export interface ContactMessage {
   phone?: string;
   subject: string;
   message: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NotificationType = "CONTACT_MESSAGE" | "SYSTEM_ALERT" | "GENERAL";
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  isRead: boolean;
+  link?: string | null;
   createdAt: string;
   updatedAt: string;
 }
