@@ -108,7 +108,7 @@ export function Sidebar({ productCount = 0, blogCount = 0, categoryCount = 0, br
       {/* Logo */}
       <div className={`flex items-center h-16 border-b border-sidebar-border px-4 ${collapsed ? "justify-center" : "gap-3"}`}>
         <div className="w-8 h-8 relative rounded-lg overflow-hidden shrink-0">
-          <Image src="/logo-manur.png" alt="Toko Manur Logo" fill className="object-contain" />
+          <Image src="/Logo Manur HD.png" alt="Toko Manur Logo" fill className="object-contain" />
         </div>
         {!collapsed && (
           <div>
