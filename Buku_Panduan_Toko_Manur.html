@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buku Panduan Website Toko Manur</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f8f8;
+      color: #2d2d2d;
+      line-height: 1.75;
+      padding: 40px 20px;
+    }
+
+    .document-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    /* Print settings */
+    @media print {
+      body { background: white; padding: 0; }
+      .document-container { box-shadow: none; border-radius: 0; max-width: 100%; }
+      .no-print { display: none; }
+      .page-break { page-break-after: always; }
+      
+      /* Make sure table header/footer repeats on every page */
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
+      
+      /* Avoid breaking inside sections if possible */
+      .section, .info-box, .feature-card { page-break-inside: avoid; }
+    }
+
+    /* Repeating Header */
+    .print-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      padding-top: 40px; /* Extra padding for print margins */
+    }
+    .print-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #333;
+    }
+    .print-header .logo span.icon {
+      background: #cf2525;
+      color: white;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    .print-header .date {
+      font-weight: 700;
+      color: #cf2525;
+      font-size: 14px;
+    }
+
+    /* Repeating Footer */
+    .print-footer {
+      padding: 20px 40px;
+      padding-bottom: 40px; /* Extra padding for print margins */
+    }
+    .print-footer-inner {
+      border-top: 1px solid #cf2525;
+      padding-top: 16px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .footer-col {
+      font-size: 11px;
+    }
+    .footer-col .label {
+      color: #cf2525;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .footer-col .value {
+      font-weight: 700;
+      color: #333;
+    }
+
+    /* Table Layout for Repeating Header/Footer */
+    .content-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .content-cell {
+      padding: 20px 56px;
+    }
+
+    /* Cover */
+    .cover {
+      background: linear-gradient(135deg, #cf2525 0%, #8b1010 100%);
+      color: white;
+      padding: 120px 56px;
+      text-align: center;
+      height: 80vh; /* Make cover take most of first page */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .cover .logo {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 32px;
+    }
+    .cover h1 {
+      font-family: 'Merriweather', serif;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 24px;
+    }
+    .cover p {
+      font-size: 16px;
+      opacity: 0.85;
+      max-width: 500px;
+      margin: 0 auto 40px;
+    }
+    .cover .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 10px 24px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* Section Styles */
+    .section { margin-bottom: 48px; }
+    .section-number {
+      display: inline-block;
+      background: #cf2525;
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    h2 {
+      font-family: 'Merriweather', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #f0e0e0;
+      padding-bottom: 12px;
+    }
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #cf2525;
+      margin: 28px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h3::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: #cf2525;
+      border-radius: 2px;
+    }
+    p { font-size: 14px; color: #444; margin-bottom: 14px; }
+    ul, ol { padding-left: 20px; margin-bottom: 14px; }
+    li { font-size: 14px; color: #444; margin-bottom: 8px; }
+    strong { color: #1a1a1a; font-weight: 600; }
+
+    /* Elements */
+    .info-box {
+      background: #fff8f8;
+      border-left: 4px solid #cf2525;
+      border-radius: 0 8px 8px 0;
+      padding: 18px 24px;
+      margin: 24px 0;
+    }
+    .info-box .label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #cf2525;
+      margin-bottom: 8px;
+    }
+    .info-box p { margin: 0; font-size: 14px; color: #555; }
+    
+    .step-list { counter-reset: step-counter; list-style: none; padding: 0; margin-bottom: 24px; }
+    .step-list li { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+    .step-list li::before {
+      content: counter(step-counter);
+      counter-increment: step-counter;
+      min-width: 30px;
+      height: 30px;
+      background: #cf2525;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+    .feature-card { background: #fafafa; border: 1px solid #ebebeb; border-radius: 12px; padding: 20px; }
+    .feature-card .icon { font-size: 24px; margin-bottom: 12px; }
+    .feature-card .title { font-size: 14px; font-weight: 700; color: #cf2525; margin-bottom: 6px; }
+    .feature-card .desc { font-size: 13px; color: #666; line-height: 1.6; }
+
+    .tip-box {
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .tip-box .tip-icon { font-size: 20px; flex-shrink: 0; }
+    .tip-box p { margin: 0; font-size: 13.5px; color: #78350f; }
+
+    kbd {
+      background: #f3f3f3;
+      border: 1px solid #ccc;
+      border-bottom: 3px solid #999;
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #333;
+    }
+
+    table.data-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+    table.data-table thead tr { background: #cf2525; color: white; }
+    table.data-table thead th { padding: 12px 16px; text-align: left; font-weight: 600; }
+    table.data-table tbody tr:nth-child(even) { background: #fafafa; }
+    table.data-table tbody td { padding: 12px 16px; color: #444; border-bottom: 1px solid #f0f0f0; }
+    table.data-table tbody td strong { color: #cf2525; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Print button (hidden on print) -->
+  <div class="no-print" style="max-width:1000px;margin:0 auto 20px;text-align:right;">
+    <button onclick="window.print()" style="background:#cf2525;color:white;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(207,37,37,0.3); transition: transform 0.2s;">
+      🖨️ Simpan / Cetak sebagai PDF
+    </button>
+  </div>
+
+  <div class="document-container">
+    
+    <!-- Cover Page -->
+    <div class="cover page-break">
+      <div class="logo">🏪 Toko Manur</div>
+      <h1>Sistem Pengelolaan<br>Dasbor</h1>
+      <p>Panduan lengkap untuk Admin/Pemilik Toko dalam mengelola konten dan tampilan website secara mandiri.</p>
+      <div class="badge">Agustus 2026</div>
+    </div>
+
+    <!-- Main Content with Repeating Header and Footer -->
+    <table class="content-table">
+      
+      <!-- Repeating Header -->
+      <thead>
+        <tr>
+          <td>
+            <div class="print-header">
+              <div class="logo">
+                <span class="icon">🏪</span>
+                Toko Manur
+              </div>
+              <div class="date">Agustus 2026</div>
+            </div>
+          </td>
+        </tr>
+      </thead>
+
+      <!-- Content Body -->
+      <tbody>
+        <tr>
+          <td class="content-cell">
+
+            <!-- BAGIAN 1 -->
+            <div class="section">
+              <span class="section-number">Pendahuluan</span>
+              <h2>Konsep Dasar — Bagaimana Website Ini Bekerja?</h2>
+              <p>Panduan ini dibuat untuk membantu pengguna memahami cara menggunakan Sistem Pengelolaan Dasbor Toko Manur.</p>
+              <p>Website Toko Manur terdiri dari dua bagian utama yang saling terhubung seperti <strong>etalase toko</strong> dan <strong>dapur rahasia</strong>.</p>
+
+              <div class="feature-grid">
+                <div class="feature-card">
+                  <div class="icon">🌐</div>
+                  <div class="title">Landing Page (Etalase)</div>
+                  <div class="desc">Halaman yang dilihat semua orang di internet. Berisi banner promo, katalog produk, artikel, dan testimoni pelanggan.</div>
+                </div>
+                <div class="feature-card">
+                  <div class="icon">🔐</div>
+                  <div class="title">Panel Admin (Dasbor)</div>
+                  <div class="desc">Ruangan khusus milik Anda. Hanya bisa diakses dengan email & password rahasia. Semua perubahan di sini langsung tampil di halaman depan!</div>
+                </div>
+              </div>
+
+              <div class="info-box">
+                <div class="label">💡 Contoh Nyata</div>
+                <p>Ingin ganti gambar promo di halaman depan? Anda tidak perlu menghubungi programmer. Cukup masuk ke Panel Admin → klik <strong>Hero Banner</strong> → upload foto baru → klik Simpan. Selesai! Gambar berubah secara otomatis!</p>
+              </div>
+            </div>
+
+            <div class="page-break"></div>
+
+            <!-- BAGIAN 2 -->
+            <div class="section">
+              <span class="section-number">Panduan Pengunjung</span>
+              <h2>Halaman Depan (Landing Page)</h2>
+              <p>Halaman depan dirancang agar sangat memanjakan mata pengunjung. Berikut adalah fitur-fitur yang tersedia untuk pengunjung:</p>
+
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Fitur</th>
+                    <th>Fungsi dan Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>Hero Banner</strong></td><td>Gambar spanduk besar di bagian paling atas, ideal untuk promo atau pengumuman penting</td></tr>
+                  <tr><td><strong>Kategori Produk</strong></td><td>Mengelompokkan produk berdasarkan jenis agar mudah ditemukan pengunjung</td></tr>
+                  <tr><td><strong>Produk Unggulan</strong></td><td>Menampilkan produk terlaris, dilengkapi tombol "Beli via WhatsApp"</td></tr>
+                  <tr><td><strong>Artikel / Blog</strong></td><td>Konten tips dan berita toko agar website mudah ditemukan di Google</td></tr>
+                  <tr><td><strong>Testimoni</strong></td><td>Ulasan pelanggan nyata untuk membangun kepercayaan pembeli baru</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- BAGIAN 3 -->
+            <div class="section">
+              <span class="section-number">Panduan Admin</span>
+              <h2>Menggunakan Dasbor Admin</h2>
+
+              <h3>Cara Masuk (Login)</h3>
+              <ol class="step-list">
+                <li>Buka browser (Chrome/Safari) lalu ketik alamat: <strong>www.tokomanur.id/admin/login</strong></li>
+                <li>Masukkan <strong>Email</strong> dan <strong>Kata Sandi</strong> rahasia Anda</li>
+                <li>Klik tombol <strong>"Masuk"</strong> yang berwarna merah</li>
+              </ol>
+
+              <h3>Dasbor (Halaman Utama Admin)</h3>
+              <p>Setelah login, Anda akan melihat "Dasbor" — pusat informasi toko yang menampilkan angka-angka penting:</p>
+              <ul>
+                <li>📦 <strong>Total Produk</strong> — berapa produk yang sudah terpajang</li>
+                <li>📝 <strong>Total Artikel</strong> — berapa artikel yang sudah ditulis</li>
+                <li>⭐ <strong>Review Terkumpul</strong> — berapa ulasan dari pelanggan</li>
+                <li>👥 <strong>Pengunjung Bulan Ini</strong> — data pengunjung real dari Google Analytics</li>
+              </ul>
+            </div>
+
+            <div class="page-break"></div>
+
+            <div class="section">
+              <h2>Mengelola Konten & Tampilan</h2>
+              
+              <div class="info-box">
+                <div class="label">🖼️ Hero Banner (Spanduk Promo)</div>
+                <p>Klik menu <strong>"Hero Banner"</strong> di sidebar kiri. Klik <strong>"Tambah Banner"</strong>, isi judul, subjudul, dan upload gambar. Aktifkan statusnya menjadi <strong>"Aktif"</strong> agar langsung tampil di halaman depan. Anda bisa memiliki beberapa banner sekaligus yang akan bergantian tampil otomatis!</p>
+              </div>
+
+              <div class="info-box">
+                <div class="label">🏷️ Kategori & Produk</div>
+                <p>Klik <strong>"Kategori"</strong> untuk menambah jenis barang (misal: Susu, Mainan). Lalu di menu <strong>"Produk"</strong> → <strong>"Tambah Produk Baru"</strong>, isi nama produk, harga (boleh dikosongkan), deskripsi, dan upload foto. Status <strong>"Aktif"</strong> membuat produk tampil ke pengunjung, sedangkan <strong>"Draft"</strong> hanya menyimpannya di draf.</p>
+              </div>
+
+              <div class="info-box">
+                <div class="label">📞 Info Kontak (Nomor WhatsApp)</div>
+                <p>Jika nomor WhatsApp toko berubah, cukup ubah sekali di menu <strong>"Info Kontak"</strong>. Secara otomatis, <em>semua</em> tombol "Hubungi Kami" dan "Beli via WhatsApp" di seluruh halaman website akan berubah ke nomor baru tanpa perlu mengubah satu per satu!</p>
+              </div>
+            </div>
+
+            <!-- BAGIAN 4 -->
+            <div class="section">
+              <span class="section-number">Ringkasan</span>
+              <h2>Daftar Hubungan: Admin → Landing Page</h2>
+              <p>Berikut adalah ringkasan yang menjelaskan setiap aksi di Panel Admin dan dampaknya ke halaman depan:</p>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tindakan Anda di Dasbor Admin...</th>
+                    <th>...Perubahan yang terjadi di Halaman Depan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Ubah Hero Banner ke "Aktif"</td><td>Gambar promo raksasa di halaman paling atas berubah/berganti</td></tr>
+                  <tr><td>Tambah Kategori (misal "Popok")</td><td>Menu "Popok" muncul di navigasi atas dan filter kategori</td></tr>
+                  <tr><td>Tambah Produk baru dengan "Aktif"</td><td>Produk langsung ter-pajang di katalog produk terbaru</td></tr>
+                  <tr><td>Ubah status Produk menjadi "Draft"</td><td>Produk otomatis menghilang atau disembunyikan dari pengunjung</td></tr>
+                  <tr><td>Tulis Artikel Baru (Terbit)</td><td>Artikel baru muncul di daftar Berita & Tips</td></tr>
+                  <tr><td>Ubah Nomor WhatsApp di Info Kontak</td><td>SEMUA tombol "Beli" & "Hubungi" langsung mengarah ke nomor baru</td></tr>
+                </tbody>
+              </table>
+
+              <div class="tip-box">
+                <div class="tip-icon">⚡</div>
+                <p><strong>Pintasan Cepat:</strong> Tekan tombol <kbd>Ctrl</kbd> + <kbd>K</kbd> secara bersamaan. Kotak pencarian akan muncul. Ketik halaman yang ingin Anda tuju lalu tekan Enter. Lebih cepat daripada mencari menu di sidebar!</p>
+              </div>
+            </div>
+
+          </td>
+        </tr>
+      </tbody>
+
+      <!-- Repeating Footer -->
+      <tfoot>
+        <tr>
+          <td>
+            <div class="print-footer">
+              <div class="print-footer-inner">
+                <div class="footer-col">
+                  <div class="label">WhatsApp</div>
+                  <div class="value">0821 1234 5678</div>
+                </div>
+                <div class="footer-col">
+                  <div class="label">Email</div>
+                  <div class="value">admin@tokomanur.id</div>
+                </div>
+                <div class="footer-col">
+                  <div class="label">Website</div>
+                  <div class="value">tokomanur.id</div>
+                </div>
+                <div class="footer-col">
+                  <div class="label">Office</div>
+                  <div class="value">Kota Makassar, Sulawesi Selatan</div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+
+    </table>
+  </div>
+
+</body>
+</html>
